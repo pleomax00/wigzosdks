@@ -126,24 +126,22 @@ public class WigzoSDK {
         else{
             this.serverUrl = serverURL;
         }
-
-        this.deviceId  = UUID.randomUUID().toString();
-   /*     WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
-        this.sharedStorage = wigzoSharedStorage.getSharedStorage();
-        sharedStorage.edit().putString(Configuration.DEVICE_ID_KEY.value, deviceId).apply();*/
-
         //TODO: Disabled only for testing. Enable it later
        /* if (sslContext == null ){
             throw new IllegalArgumentException("Valid SSL Context is required!");
         }else {*/
-            this.sslContext = sslContext;
+        this.sslContext = sslContext;
         //}
-
-        if(!this.wigzoSdkInitialized){
-            final String userData = getUserIdentificationData();
-            final String url = serverURL + "/androidsdk/getinitialdata";
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+        this.sharedStorage = wigzoSharedStorage.getSharedStorage();
+        String storedDeviceId = this.sharedStorage.getString(Configuration.DEVICE_ID_KEY.value, "");
+        if(storedDeviceId != null && !storedDeviceId.isEmpty()){
+           this.deviceId  = UUID.randomUUID().toString();
+           this.sharedStorage.edit().putString(Configuration.DEVICE_ID_KEY.value, deviceId).apply();
+           final String userData = getUserIdentificationData();
+           final String url = serverURL + "/androidsdk/getinitialdata";
+           ExecutorService executorService = Executors.newSingleThreadExecutor();
+           Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
                 public Boolean call()  {
                     Boolean success = ConnectionStream.sendData(url,userData);
                     return success;
@@ -158,7 +156,6 @@ public class WigzoSDK {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-
         }
 
         return this;

@@ -43,7 +43,7 @@ public class WigzoSharedStorage {
     public List<EventInfo> getEventList(){
         List<EventInfo> eventInfoList = new ArrayList<>();
         Gson gson = new Gson();
-        String eventsStr = sharedStorage.getString(Configuration.EVENTS_KEY.key, "");
+        String eventsStr = sharedStorage.getString(Configuration.EVENTS_KEY.value, "");
         if(eventsStr != null && !eventsStr.isEmpty())
             eventInfoList = gson.fromJson(eventsStr, new TypeToken<List<EventInfo>>() { }.getType());
         return eventInfoList;
