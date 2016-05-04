@@ -2,10 +2,12 @@ package wigzo.sdk;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.util.Log;
 import com.google.gson.Gson;
-import java.net.MalformedURLException;
-import java.net.URL;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import javax.net.ssl.SSLContext;
 
 import wigzo.sdk.helpers.Configuration;
 import wigzo.sdk.helpers.ConnectionStream;
@@ -44,28 +45,16 @@ import wigzo.sdk.model.EventInfo;
 
 public class WigzoSDK {
 
-    private SSLContext sslContext;
-    private List<String> publicKeyPinCertificates;
     private boolean wigzoSdkInitialized = false;
     private Context context;
     private SharedPreferences sharedStorage = null;
-    private static String serverUrl;
     private String deviceId;
     private String orgToken;
-    private boolean enableLogging;
+    private boolean enableLogging = true;
     private long startTime;
 
 
-    public boolean isEnableLogging() {
-        return enableLogging;
-    }
 
-    public void setEnableLogging(boolean enableLogging) {
-        this.enableLogging = enableLogging;
-    }
-    public  void setContext(Context context) {
-        this.context = context;
-    }
 
     /**
      * Enum used in Wigzo.initMessaging() method which controls what kind of
@@ -101,13 +90,13 @@ public class WigzoSDK {
      * Initializes the Wigzo SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * @param context application context
-     * @param serverURL URL of the Wigzo server to submit data to; use "https://analytics.wigzo.com" for Wigzo Cloud
      * @param orgToken    unique Id for organization provided by wigzo to organization
      * @return Wigzo instance for easy method chaining
      * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws IllegalStateException if initializeWigzoData has previously been called with different values during the same application instance
      */
-    public WigzoSDK initializeWigzoData(Context context, String serverURL, String orgToken, SSLContext sslContext) {
+    public WigzoSDK initializeWigzoData(Context context, String orgToken) {
+
         if (context == null) {
             throw new IllegalArgumentException("valid context is required");
         }
@@ -120,32 +109,48 @@ public class WigzoSDK {
         else {
             this.orgToken = orgToken;
         }
-        if (!isValidURL(serverURL)) {
-            throw new IllegalArgumentException("valid serverURL is required");
-        }
-        else{
-            this.serverUrl = serverURL;
-        }
-        //TODO: Disabled only for testing. Enable it later
-       /* if (sslContext == null ){
-            throw new IllegalArgumentException("Valid SSL Context is required!");
-        }else {*/
-        this.sslContext = sslContext;
-        //}
-        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+
+        /**
+         * 1. check if deviceId is already generated.If not generate device Id and store it in sharedpreference
+         * 2. create user mapping data to be send to wigzo
+         * 3. create thread and send data to wigzo.
+         * 4. set flag wigzoSdkInitialized if data is sent successfully
+         */
+
+
+
+            WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
         this.sharedStorage = wigzoSharedStorage.getSharedStorage();
         String storedDeviceId = this.sharedStorage.getString(Configuration.DEVICE_ID_KEY.value, "");
-        if(storedDeviceId != null && !storedDeviceId.isEmpty()){
+        if(StringUtils.isEmpty(storedDeviceId)){
            this.deviceId  = UUID.randomUUID().toString();
            this.sharedStorage.edit().putString(Configuration.DEVICE_ID_KEY.value, deviceId).apply();
            final String userData = getUserIdentificationData();
-           final String url = serverURL + "/androidsdk/getinitialdata";
+           final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
            ExecutorService executorService = Executors.newSingleThreadExecutor();
            Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
                 public Boolean call()  {
-                    Boolean success = ConnectionStream.sendData(url,userData);
+                    Boolean success = ConnectionStream.postRequest(url,userData);
                     return success;
-
+                }});
+            try {
+                if(future.get()){
+                    this.wigzoSdkInitialized = true;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }else if(!wigzoSdkInitialized){
+            this.deviceId = storedDeviceId;
+            final String userData = getUserIdentificationData();
+            final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
+                public Boolean call()  {
+                    Boolean success = ConnectionStream.postRequest(url,userData);
+                    return success;
                 }});
             try {
                 if(future.get()){
@@ -170,27 +175,34 @@ public class WigzoSDK {
          * 3. if eventInfo size is greater than threshold, send data to server
          * 4. if send successful, remove eventInfo data from shared storage
          */
-        Map<String,Object> eventData = new HashMap<>();
-        eventData.put("DeviceId",this.deviceId);
-        eventData.put("OrgToken",this.orgToken);
-        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
-        this.sharedStorage = wigzoSharedStorage.getSharedStorage();
-        List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
-        eventInfos.add(eventInfo);
-        Gson gson = new Gson();
-        final String eventsStr = gson.toJson(eventInfos);
-        sharedStorage.edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
-        if(eventInfos.size() >= Integer.parseInt(Configuration.EVENT_QUEUE_SIZE_THRESHOLD.value)){
-            eventData.put("EventData",eventsStr);
-            final String eventDataStr = gson.toJson(eventData);
-            final String url = this.serverUrl + "/androidsdk/geteventdata";
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            Future<?> future = executorService.submit(new Runnable(){
-                public void run()  {
-                    ConnectionStream.sendData(url, eventDataStr);
+        boolean checkStatus = checkWigzoData();
+        if(checkStatus) {
+            Map<String, Object> eventData = new HashMap<>();
+            eventData.put("DeviceId", this.deviceId);
+            eventData.put("OrgToken", this.orgToken);
+            WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+            this.sharedStorage = wigzoSharedStorage.getSharedStorage();
+            List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
+            eventInfos.add(eventInfo);
+            Gson gson = new Gson();
+            final String eventsStr = gson.toJson(eventInfos);
+            sharedStorage.edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
+            if (eventInfos.size() >= Integer.parseInt(Configuration.EVENT_QUEUE_SIZE_THRESHOLD.value)) {
+                eventData.put("EventData", eventsStr);
+                final String eventDataStr = gson.toJson(eventData);
+                final String url = Configuration.BASE_URL.value + Configuration.EVENT_DATA_URL.value;
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                Future<?> future = executorService.submit(new Runnable() {
+                    public void run() {
+                        ConnectionStream.postRequest(url, eventDataStr);
 
-                }});
-            sharedStorage.edit().putString("WIGZO_EVENTS", "").apply();
+                    }
+                });
+                sharedStorage.edit().putString("WIGZO_EVENTS", "").apply();
+
+            }
+        }else{
+            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo initial data is not initiallized.Cannot send event information");
 
         }
 
@@ -204,27 +216,19 @@ public class WigzoSDK {
         userData.put("OrgToken",this.orgToken);
         DeviceInfo deviceInfo = new DeviceInfo();
         userData.put("DeviceInfo", deviceInfo.getMetrics(this.context));
+        //TODO:
         /*if(this.senderId != null){
             set senderid as well
         }*/
         return gson.toJson(userData);
     }
 
-    /**
-     * Utility method for testing validity of a URL.
-     */
-    static boolean isValidURL(final String urlStr) {
-        boolean validURL = false;
-        if (urlStr != null && urlStr.length() > 0) {
-            try {
-                new URL(urlStr);
-                validURL = true;
-            }
-            catch (MalformedURLException e) {
-                validURL = false;
-            }
+    public boolean checkWigzoData(){
+
+        if(StringUtils.isEmpty(this.deviceId) || StringUtils.isEmpty(this.orgToken) || this.context == null){
+            return false;
         }
-        return validURL;
+        return true;
     }
 
     public synchronized void onStart() {
@@ -234,19 +238,15 @@ public class WigzoSDK {
     }
 
     public void onStop(){
+
         long duration = (System.currentTimeMillis()/1000l) - this.startTime;
+        WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
+        storage.getSharedStorage().edit().clear().commit();
 
     }
 
     public boolean isLoggingEnabled() {
         return this.enableLogging;
-    }
-    public SSLContext getSslContext() {
-        return this.sslContext;
-    }
-
-    public List<String> getPublicKeyPinCertificates() {
-        return this.publicKeyPinCertificates;
     }
 
 }

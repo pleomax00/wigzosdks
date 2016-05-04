@@ -2,7 +2,12 @@ package wigzo.sdk.model;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -10,7 +15,19 @@ import android.view.WindowManager;
 
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +42,7 @@ public class DeviceInfo {
 
     //private static final String TAG = "DeviceId";
     private String id;
+    private Location location;
     public DeviceInfo(){}
 
     protected void setId(String id) {
@@ -203,12 +221,12 @@ public class DeviceInfo {
         deviceInfo.put("device", getDevice());
         deviceInfo.put("os", getOS());
         deviceInfo.put("osVersion", getOSVersion());
-        deviceInfo.put("carrier", getCarrier(context));
-        deviceInfo.put("resolution", getResolution(context));
-        deviceInfo.put("density", getDensity(context));
-        deviceInfo.put("locale", getLocale());
-        deviceInfo.put("appVersion", getAppVersion(context));
-        deviceInfo.put("installingApp", getStore(context));
+        //deviceInfo.put("carrier", getCarrier(context));
+        //deviceInfo.put("resolution", getResolution(context));
+       // deviceInfo.put("density", getDensity(context));
+        deviceInfo.put("ipAddress", getIpAddress());
+       // deviceInfo.put("appVersion", getAppVersion(context));
+      //  deviceInfo.put("installingApp", getStore(context));
         Gson gson = new Gson();
 
         String result = gson.toJson(deviceInfo);
@@ -222,5 +240,23 @@ public class DeviceInfo {
         return result;
     }
 
+    public String getIpAddress(){
+        String ipAddress = null;
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress()) {
+                        ipAddress = inetAddress.getHostAddress().toString();
+
+                    }
+                }
+            }
+        } catch (SocketException ex) {}
+
+    return ipAddress;
+
+    }
 
 }

@@ -11,7 +11,10 @@ public enum Configuration {
     EVENT_QUEUE_SIZE_THRESHOLD("eventQSizeThreshold","1"),
     STORAGE_KEY("storageKey","WIGZO_SHARED_STORAGE"),
     EVENTS_KEY("eventKey","WIGZO_EVENTS"),
-    DEVICE_ID_KEY("deviceIdKey","DEVICE_ID_KEY");
+    DEVICE_ID_KEY("deviceIdKey","DEVICE_ID_KEY"),
+    BASE_URL("baseUrl","https://stage.wigzopush.com"),
+    INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
+    EVENT_DATA_URL("eventDataUrl","/androidsdk/geteventdata");
     /*
       private static final String LOCATION_KEY = "LOCATION";
      */

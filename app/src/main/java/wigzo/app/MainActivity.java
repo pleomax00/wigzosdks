@@ -19,11 +19,14 @@ public class MainActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
         WigzoSDK sdk = WigzoSDK.getSharedInstance();
-        sdk.initializeWigzoData(this,"http://minaz.wigzoes.com", "2345",null);
+        sdk.onStart();
+        sdk.initializeWigzoData(this, "2345");
         EventInfo eventInfo = new EventInfo("view","viewed");
         EventInfo.Metadata metadata = new EventInfo.Metadata("Iphone","Iphone 6SE");
         eventInfo.setMetadata(metadata);
         sdk.pushEvent(eventInfo);
+        sdk.onStop();
+        onDestroy();
 
     }
 }

@@ -3,7 +3,11 @@ package wigzo.sdk.helpers;
 import android.util.Log;
 
 import com.google.gson.Gson;
+
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -15,6 +19,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.model.DeviceInfo;
@@ -27,23 +32,14 @@ public class ConnectionStream {
     private static final int CONNECT_TIMEOUT_IN_MILLISECONDS = 30000;
     private static final int READ_TIMEOUT_IN_MILLISECONDS = 30000;
 
-    public static boolean sendData(String urlStr, String data)
+    public static boolean postRequest(String urlStr, String data)
     {
-        WigzoSDK sdk = WigzoSDK.getSharedInstance();
         Log.d("server url: ", urlStr);
         final URL url;
         HttpURLConnection connection = null;
         try {
             url = new URL(urlStr);
-
-            if (sdk.getPublicKeyPinCertificates() == null) {
-                connection = (HttpURLConnection) url.openConnection();
-
-            } else {
-                HttpsURLConnection c = (HttpsURLConnection) url.openConnection();
-                c.setSSLSocketFactory(sdk.getSslContext().getSocketFactory());
-                connection = c;
-            }
+            connection = (HttpURLConnection) url.openConnection();
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,7 +55,6 @@ public class ConnectionStream {
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("charset", "utf-8");
-           // connection.setRequestProperty("X-Requested-With", "XMLHttpRequest");
             OutputStream outputStream = connection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             writer.write(data);
@@ -80,11 +75,8 @@ public class ConnectionStream {
             if (connection != null && connection instanceof HttpURLConnection) {
                 (connection).disconnect();
             }
-
         }
-
         return false;
 
     }
-
 }

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,16 +46,9 @@ public class WigzoSharedStorage {
         List<EventInfo> eventInfoList = new ArrayList<>();
         Gson gson = new Gson();
         String eventsStr = sharedStorage.getString(Configuration.EVENTS_KEY.value, "");
-        if(eventsStr != null && !eventsStr.isEmpty())
+        if(StringUtils.isNotEmpty(eventsStr))
             eventInfoList = gson.fromJson(eventsStr, new TypeToken<List<EventInfo>>() { }.getType());
         return eventInfoList;
     }
 
-    /**
-     * Retrieves a preference from local store.
-     * @param key the preference key
-     */
-    public synchronized String getPreference(final String key) {
-        return sharedStorage.getString(key, null);
-    }
 }
