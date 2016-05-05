@@ -225,8 +225,8 @@ public class DeviceInfo {
         //deviceInfo.put("resolution", getResolution(context));
        // deviceInfo.put("density", getDensity(context));
         deviceInfo.put("ipAddress", getIpAddress());
-       // deviceInfo.put("appVersion", getAppVersion(context));
-      //  deviceInfo.put("installingApp", getStore(context));
+        deviceInfo.put("appVersion", getAppVersion(context));
+        //deviceInfo.put("installingApp", getStore(context));
         Gson gson = new Gson();
 
         String result = gson.toJson(deviceInfo);

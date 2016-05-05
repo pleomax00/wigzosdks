@@ -23,7 +23,7 @@ import wigzo.sdk.model.EventInfo;
 
 public class WigzoSharedStorage {
 
-    public  SharedPreferences getSharedStorage() {
+    public SharedPreferences getSharedStorage() {
         return sharedStorage;
     }
 

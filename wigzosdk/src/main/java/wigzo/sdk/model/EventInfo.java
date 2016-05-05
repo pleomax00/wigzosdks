@@ -1,5 +1,7 @@
 package wigzo.sdk.model;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
@@ -13,15 +15,15 @@ public class EventInfo {
 
     private Metadata metadata;
 
-    private Date timestamp;
+    private String timestamp;
 
     public EventInfo(String eventName, String eventValue) {
         this.eventName = eventName;
         this.eventValue = eventValue;
-        this.timestamp = new Date();
+        this.timestamp = String.valueOf(System.currentTimeMillis());
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -35,7 +37,7 @@ public class EventInfo {
         private String title;
         private String description;
         private String tags;
-        private double price;
+        private BigDecimal price;
 
         public Metadata (){}
 
@@ -56,11 +58,20 @@ public class EventInfo {
             this.tags = tags;
         }
 
-        public void setPrice(double price) {
+        public void setPrice(BigDecimal price) {
             this.price = price;
         }
 
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof EventInfo){
+            EventInfo eventInfo = (EventInfo)o;
+            return this.timestamp.equalsIgnoreCase(eventInfo.timestamp);
+        }
+        return false;
     }
 
 
