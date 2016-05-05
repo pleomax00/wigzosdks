@@ -14,7 +14,8 @@ public enum Configuration {
     DEVICE_ID_KEY("deviceIdKey","DEVICE_ID_KEY"),
     BASE_URL("baseUrl","https://stage.wigzopush.com"),
     INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
-    EVENT_DATA_URL("eventDataUrl","/androidsdk/geteventdata");
+    EVENT_DATA_URL("eventDataUrl","/androidsdk/geteventdata"),
+    TIME_DELAY("timeDelay","10");
     /*
       private static final String LOCATION_KEY = "LOCATION";
      */

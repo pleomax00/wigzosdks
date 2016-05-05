@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import wigzo.sdk.helpers.Configuration;
 import wigzo.sdk.helpers.ConnectionStream;
@@ -84,6 +87,16 @@ public class WigzoSDK {
     public static WigzoSDK getSharedInstance() {
 
         return SingletonHolder.instance;
+    }
+
+    WigzoSDK(){
+        int timer = Integer.parseInt(Configuration.TIME_DELAY.value);
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleWithFixedDelay(new Runnable() {
+            public void run() {
+                checkAndPushEvent();
+
+            }},timer,timer, TimeUnit.SECONDS);
     }
 
     /**
@@ -167,43 +180,43 @@ public class WigzoSDK {
     }
 
 
-    public void pushEvent(EventInfo eventInfo) {
-            //TODO: add null checks for url,sslcontext
-        /**
-         * 1. call getEventList() to get already stored eventInfos
-         * 2. append this eventInfo to the list
-         * 3. if eventInfo size is greater than threshold, send data to server
-         * 4. if send successful, remove eventInfo data from shared storage
-         */
+    public void pushEvent(final EventInfo eventInfo) {
+
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+        this.sharedStorage = wigzoSharedStorage.getSharedStorage();
+        List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
+        eventInfos.add(eventInfo);
+        Gson gson = new Gson();
+        final String eventsStr = gson.toJson(eventInfos);
+        sharedStorage.edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
+
+    }
+
+    private void checkAndPushEvent(){
+
         boolean checkStatus = checkWigzoData();
         if(checkStatus) {
+
             Map<String, Object> eventData = new HashMap<>();
             eventData.put("DeviceId", this.deviceId);
             eventData.put("OrgToken", this.orgToken);
             WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
             this.sharedStorage = wigzoSharedStorage.getSharedStorage();
             List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
-            eventInfos.add(eventInfo);
-            Gson gson = new Gson();
-            final String eventsStr = gson.toJson(eventInfos);
-            sharedStorage.edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
-            if (eventInfos.size() >= Integer.parseInt(Configuration.EVENT_QUEUE_SIZE_THRESHOLD.value)) {
+            if(!eventInfos.isEmpty()) {
+
+                Gson gson = new Gson();
+                final String eventsStr = gson.toJson(eventInfos);
+                sharedStorage.edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
                 eventData.put("EventData", eventsStr);
                 final String eventDataStr = gson.toJson(eventData);
                 final String url = Configuration.BASE_URL.value + Configuration.EVENT_DATA_URL.value;
-                ExecutorService executorService = Executors.newSingleThreadExecutor();
-                Future<?> future = executorService.submit(new Runnable() {
-                    public void run() {
-                        ConnectionStream.postRequest(url, eventDataStr);
-
-                    }
-                });
                 sharedStorage.edit().putString("WIGZO_EVENTS", "").apply();
-
+                ConnectionStream.postRequest(url, eventDataStr);
             }
         }else{
-            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo initial data is not initiallized.Cannot send event information");
 
+            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo initial data is not initiallized.Cannot send event information");
         }
 
     }

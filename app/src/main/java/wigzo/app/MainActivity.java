@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         eventInfo.setMetadata(metadata);
         sdk.pushEvent(eventInfo);
         sdk.onStop();
-        onDestroy();
+        //onDestroy();
 
     }
 }
