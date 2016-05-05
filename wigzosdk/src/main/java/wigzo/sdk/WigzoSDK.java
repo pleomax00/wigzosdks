@@ -2,13 +2,9 @@ package wigzo.sdk;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
 import android.util.Log;
 import com.google.gson.Gson;
-
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,9 +51,6 @@ public class WigzoSDK {
     private String orgToken;
     private boolean enableLogging = true;
     private long startTime;
-
-
-
 
     /**
      * Enum used in Wigzo.initMessaging() method which controls what kind of
@@ -132,7 +125,7 @@ public class WigzoSDK {
 
 
 
-            WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
         this.sharedStorage = wigzoSharedStorage.getSharedStorage();
         String storedDeviceId = this.sharedStorage.getString(Configuration.DEVICE_ID_KEY.value, "");
         if(StringUtils.isEmpty(storedDeviceId)){
@@ -200,6 +193,8 @@ public class WigzoSDK {
             Map<String, Object> eventData = new HashMap<>();
             eventData.put("DeviceId", this.deviceId);
             eventData.put("OrgToken", this.orgToken);
+            DeviceInfo deviceInfo = new DeviceInfo();
+            eventData.put("DeviceInfo", deviceInfo.getMetrics(this.context));
             WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
             this.sharedStorage = wigzoSharedStorage.getSharedStorage();
             List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
@@ -227,8 +222,7 @@ public class WigzoSDK {
         Map<String , Object> userData = new HashMap<>();
         userData.put("DeviceId",this.deviceId);
         userData.put("OrgToken",this.orgToken);
-        DeviceInfo deviceInfo = new DeviceInfo();
-        userData.put("DeviceInfo", deviceInfo.getMetrics(this.context));
+
         //TODO:
         /*if(this.senderId != null){
             set senderid as well
@@ -253,8 +247,23 @@ public class WigzoSDK {
     public void onStop(){
 
         long duration = (System.currentTimeMillis()/1000l) - this.startTime;
-        WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
-        storage.getSharedStorage().edit().clear().commit();
+        String durationStr = Long.toString(duration);
+        final Map<String, String> sessionData = new HashMap<>();
+        sessionData.put("DeviceId",this.deviceId);
+        sessionData.put("OrgToken",this.orgToken);
+        sessionData.put("SessionData",durationStr);
+        Gson gson = new Gson();
+        final String sessionDataStr = gson.toJson(sessionData);
+        final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                ConnectionStream.postRequest(url,sessionDataStr);
+            }
+        });
+/*        WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
+        storage.getSharedStorage().edit().clear().commit();*/
 
     }
 
