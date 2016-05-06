@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.model.EventInfo;
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
                     new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        WigzoSDK sdk = WigzoSDK.getSharedInstance();
+        WigzoSDK sdk = WigzoSDK.getInstance();
         sdk.onStart();
         sdk.initializeWigzoData(this, "dd968763-6537-43ae-a86c-9d3922ebf319");
         EventInfo eventInfo = new EventInfo("view","viewed");
@@ -40,7 +42,11 @@ public class MainActivity extends AppCompatActivity {
         eventInfo2.setMetadata(metadata2);
         sdk.pushEvent(eventInfo2);
         UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
-        user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
+        //user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
+        Map<String, String> customData = new HashMap<>();
+        customData.put("key1","value1");
+        customData.put("key2","value2");
+        user.setCustomData(customData);
         user.save();
         sdk.onStop();
         onDestroy();

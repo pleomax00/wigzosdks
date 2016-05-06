@@ -76,12 +76,12 @@ public class WigzoSDK {
     /**
      * Returns the Wigzo singleton.
      */
-    public static WigzoSDK getSharedInstance() {
+    public static synchronized WigzoSDK getInstance() {
 
         return SingletonHolder.instance;
     }
 
-    WigzoSDK(){
+    private WigzoSDK(){
         int timer = Integer.parseInt(Configuration.TIME_DELAY.value);
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleWithFixedDelay(new Runnable() {
@@ -188,7 +188,7 @@ public class WigzoSDK {
 
     }
 
-    /*public synchronized void mapEmail(final String emailId){
+    public synchronized void mapEmail(final String emailId){
 
         boolean checkStatus = checkWigzoData();
         if(checkStatus) {
@@ -213,7 +213,7 @@ public class WigzoSDK {
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo initial data is not initiallized.Cannot send event information");
         }
 
-    }*/
+    }
 
     private synchronized void checkAndPushEvent(){
 
@@ -243,7 +243,7 @@ public class WigzoSDK {
             }
         }else{
 
-            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initiallized.Cannot send event information");
+            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
         }
 
     }
@@ -298,15 +298,15 @@ public class WigzoSDK {
         return this.enableLogging;
     }
 
-    public String getDeviceId() {
+    public synchronized String getDeviceId() {
         return deviceId;
     }
 
-    public String getOrgToken() {
+    public synchronized String getOrgToken() {
         return orgToken;
     }
 
-    public String getAppKey() {
+    public synchronized String getAppKey() {
         return appKey;
     }
 }

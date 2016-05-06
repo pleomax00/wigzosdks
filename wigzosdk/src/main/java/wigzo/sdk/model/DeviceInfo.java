@@ -3,11 +3,7 @@ package wigzo.sdk.model;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -15,18 +11,10 @@ import android.view.WindowManager;
 
 import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -46,7 +34,7 @@ public class DeviceInfo {
     public DeviceInfo(){}
 
     protected void setId(String id) {
-        if (WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+        if (WigzoSDK.getInstance().isLoggingEnabled()) {
             Log.w(Configuration.DEVICE_ID_TAG.value, "Device ID is " + id );
         }
         this.id = id;
@@ -93,7 +81,7 @@ public class DeviceInfo {
             resolution = metrics.widthPixels + "x" + metrics.heightPixels;
         }
         catch (Throwable t) {
-            if (WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+            if (WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "Device resolution cannot be determined");
             }
         }
@@ -153,7 +141,7 @@ public class DeviceInfo {
         }
         if (carrier == null || carrier.length() == 0) {
             carrier = "";
-            if (WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+            if (WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "No carrier found");
             }
         }
@@ -179,7 +167,7 @@ public class DeviceInfo {
             result = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         }
         catch (PackageManager.NameNotFoundException e) {
-            if (WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+            if (WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "No app version found");
             }
         }
@@ -195,13 +183,13 @@ public class DeviceInfo {
             try {
                 result = context.getPackageManager().getInstallerPackageName(context.getPackageName());
             } catch (Exception e) {
-                if (WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+                if (WigzoSDK.getInstance().isLoggingEnabled()) {
                     Log.i(Configuration.WIGZO_SDK_TAG.value, "Can't get Installer package");
                 }
             }
             if (result == null || result.length() == 0) {
                 result = "";
-                if (WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+                if (WigzoSDK.getInstance().isLoggingEnabled()) {
                     Log.i(Configuration.WIGZO_SDK_TAG.value, "No store found");
                 }
             }

@@ -2,35 +2,18 @@ package wigzo.sdk.helpers;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
 
 import wigzo.sdk.WigzoSDK;
-import wigzo.sdk.model.DeviceInfo;
 
 /**
  * Created by wigzo on 28/4/16.
@@ -71,7 +54,7 @@ public class ConnectionStream {
             writer.close();
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
-            if (!success && WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+            if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
             }
             return success;
@@ -146,7 +129,7 @@ public class ConnectionStream {
 
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
-            if (!success && WigzoSDK.getSharedInstance().isLoggingEnabled()) {
+            if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
             }
             return success;

@@ -84,10 +84,10 @@ public class UserProfile {
     }
 
     public void save(){
-        if(WigzoSDK.getSharedInstance().checkWigzoData()) {
-            String deviceId = WigzoSDK.getSharedInstance().getDeviceId();
-            String orgToken = WigzoSDK.getSharedInstance().getOrgToken();
-            String appKey = WigzoSDK.getSharedInstance().getAppKey();
+        if(WigzoSDK.getInstance().checkWigzoData()) {
+            String deviceId = WigzoSDK.getInstance().getDeviceId();
+            String orgToken = WigzoSDK.getInstance().getOrgToken();
+            String appKey = WigzoSDK.getInstance().getAppKey();
             Gson gson = new Gson();
             Map<String, Object> userDataMap = new HashMap<>();
             userDataMap.put("deviceId", deviceId);
