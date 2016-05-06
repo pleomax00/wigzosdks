@@ -188,7 +188,7 @@ public class WigzoSDK {
 
     }
 
-    public synchronized void mapEmail(final String emailId){
+    /*public synchronized void mapEmail(final String emailId){
 
         boolean checkStatus = checkWigzoData();
         if(checkStatus) {
@@ -213,7 +213,7 @@ public class WigzoSDK {
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo initial data is not initiallized.Cannot send event information");
         }
 
-    }
+    }*/
 
     private synchronized void checkAndPushEvent(){
 
@@ -243,7 +243,7 @@ public class WigzoSDK {
             }
         }else{
 
-            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo initial data is not initiallized.Cannot send event information");
+            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initiallized.Cannot send event information");
         }
 
     }
@@ -298,4 +298,15 @@ public class WigzoSDK {
         return this.enableLogging;
     }
 
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public String getOrgToken() {
+        return orgToken;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
 }

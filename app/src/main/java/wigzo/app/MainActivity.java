@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.model.EventInfo;
+import wigzo.sdk.model.UserProfile;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
         metadata2.setPrice(new BigDecimal(45000));
         eventInfo2.setMetadata(metadata2);
         sdk.pushEvent(eventInfo2);
-        sdk.mapEmail("suyash@wigzo.com");
+        UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
+        user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
+        user.save();
         sdk.onStop();
         onDestroy();
 
