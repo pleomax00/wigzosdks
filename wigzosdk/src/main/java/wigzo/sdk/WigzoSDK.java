@@ -146,14 +146,14 @@ public class WigzoSDK {
                 }});
             try {
                 if(future.get()){
-                    this.wigzoSdkInitialized = true;
+                    wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value,"true").apply();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-        }else if(!wigzoSdkInitialized){
+        }else if(StringUtils.isEmpty(wigzoSharedStorage.getSharedStorage().getString(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value,""))){
             this.deviceId = storedDeviceId;
             final String userData = getUserIdentificationData();
             final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
@@ -165,7 +165,7 @@ public class WigzoSDK {
                 }});
             try {
                 if(future.get()){
-                    this.wigzoSdkInitialized = true;
+                    wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value,"true").apply();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
