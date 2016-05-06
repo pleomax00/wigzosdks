@@ -40,18 +40,18 @@ public class ConnectionStream {
         connection.setUseCaches(false);
         connection.setDoInput(true);
         connection.setDoOutput(true);
+        OutputStream outputStream = null;
+        BufferedWriter writer = null;
 
 
         try {
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("charset", "utf-8");
-            OutputStream outputStream = connection.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+            outputStream = connection.getOutputStream();
+            writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             writer.write(data);
-
             writer.flush();
-            writer.close();
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
             if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
@@ -63,6 +63,17 @@ public class ConnectionStream {
         }
 
         finally {
+            try {
+                if(outputStream != null) {
+                    outputStream.close();
+                }
+                if(writer != null){
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             if (connection != null && connection instanceof HttpURLConnection) {
                 (connection).disconnect();
             }
@@ -90,6 +101,9 @@ public class ConnectionStream {
         connection.setDoInput(true);
         connection.setDoOutput(true);
 
+        PrintWriter writer = null;
+        OutputStream output = null;
+        FileInputStream fileInputStream = null;
 
         try {
             connection.setRequestMethod("POST");
@@ -101,15 +115,15 @@ public class ConnectionStream {
             String CRLF = "\r\n";
             String charset = "UTF-8";
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-            OutputStream output = connection.getOutputStream();
-            PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
+            output = connection.getOutputStream();
+            writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
                 // Send binary file.
             writer.append("--" + boundary).append(CRLF);
             writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
             writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
             writer.append("Content-Transfer-Encoding: binary").append(CRLF);
             writer.append(CRLF).flush();
-            FileInputStream fileInputStream = new FileInputStream(binaryFile);
+            fileInputStream = new FileInputStream(binaryFile);
             byte[] buffer = new byte[1024];
             int len;
             try {
@@ -125,7 +139,6 @@ public class ConnectionStream {
             // End of multipart/form-data.
             writer.append("--" + boundary + "--").append(CRLF).flush();
             writer.flush();
-            writer.close();
 
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
@@ -138,6 +151,22 @@ public class ConnectionStream {
         }
 
         finally {
+
+            try {
+
+                if(fileInputStream != null){
+                    fileInputStream.close();
+                }
+                if(output != null) {
+                    output.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(writer != null){
+                writer.close();
+            }
+
             if (connection != null && connection instanceof HttpURLConnection) {
                 (connection).disconnect();
             }
@@ -146,36 +175,4 @@ public class ConnectionStream {
 
     }
 
-    /**
-     *
-     File binaryFile = new File(picturePath);
-     conn.setDoOutput(true);
-     // Just generate some unique random value.
-     String boundary = Long.toHexString(System.currentTimeMillis());
-     // Line separator required by multipart/form-data.
-     String CRLF = "\r\n";
-     String charset = "UTF-8";
-     conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-     OutputStream output = conn.getOutputStream();
-     PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-     // Send binary file.
-     writer.append("--" + boundary).append(CRLF);
-     writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
-     writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
-     writer.append("Content-Transfer-Encoding: binary").append(CRLF);
-     writer.append(CRLF).flush();
-     FileInputStream fileInputStream = new FileInputStream(binaryFile);
-     byte[] buffer = new byte[1024];
-     int len;
-     try {
-     while ((len = fileInputStream.read(buffer)) != -1) {
-     output.write(buffer, 0, len);
-     }
-     }catch(IOException ex){
-     ex.printStackTrace();
-     }
-     output.flush(); // Important before continuing with writer!
-     writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
-     fileInputStream.close();
-     */
 }

@@ -41,7 +41,6 @@ import wigzo.sdk.model.EventInfo;
 
 public class WigzoSDK {
 
-    private boolean wigzoSdkInitialized = false;
     private Context context;
     private String deviceId;
     private String appKey;
@@ -68,7 +67,7 @@ public class WigzoSDK {
         static final WigzoSDK instance = new WigzoSDK();
     }
 
-    public Context getContext() {
+    public synchronized Context getContext() {
         return this.context;
     }
 
@@ -94,11 +93,9 @@ public class WigzoSDK {
     /**
      * Initializes the Wigzo SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
-     * @param context application context
-     * @param orgToken    unique Id for organization provided by wigzo to organization
-     * @return Wigzo instance for easy method chaining
-     * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
-     * @throws IllegalStateException if initializeWigzoData has previously been called with different values during the same application instance
+     * @param context
+     * @param orgToken
+     * @return
      */
     public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken) {
 
@@ -289,8 +286,8 @@ public class WigzoSDK {
                 ConnectionStream.postRequest(url,sessionDataStr);
             }
         });*/
-        WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
-        storage.getSharedStorage().edit().clear().commit();
+       /* WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
+        storage.getSharedStorage().edit().clear().commit();*/
 
     }
 
