@@ -23,19 +23,8 @@ import wigzo.sdk.model.DeviceInfo;
 import wigzo.sdk.model.EventInfo;
 
 /**
- * Created by wigzo on 28/4/16.
- */
-
-/**
  * This class is the public API for the Wigzo Android SDK.
- */
-
-/**
- * 1. add relevant getters and setters for clients to call/use
- * 2. implement Singleton pattern
- * 3. implement initializeWigzoData
- * 4. implement call to send intial user data
- * 5. logic to handle events
+ *  @author Minaz Ali
  */
 
 
@@ -50,30 +39,26 @@ public class WigzoSDK {
     private String emailId;
     private Gson gson;
 
+
     /**
-     * Enum used in Wigzo.initMessaging() method which controls what kind of
-     * app installation it is. Later (in Wigzo Dashboard or when calling Wigzo API method),
-     * you'll be able to choose whether you want to send a message to test devices,
-     * or to production ones.
+     * Static class which returns singleton instance of WigzoSDK
      */
-
-    public static enum WigzoMessagingMode {
-        TEST,
-        PRODUCTION,
-    }
-
     // see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
     private static class SingletonHolder {
         static final WigzoSDK instance = new WigzoSDK();
     }
 
+    /**
+     *
+     * @return Context of the application installing the SDK
+     */
     public synchronized Context getContext() {
         return this.context;
     }
 
 
     /**
-     * Returns the Wigzo singleton.
+     * Returns the WigzoSdk singleton.
      */
     public static synchronized WigzoSDK getInstance() {
 
@@ -93,9 +78,9 @@ public class WigzoSDK {
     /**
      * Initializes the Wigzo SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
-     * @param context
-     * @param orgToken
-     * @return
+     * @param context Context of application installing sdk
+     * @param orgToken Organization token
+     *
      */
     public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken) {
 
@@ -111,13 +96,6 @@ public class WigzoSDK {
         else {
             this.orgToken = orgToken;
         }
-
-        /**
-         * 1. check if deviceId is already generated.If not generate device Id and store it in sharedpreference
-         * 2. create user mapping data to be send to wigzo
-         * 3. create thread and send data to wigzo.
-         * 4. set flag wigzoSdkInitialized if data is sent successfully
-         */
 
         this.gson = new Gson();
 
@@ -174,8 +152,11 @@ public class WigzoSDK {
         return this;
     }
 
-
-    public synchronized void pushEvent(final EventInfo eventInfo) {
+    /**
+     * This method is used to store events(or Activities)
+     * @param {@Link EventInfo) object
+     */
+    public synchronized void saveEvent(final EventInfo eventInfo) {
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
         List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
@@ -185,6 +166,10 @@ public class WigzoSDK {
 
     }
 
+    /**
+     * <p>Once the email id of user is obtained, this method is used to map email id to user if it was not mapped when {@Link UserProfile} was created</p>
+     * @param emailId email id of user
+     */
     public synchronized void mapEmail(final String emailId){
 
         boolean checkStatus = checkWigzoData();
@@ -212,6 +197,9 @@ public class WigzoSDK {
 
     }
 
+    /**
+     * Method to send events to wigzo server
+     */
     private synchronized void checkAndPushEvent(){
 
         boolean checkStatus = checkWigzoData();
@@ -245,6 +233,10 @@ public class WigzoSDK {
 
     }
 
+    /**
+     * Method to prepare Map of User Identification data. Map contains deviceId and orgToken
+     * @return
+     */
     public String getUserIdentificationData(){
 
 
@@ -254,6 +246,10 @@ public class WigzoSDK {
         return this.gson.toJson(userData);
     }
 
+    /**
+     * This method is used to check if WigzoSdk is initialized or not before sending any request to wigzo server
+     * @return
+     */
     public boolean checkWigzoData(){
 
         if(StringUtils.isEmpty(this.deviceId) || StringUtils.isEmpty(this.orgToken) || this.context == null){
@@ -262,16 +258,22 @@ public class WigzoSDK {
         return true;
     }
 
+    /**
+     * Method to track session start time. This should be called when app starts and not in all activities
+     */
     public synchronized void onStart() {
        //CrashDetails.inForeground();
         this.startTime = System.currentTimeMillis()/1000l;
 
     }
 
+    /**
+     * Method to track session end time. This should be called when app is about to close and not in all activities
+     */
     public synchronized void onStop(){
 
         long duration = (System.currentTimeMillis()/1000l) - this.startTime;
-        /*String durationStr = Long.toString(duration);
+        String durationStr = Long.toString(duration);
         final Map<String, String> sessionData = new HashMap<>();
         sessionData.put("DeviceId",this.deviceId);
         sessionData.put("OrgToken",this.orgToken);
@@ -285,15 +287,15 @@ public class WigzoSDK {
             public void run() {
                 ConnectionStream.postRequest(url,sessionDataStr);
             }
-        });*/
+        });
        /* WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
         storage.getSharedStorage().edit().clear().commit();*/
 
     }
 
-    public synchronized boolean isLoggingEnabled() {
+   /* public synchronized boolean isLoggingEnabled() {
         return this.enableLogging;
-    }
+    }*/
 
     public synchronized String getDeviceId() {
         return deviceId;

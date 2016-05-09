@@ -16,8 +16,22 @@ import wigzo.sdk.helpers.Configuration;
 import wigzo.sdk.helpers.ConnectionStream;
 
 /**
- * Created by wigzo on 6/5/16.
+ * <p>An instance of this class represents Profile of user.</p>
+ * Profile information includes -
+ * <ol>
+ *     <li>{@link UserProfile#fullName} - Full name of user.</li>
+ *     <li>{@link UserProfile#userName} - user name of user.</li>
+ *     <li>{@link UserProfile#email} - email of user.</li>
+ *     <li>{@link UserProfile#organization} - Organization details of application t.</li>
+ *     <li>{@link UserProfile#phone} - phone number of user.</li>
+ *     <li>{@link UserProfile#gender} - gender of user.</li>
+ *     <li>{@link UserProfile#birthYear} - birth year of user.</li>
+ *     <li>{@link UserProfile#picturePath} - user's profile picture's path.</li>
+ *     <li>{@link UserProfile#customData} - Map of custom data ( any other addition data).</li>
+ * </ol>
+ * @author Minaz Ali
  */
+
 public class UserProfile {
 
     private String fullName;
@@ -32,6 +46,13 @@ public class UserProfile {
 
     public UserProfile() {}
 
+    /**
+     * Constructor to obtain object of {@link UserProfile} with fullname, username , email and organization details
+     * @param fullName : Full name of application user
+     * @param userName :user name of application user
+     * @param email : email of application user
+     * @param organization : organization of application
+     */
     public UserProfile(String fullName, String userName, String email, String organization) {
         this.fullName = fullName;
         this.userName = userName;
@@ -39,7 +60,15 @@ public class UserProfile {
         this.organization = organization;
     }
 
-    public UserProfile(String fullName, String organization, String email, String userName, Map<String, String> customData) {
+    /**
+     * Constructor to obtain object of {@link UserProfile} with fullname, username , email ,organization details and custom data
+     * @param fullName : Full name of application user
+     * @param userName :user name of application user
+     * @param email : email of application user
+     * @param organization : organization of application
+     * @param customData : this map can be used to provide any additoinal user data if any
+     */
+    public UserProfile(String fullName, String userName, String email, String organization, Map<String, String> customData) {
         this.fullName = fullName;
         this.organization = organization;
         this.email = email;
@@ -83,7 +112,11 @@ public class UserProfile {
         this.customData = customData;
     }
 
-    public void save(){
+
+    /**
+     * This method is used to save {@link UserProfile} and send the same to wigzo server
+     */
+    public void saveUserProfile(){
         if(WigzoSDK.getInstance().checkWigzoData()) {
             String deviceId = WigzoSDK.getInstance().getDeviceId();
             String orgToken = WigzoSDK.getInstance().getOrgToken();

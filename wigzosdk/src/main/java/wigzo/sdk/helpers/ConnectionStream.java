@@ -16,13 +16,19 @@ import java.net.URLConnection;
 import wigzo.sdk.WigzoSDK;
 
 /**
- * Created by wigzo on 28/4/16.
+ * @Author Minaz Ali
  */
 public class ConnectionStream {
 
     private static final int CONNECT_TIMEOUT_IN_MILLISECONDS = 30000;
     private static final int READ_TIMEOUT_IN_MILLISECONDS = 30000;
 
+    /**
+     * Method to send post request to wigzo server
+     * @param urlStr : server url
+     * @param data : data
+     * @return Boolean: success status ( true or false ) whether post request was sent successfully or not
+     */
     public static boolean postRequest(String urlStr, String data)
     {
         Log.d("server url: ", urlStr);
@@ -54,9 +60,9 @@ public class ConnectionStream {
             writer.flush();
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
-            if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
+            //if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
-            }
+           // }
             return success;
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,6 +88,13 @@ public class ConnectionStream {
 
     }
 
+    /**
+     * Method to send multipart post request to wigzo server
+     * @param urlStr server url
+     * @param data : data
+     * @param picturePath : path from where picture is to be retrieved
+     * @return Boolean: success status ( true or false ) whether post request was sent successfully or not
+     */
     public static boolean postMultimediaRequest(String urlStr, String data, String picturePath)
     {
         Log.d("server url: ", urlStr);
@@ -142,9 +155,9 @@ public class ConnectionStream {
 
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
-            if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
+            //if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
-            }
+            //}
             return success;
         } catch (Exception e) {
             e.printStackTrace();

@@ -14,11 +14,9 @@ import java.util.List;
 import wigzo.sdk.model.EventInfo;
 
 /**
- * Created by wigzo on 28/4/16.
- */
-
-/**
- * This class provides a persistence layer for the local event &amp; connection queues.
+ * This class provides a persistence layer for the sdk.
+ *
+ *  @author Minaz Ali
  */
 
 public class WigzoSharedStorage {

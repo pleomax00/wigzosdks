@@ -24,7 +24,9 @@ import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
 
 /**
- * Created by wigzo on 28/4/16.
+ * <p>An instance of this class represents information of device.</p>
+ *
+ * @author Minaz Ali
  */
 public class DeviceInfo {
 
@@ -34,9 +36,9 @@ public class DeviceInfo {
     public DeviceInfo(){}
 
     protected void setId(String id) {
-        if (WigzoSDK.getInstance().isLoggingEnabled()) {
+       // if (WigzoSDK.getInstance().isLoggingEnabled()) {
             Log.w(Configuration.DEVICE_ID_TAG.value, "Device ID is " + id );
-        }
+        //}
         this.id = id;
     }
 
@@ -81,9 +83,9 @@ public class DeviceInfo {
             resolution = metrics.widthPixels + "x" + metrics.heightPixels;
         }
         catch (Throwable t) {
-            if (WigzoSDK.getInstance().isLoggingEnabled()) {
+            //if (WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "Device resolution cannot be determined");
-            }
+            //}
         }
         return resolution;
     }
@@ -141,9 +143,9 @@ public class DeviceInfo {
         }
         if (carrier == null || carrier.length() == 0) {
             carrier = "";
-            if (WigzoSDK.getInstance().isLoggingEnabled()) {
+            //if (WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "No carrier found");
-            }
+            //}
         }
         return carrier;
     }
@@ -167,9 +169,9 @@ public class DeviceInfo {
             result = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         }
         catch (PackageManager.NameNotFoundException e) {
-            if (WigzoSDK.getInstance().isLoggingEnabled()) {
+            //if (WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "No app version found");
-            }
+            //}
         }
         return result;
     }
@@ -183,15 +185,15 @@ public class DeviceInfo {
             try {
                 result = context.getPackageManager().getInstallerPackageName(context.getPackageName());
             } catch (Exception e) {
-                if (WigzoSDK.getInstance().isLoggingEnabled()) {
+                //if (WigzoSDK.getInstance().isLoggingEnabled()) {
                     Log.i(Configuration.WIGZO_SDK_TAG.value, "Can't get Installer package");
-                }
+                //}
             }
             if (result == null || result.length() == 0) {
                 result = "";
-                if (WigzoSDK.getInstance().isLoggingEnabled()) {
+                //if (WigzoSDK.getInstance().isLoggingEnabled()) {
                     Log.i(Configuration.WIGZO_SDK_TAG.value, "No store found");
-                }
+                //}
             }
         }
         return result;
@@ -199,9 +201,6 @@ public class DeviceInfo {
 
     /**
      * Returns a URL-encoded JSON string containing the device metrics
-     * to be associated with a begin session event.
-     * See the following link for more info:
-     * https://wigzo/resources/reference/server-api
      */
     public String getMetrics(final Context context) {
         Map<String,Object> deviceInfo = new HashMap<>();
