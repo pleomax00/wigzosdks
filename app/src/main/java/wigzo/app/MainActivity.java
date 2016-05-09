@@ -26,21 +26,27 @@ public class MainActivity extends AppCompatActivity {
         WigzoSDK sdk = WigzoSDK.getInstance();
         sdk.onStart();
         sdk.initializeWigzoData(this, "dd968763-6537-43ae-a86c-9d3922ebf319");
+        EventInfo eventInfo3 = new EventInfo("Bought","Bought");
+        sdk.saveEvent(eventInfo3);
+
         EventInfo eventInfo = new EventInfo("view","viewed");
-        EventInfo.Metadata metadata = new EventInfo.Metadata("Iphone","Iphone 6SE");
+        EventInfo.Metadata metadata = new EventInfo.Metadata("1","Iphone","Iphone 6SE",null);
         eventInfo.setMetadata(metadata);
         sdk.saveEvent(eventInfo);
+
         EventInfo eventInfo1 = new EventInfo("addToCart","Add To Cart");
-        EventInfo.Metadata metadata1 = new EventInfo.Metadata("Galaxy S","Galaxy S");
+        EventInfo.Metadata metadata1 = new EventInfo.Metadata("2","Galaxy S","Galaxy S",null);
         metadata1.setTags("Phone");
         eventInfo1.setMetadata(metadata1);
         sdk.saveEvent(eventInfo1);
+
         EventInfo eventInfo2 = new EventInfo("Bought","Bought");
-        EventInfo.Metadata metadata2 = new EventInfo.Metadata("Laptop","Lenovo");
+        EventInfo.Metadata metadata2 = new EventInfo.Metadata("3","Laptop","Lenovo",null);
         metadata2.setTags("Lenovo Flexi");
         metadata2.setPrice(new BigDecimal(45000));
         eventInfo2.setMetadata(metadata2);
         sdk.saveEvent(eventInfo2);
+
         UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
         //user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
         Map<String, String> customData = new HashMap<>();
@@ -49,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         user.setCustomData(customData);
         user.saveUserProfile();
         sdk.onStop();
-        onDestroy();
+        //onDestroy();
 
     }
 }

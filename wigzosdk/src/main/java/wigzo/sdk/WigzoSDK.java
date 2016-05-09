@@ -275,9 +275,9 @@ public class WigzoSDK {
         long duration = (System.currentTimeMillis()/1000l) - this.startTime;
         String durationStr = Long.toString(duration);
         final Map<String, String> sessionData = new HashMap<>();
-        sessionData.put("DeviceId",this.deviceId);
-        sessionData.put("OrgToken",this.orgToken);
-        sessionData.put("SessionData",durationStr);
+        sessionData.put("deviceId",this.deviceId);
+        sessionData.put("orgToken",this.orgToken);
+        sessionData.put("sessionData",durationStr);
         Gson gson = new Gson();
         final String sessionDataStr = gson.toJson(sessionData);
         final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;

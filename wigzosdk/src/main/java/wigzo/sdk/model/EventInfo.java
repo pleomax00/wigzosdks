@@ -14,7 +14,7 @@ import wigzo.sdk.WigzoSDK;
  * <p>An instance of this class represents an event(or activity).</p>
  * Event information includes -
  * <ol>
- *     <li>{@link EventInfo#eventName} - Name of underlying event.</li>
+ *     <li>{@link EventInfo#eventName} - Name of underlying event. It can either be standard event name(as defined under {@link wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.</li>
  *     <li>{@link EventInfo#eventValue} - Value of underlying event. e.g. rating info in case of <i>Rate</i> event</li>
  *     <li>{@link EventInfo#metadata}. For more info see - {@link Metadata}</li>
  * </ol>
@@ -31,7 +31,7 @@ public class EventInfo {
 
     /**
      * Constructor to create {@link EventInfo} object whenever an event( or activity ) takes place
-     * @param eventName : Name of Event ( or activity), must not be null
+     * @param eventName : Name of Event ( or activity), must not be null. It can either be standard event name(as defined under {@link wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.
      * @param eventValue : Value of Event ( or Activity), must not be null
      */
     public EventInfo(String eventName, String eventValue) {
@@ -48,10 +48,10 @@ public class EventInfo {
     /**
      * <code>Metadata</code> class is used to provide additional information about activity.
      * <b>Example</b> : <p>If it is a product page, metadata can be used to provide product details like
-     * <code> {@link Metadata#id}, {@link Metadata#title}, {@link Metadata#description}, {@link Metadata#url}, {@link Metadata#price} </code>
+     * <code> {@link Metadata#productId}, {@link Metadata#title}, {@link Metadata#description}, {@link Metadata#url}, {@link Metadata#price} </code>
      */
     public static class Metadata{
-        private String id;
+        private String productId;
         private String title;
         private String description;
         private String url;
@@ -64,13 +64,13 @@ public class EventInfo {
          * Constructor to obtain <code>Metadata</code> object with id, title, description,url.
          * This object used to provide additional information about activity.
          * <b>Example</b> : If it is a product page, metadata can be used to provide product details like id, title, description, url, price
-         * @param id id of event ( or activity)
+         * @param productId productId of event ( or activity)
          * @param title title of event ( or activity)
          * @param description description of event ( or activity)
          * @param url url of application's  market place or web url
          */
-        public Metadata(String id, String title, String description, String url) {
-            this.id = id;
+        public Metadata(String productId, String title, String description, String url) {
+            this.productId = productId;
             this.title = title;
             this.description = description;
             if(StringUtils.isEmpty(url)){
