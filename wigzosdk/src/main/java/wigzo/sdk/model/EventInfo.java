@@ -1,14 +1,19 @@
 package wigzo.sdk.model;
 
+import com.google.gson.Gson;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import wigzo.sdk.WigzoSDK;
+import wigzo.sdk.helpers.Configuration;
+import wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
  * An instance of this class represents an event(or activity).
@@ -106,6 +111,20 @@ public class EventInfo {
             return this.timestamp.equalsIgnoreCase(eventInfo.timestamp);
         }
         return false;
+    }
+
+    /**
+     * This method is used to store events(or Activities)
+     */
+    public void saveEvent() {
+
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
+        eventInfos.add(this);
+        Gson gson = new Gson();
+        final String eventsStr = gson.toJson(eventInfos);
+        wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
+
     }
 
 

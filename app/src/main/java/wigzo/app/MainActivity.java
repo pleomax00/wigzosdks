@@ -27,25 +27,25 @@ public class MainActivity extends AppCompatActivity {
         sdk.onStart();
         sdk.initializeWigzoData(this, "dd968763-6537-43ae-a86c-9d3922ebf319");
         EventInfo eventInfo3 = new EventInfo("Bought","Bought");
-        sdk.saveEvent(eventInfo3);
+        eventInfo3.saveEvent();
 
         EventInfo eventInfo = new EventInfo("view","viewed");
         EventInfo.Metadata metadata = new EventInfo.Metadata("1","Iphone","Iphone 6SE",null);
         eventInfo.setMetadata(metadata);
-        sdk.saveEvent(eventInfo);
+        eventInfo.saveEvent();
 
         EventInfo eventInfo1 = new EventInfo("addToCart","Add To Cart");
         EventInfo.Metadata metadata1 = new EventInfo.Metadata("2","Galaxy S","Galaxy S",null);
         metadata1.setTags("Phone");
         eventInfo1.setMetadata(metadata1);
-        sdk.saveEvent(eventInfo1);
+        eventInfo1.saveEvent();
 
         EventInfo eventInfo2 = new EventInfo("Bought","Bought");
         EventInfo.Metadata metadata2 = new EventInfo.Metadata("3","Laptop","Lenovo",null);
         metadata2.setTags("Lenovo Flexi");
         metadata2.setPrice(new BigDecimal(45000));
         eventInfo2.setMetadata(metadata2);
-        sdk.saveEvent(eventInfo2);
+        eventInfo2.saveEvent();
 
         UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
         //user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");

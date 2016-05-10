@@ -155,7 +155,7 @@ public class WigzoSDK {
     /**
      * This method is used to store events(or Activities)
      * @param eventInfo instance of EventInfo
-     */
+     *//*
     public synchronized void saveEvent(final EventInfo eventInfo) {
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
@@ -164,7 +164,7 @@ public class WigzoSDK {
         final String eventsStr = this.gson.toJson(eventInfos);
         wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
 
-    }
+    }*/
 
     /**
      * Once the email id of user is obtained, this method is used to map email id to user if it was not mapped when UserProfile instance was created
