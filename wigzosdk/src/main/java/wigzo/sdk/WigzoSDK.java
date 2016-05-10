@@ -2,8 +2,14 @@ package wigzo.sdk;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.google.android.gms.gcm.GcmPubSub;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -175,6 +181,46 @@ public class WigzoSDK {
         }
 
         return this;
+    }
+
+    public void gcmSubscribe() {
+        final InstanceID instanceID = InstanceID.getInstance(getContext());
+        final GcmPubSub pubSub = GcmPubSub.getInstance(getContext());
+
+        Runnable gcmRunnable = new Runnable() {
+            @Override
+            public void run() {
+                String token = null;
+                try {
+                    token = instanceID.getToken("269180167136",
+                            GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                    System.out.println("GCM Registration Token: " + token);
+                    pubSub.subscribe(token, "/topics/" + "global" , null);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // [END get_token]
+
+                // TODO: Implement this method to send any registration to your app's servers.
+//                sendRegistrationToServer(token);
+//
+//                Subscribe to topic channels
+//                subscribeTopics(token);
+            }
+        };
+
+        Thread gcmThread = new Thread(gcmRunnable, "GCM_REGISTRATION_THREAD");
+        gcmThread.start();
+    }
+
+    private void subscribeTopics(String token) throws IOException {
+//        GcmPubSub pubSub = GcmPubSub.getInstance(getContext());
+//        pubSub.subscribe(token, "/topics/" + "global" , null);
+//        pubSub.subscribe(token, "/topics/" + orgToken , null);
+        /*for (String topic : TOPICS) {
+            pubSub.subscribe(token, "/topics/" + topic, null);
+        }*/
     }
 
 
