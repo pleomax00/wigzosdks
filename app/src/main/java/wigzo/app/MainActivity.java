@@ -39,8 +39,9 @@ public class MainActivity extends AppCompatActivity {
         eventInfo2.setMetadata(metadata2);
         sdk.pushEvent(eventInfo2);
         sdk.mapEmail("suyash@wigzo.com");
-        sdk.onStop();
-        onDestroy();
+        sdk.gcmSubscribe();
+//        sdk.onStop();
+//        onDestroy();
 
     }
 }
