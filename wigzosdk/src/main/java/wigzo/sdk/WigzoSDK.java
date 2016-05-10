@@ -293,9 +293,9 @@ public class WigzoSDK {
 
     }
 
-   /* public synchronized boolean isLoggingEnabled() {
+    public synchronized boolean isLoggingEnabled() {
         return this.enableLogging;
-    }*/
+    }
 
     public synchronized String getDeviceId() {
         return deviceId;

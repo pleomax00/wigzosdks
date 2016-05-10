@@ -60,9 +60,9 @@ public class ConnectionStream {
             writer.flush();
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
-            //if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
+            if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
-           // }
+            }
             return success;
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,9 +155,9 @@ public class ConnectionStream {
 
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
-            //if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
+            if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
-            //}
+            }
             return success;
         } catch (Exception e) {
             e.printStackTrace();
