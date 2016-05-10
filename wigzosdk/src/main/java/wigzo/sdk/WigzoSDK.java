@@ -154,7 +154,7 @@ public class WigzoSDK {
 
     /**
      * This method is used to store events(or Activities)
-     * @param {@Link EventInfo) object
+     * @param eventInfo instance of EventInfo
      */
     public synchronized void saveEvent(final EventInfo eventInfo) {
 
@@ -167,7 +167,7 @@ public class WigzoSDK {
     }
 
     /**
-     * <p>Once the email id of user is obtained, this method is used to map email id to user if it was not mapped when {@Link UserProfile} was created</p>
+     * Once the email id of user is obtained, this method is used to map email id to user if it was not mapped when UserProfile instance was created
      * @param emailId email id of user
      */
     public synchronized void mapEmail(final String emailId){

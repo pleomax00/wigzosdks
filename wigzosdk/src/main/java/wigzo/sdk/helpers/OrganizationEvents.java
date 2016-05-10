@@ -3,11 +3,11 @@ package wigzo.sdk.helpers;
 
 /**
  * Utility for standard events. It's advisable to use standard events so that Wigzo's recommendation engine can function properly.
- * <p>Although you are free to use custom event names.</p>
- * <p>Standard events can be used as follows - </p>
- * <code><pre>
+ * Although you are free to use custom event names.
+ * Standard events can be used as follows -
+ *
  *     EventInfo eventInfo = new EventInfo( OrganizationEvents.Events.SEARCH.key,"iphone" );
- * </pre></code>
+ *
  */
 public class OrganizationEvents {
 

@@ -24,7 +24,7 @@ import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
 
 /**
- * <p>An instance of this class represents information of device.</p>
+ * An instance of this class represents information of device.
  *
  * @author Minaz Ali
  */

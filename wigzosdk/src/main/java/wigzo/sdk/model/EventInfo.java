@@ -11,13 +11,11 @@ import java.util.Objects;
 import wigzo.sdk.WigzoSDK;
 
 /**
- * <p>An instance of this class represents an event(or activity).</p>
+ * An instance of this class represents an event(or activity).
  * Event information includes -
- * <ol>
- *     <li>{@link EventInfo#eventName} - Name of underlying event. It can either be standard event name(as defined under {@link wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.</li>
- *     <li>{@link EventInfo#eventValue} - Value of underlying event. e.g. rating info in case of <i>Rate</i> event</li>
- *     <li>{@link EventInfo#metadata}. For more info see - {@link Metadata}</li>
- * </ol>
+ * {@link EventInfo#eventName} - Name of underlying event. It can either be standard event name(as defined under {@link wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.
+ * {@link EventInfo#eventValue} - Value of underlying event. e.g. rating info in case of Rate event
+ * {@link EventInfo#metadata}. For more info see - {@link Metadata}
  * @author Minaz Ali
  */
 
@@ -45,10 +43,9 @@ public class EventInfo {
         this.metadata = metadata;
     }
 
-    /**
-     * <code>Metadata</code> class is used to provide additional information about activity.
-     * <b>Example</b> : <p>If it is a product page, metadata can be used to provide product details like
-     * <code> {@link Metadata#productId}, {@link Metadata#title}, {@link Metadata#description}, {@link Metadata#url}, {@link Metadata#price} </code>
+    /**{@code Metadata} class is used to provide additional information about activity.
+     * Example : <p>If it is a product page, metadata can be used to provide product details like
+     * {@link Metadata#productId}, {@link Metadata#title}, {@link Metadata#description}, {@link Metadata#url}, {@link Metadata#price}
      */
     public static class Metadata{
         private String productId;
@@ -61,9 +58,9 @@ public class EventInfo {
         public Metadata (){}
 
         /**
-         * Constructor to obtain <code>Metadata</code> object with id, title, description,url.
+         * Constructor to obtain {@code Metadata} object with id, title, description,url.
          * This object used to provide additional information about activity.
-         * <b>Example</b> : If it is a product page, metadata can be used to provide product details like id, title, description, url, price
+         * Example: If it is a product page, metadata can be used to provide product details like id, title, description, url, price
          * @param productId productId of event ( or activity)
          * @param title title of event ( or activity)
          * @param description description of event ( or activity)

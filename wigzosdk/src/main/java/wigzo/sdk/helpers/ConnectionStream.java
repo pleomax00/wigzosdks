@@ -15,9 +15,7 @@ import java.net.URLConnection;
 
 import wigzo.sdk.WigzoSDK;
 
-/**
- * @Author Minaz Ali
- */
+
 public class ConnectionStream {
 
     private static final int CONNECT_TIMEOUT_IN_MILLISECONDS = 30000;

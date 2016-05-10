@@ -16,19 +16,18 @@ import wigzo.sdk.helpers.Configuration;
 import wigzo.sdk.helpers.ConnectionStream;
 
 /**
- * <p>An instance of this class represents Profile of user.</p>
+ * An instance of this class represents Profile of user.
  * Profile information includes -
- * <ol>
- *     <li>{@link UserProfile#fullName} - Full name of user.</li>
- *     <li>{@link UserProfile#userName} - user name of user.</li>
- *     <li>{@link UserProfile#email} - email of user.</li>
- *     <li>{@link UserProfile#organization} - Organization details of application t.</li>
- *     <li>{@link UserProfile#phone} - phone number of user.</li>
- *     <li>{@link UserProfile#gender} - gender of user.</li>
- *     <li>{@link UserProfile#birthYear} - birth year of user.</li>
- *     <li>{@link UserProfile#picturePath} - user's profile picture's path.</li>
- *     <li>{@link UserProfile#customData} - Map of custom data ( any other addition data).</li>
- * </ol>
+ * {@link UserProfile#fullName} - Full name of user.
+ * {@link UserProfile#userName} - user name of user.
+ * {@link UserProfile#email} - email of user.
+ * {@link UserProfile#organization} - Organization details of application .
+ * {@link UserProfile#phone} - phone number of user.
+ * {@link UserProfile#gender} - gender of user.
+ * {@link UserProfile#birthYear} - birth year of user.
+ * {@link UserProfile#picturePath} - user's profile picture's path.
+ * {@link UserProfile#customData} - Map of custom data ( any other addition data).
+ *
  * @author Minaz Ali
  */
 

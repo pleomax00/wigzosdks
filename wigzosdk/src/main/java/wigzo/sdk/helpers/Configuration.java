@@ -14,7 +14,7 @@ public enum Configuration {
     DEVICE_ID_KEY("deviceIdKey","DEVICE_ID_KEY"),
     APP_KEY("appKey","APP_KEY"),
     EMAIL_KEY("emailKey","EMAIL_KEY"),
-    BASE_URL("baseUrl","http://suyash.wigzoes.com"),
+    BASE_URL("baseUrl","http://minaz.wigzoes.com"),
     INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
     EVENT_DATA_URL("eventDataUrl","/androidsdk/geteventdata"),
     SESSION_DATA_URL("sessionDataUrl","/androidsdk/getsessiondata"),
