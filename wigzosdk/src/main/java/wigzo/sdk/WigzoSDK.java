@@ -167,6 +167,8 @@ public class WigzoSDK {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
+        }else {
+            this.deviceId = storedDeviceId;
         }
 
         return this;
@@ -175,7 +177,7 @@ public class WigzoSDK {
     /**
      * This method is used to store events(or Activities)
      * @param eventInfo instance of EventInfo
-     */
+     *//*
     public synchronized void saveEvent(final EventInfo eventInfo) {
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
@@ -184,7 +186,7 @@ public class WigzoSDK {
         final String eventsStr = this.gson.toJson(eventInfos);
         wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
 
-    }
+    }*/
 
     /**
      * Once the email id of user is obtained, this method is used to map email id to user if it was not mapped when UserProfile instance was created
@@ -294,23 +296,25 @@ public class WigzoSDK {
 
         long duration = (System.currentTimeMillis()/1000l) - this.startTime;
         String durationStr = Long.toString(duration);
-        final Map<String, String> sessionData = new HashMap<>();
-        sessionData.put("deviceId",this.deviceId);
-        sessionData.put("orgToken",this.orgToken);
-        sessionData.put("sessionData",durationStr);
-        Gson gson = new Gson();
-        final String sessionDataStr = gson.toJson(sessionData);
-        final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                ConnectionStream.postRequest(url,sessionDataStr);
-            }
-        });
+        boolean checkStatus = checkWigzoData();
+        if(checkStatus) {
+            final Map<String, String> sessionData = new HashMap<>();
+            sessionData.put("deviceId", this.deviceId);
+            sessionData.put("orgToken", this.orgToken);
+            sessionData.put("sessionData", durationStr);
+            Gson gson = new Gson();
+            final String sessionDataStr = gson.toJson(sessionData);
+            final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    ConnectionStream.postRequest(url, sessionDataStr);
+                }
+            });
        /* WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
         storage.getSharedStorage().edit().clear().commit();*/
-
+        }
     }
 
     public synchronized boolean isLoggingEnabled() {
