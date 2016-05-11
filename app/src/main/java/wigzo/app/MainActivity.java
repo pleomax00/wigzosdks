@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         }
         WigzoSDK sdk = WigzoSDK.getInstance();
         sdk.onStart();
-        sdk.initializeWigzoData(this, "dd968763-6537-43ae-a86c-9d3922ebf319");
+        sdk.initializeWigzoData(this, "56065c5b-db30-4b89-bd76-0a9c2938c90b");
         EventInfo eventInfo3 = new EventInfo("Bought","Bought");
         eventInfo3.saveEvent();
 

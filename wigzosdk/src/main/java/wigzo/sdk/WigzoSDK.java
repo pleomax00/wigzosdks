@@ -147,6 +147,8 @@ public class WigzoSDK {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
+        }else {
+            this.deviceId = storedDeviceId;
         }
 
         return this;
@@ -274,23 +276,25 @@ public class WigzoSDK {
 
         long duration = (System.currentTimeMillis()/1000l) - this.startTime;
         String durationStr = Long.toString(duration);
-        final Map<String, String> sessionData = new HashMap<>();
-        sessionData.put("deviceId",this.deviceId);
-        sessionData.put("orgToken",this.orgToken);
-        sessionData.put("sessionData",durationStr);
-        Gson gson = new Gson();
-        final String sessionDataStr = gson.toJson(sessionData);
-        final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                ConnectionStream.postRequest(url,sessionDataStr);
-            }
-        });
+        boolean checkStatus = checkWigzoData();
+        if(checkStatus) {
+            final Map<String, String> sessionData = new HashMap<>();
+            sessionData.put("deviceId", this.deviceId);
+            sessionData.put("orgToken", this.orgToken);
+            sessionData.put("sessionData", durationStr);
+            Gson gson = new Gson();
+            final String sessionDataStr = gson.toJson(sessionData);
+            final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    ConnectionStream.postRequest(url, sessionDataStr);
+                }
+            });
        /* WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
         storage.getSharedStorage().edit().clear().commit();*/
-
+        }
     }
 
     public synchronized boolean isLoggingEnabled() {
