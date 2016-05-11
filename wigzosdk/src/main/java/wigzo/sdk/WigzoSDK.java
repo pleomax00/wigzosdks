@@ -91,7 +91,7 @@ public class WigzoSDK {
 //    }
 
     public void gcmRegister() {
-        Intent intent = new Intent(getContext(), RegistrationIntentService.class);
+        Intent intent = new Intent(getContext(), WigzoRegistrationIntentService.class);
         getContext().startService(intent);
     }
 
