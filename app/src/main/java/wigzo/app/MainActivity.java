@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         metadata2.setPrice(new BigDecimal(45000));
         eventInfo2.setMetadata(metadata2);
         sdk.saveEvent(eventInfo2);
+        sdk.gcmRegister();
 
         UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
         //user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");

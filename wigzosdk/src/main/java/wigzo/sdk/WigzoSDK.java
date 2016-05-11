@@ -1,7 +1,11 @@
 package wigzo.sdk;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+
+//import com.google.android.gms.common.ConnectionResult;
+//import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
@@ -38,6 +42,11 @@ public class WigzoSDK {
     private long startTime;
     private String emailId;
     private Gson gson;
+    private String senderId = "1080912767729";
+
+    public String getSenderId() {
+        return senderId;
+    }
 
 
     /**
@@ -73,6 +82,17 @@ public class WigzoSDK {
                 checkAndPushEvent();
 
             }},timer,timer, TimeUnit.SECONDS);
+    }
+
+//    private boolean checkPlayServices() {
+//        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+//        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+//        return resultCode == ConnectionResult.SUCCESS;
+//    }
+
+    public void gcmRegister() {
+        Intent intent = new Intent(getContext(), RegistrationIntentService.class);
+        getContext().startService(intent);
     }
 
     /**
