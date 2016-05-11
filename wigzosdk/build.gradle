@@ -39,7 +39,7 @@ dependencies {
 }
 
 group = 'com.github.pleomax00'
-version = '1.0.4'   // Update version number for next release.
+version = '1.0.6'   // Update version number for next release.
 
 allprojects {
     repositories {
@@ -86,7 +86,7 @@ install {
             packaging 'aar'
             groupId 'com.github.pleomax00'
             artifactId 'wigzosdk'
-            version '1.0.4'     // Update version number for next release.
+            version '1.0.6'     // Update version number for next release.
 
             licenses {
                 license {
@@ -228,7 +228,7 @@ bintray {
         vcsUrl = 'https://github.com/pleomax00/wigzosdks.git'
         publish = true
         version {
-            name = '1.0.4' // Update version number for next release.
+            name = '1.0.6' // Update version number for next release.
 //            desc = //Optional - Version-specific description'
             gpg {
                 sign = true //Determines whether to GPG sign the files. The default is false

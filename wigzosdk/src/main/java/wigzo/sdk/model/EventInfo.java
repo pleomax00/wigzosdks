@@ -66,10 +66,10 @@ public class EventInfo {
          * Constructor to obtain {@code Metadata} object with id, title, description,url.
          * This object used to provide additional information about activity.
          * Example: If it is a product page, metadata can be used to provide product details like id, title, description, url, price
-         * @param productId productId of event ( or activity)
-         * @param title title of event ( or activity)
-         * @param description description of event ( or activity)
-         * @param url url of application's  market place or web url
+         * @param productId productId of Item
+         * @param title title of Item
+         * @param description description of Item
+         * @param url url of application's  market place or web
          */
         public Metadata(String productId, String title, String description, String url) {
             this.productId = productId;
