@@ -27,6 +27,7 @@ import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -65,19 +66,19 @@ public class WigzoRegistrationIntentService extends IntentService {
             // TODO: Implement this method to send any registration to your app's servers.
             sendRegistrationToServer(token);
 
+            mapGcmToDeviceId(token);
+
             // Subscribe to topic channels
             subscribeTopics(token);
 
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
-            sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, true).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
-            sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false).apply();
         }
         // Notify UI that registration has completed, so the progress indicator can be hidden.
         Intent registrationComplete = new Intent(QuickstartPreferences.REGISTRATION_COMPLETE);
@@ -97,17 +98,52 @@ public class WigzoRegistrationIntentService extends IntentService {
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
 
-        Map<String, Object> eventData = new HashMap<>();
-        eventData.put("registraionId", token);
-        eventData.put("orgtoken", WigzoSDK.getInstance().getOrgToken());
+        // Send to server only when the token is not yet sent
+        if (!sharedPreferences.getBoolean(Configuration.SENT_TOKEN_TO_SERVER.value, false)) {
+            Map<String, Object> eventData = new HashMap<>();
+            eventData.put("registrationId", token);
+            eventData.put("orgtoken", WigzoSDK.getInstance().getOrgToken());
 
-        final String eventDataStr = gson.toJson(eventData);
-        final String url = Configuration.BASE_URL.value + Configuration.GCM_REGISTRATION_URL.value;
+            final String eventDataStr = gson.toJson(eventData);
+            final String url = Configuration.BASE_URL.value + Configuration.GCM_REGISTRATION_URL.value;
 
-        ConnectionStream.postRequest(url, eventDataStr);
-        Boolean success =
-        if (success) {
-            sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, true).apply();
+            String response = ConnectionStream.postRequest(url, eventDataStr);
+            if (null != response) {
+                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                }.getType());
+                if ("success".equals(jsonResponse.get("status"))) {
+                    sharedPreferences.edit().putBoolean(Configuration.SENT_TOKEN_TO_SERVER.value, true).apply();
+                }
+            }
+        }
+
+    }
+
+    private void mapGcmToDeviceId(String token) {
+        Gson gson = new Gson();
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+        Boolean initDataSynced = sharedPreferences.getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, false);
+        Boolean isGcmDeviceMapped = sharedPreferences.getBoolean(Configuration.GCM_DEVICE_MAPPED.value, false);
+        if (initDataSynced && !isGcmDeviceMapped) {
+            Map<String, Object> eventData = new HashMap<>();
+            String deviceId = sharedPreferences.getString(Configuration.DEVICE_ID_KEY.value, "");
+
+            eventData.put("registrationId", token);
+            eventData.put("orgtoken", WigzoSDK.getInstance().getOrgToken());
+            eventData.put("deviceId", deviceId);
+
+            final String eventDataStr = gson.toJson(eventData);
+            final String url = Configuration.BASE_URL.value + Configuration.GCM_DEVICE_MAPPING_URL.value;
+
+            String response = ConnectionStream.postRequest(url, eventDataStr);
+            if (null != response) {
+                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                }.getType());
+                if ("success".equals(jsonResponse.get("status"))) {
+                    sharedPreferences.edit().putBoolean(Configuration.GCM_DEVICE_MAPPED.value, true);
+                }
+            }
         }
     }
 

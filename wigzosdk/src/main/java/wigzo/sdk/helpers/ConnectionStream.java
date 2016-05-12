@@ -2,10 +2,12 @@ package wigzo.sdk.helpers;
 
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -27,7 +29,7 @@ public class ConnectionStream {
      * @param data : data
      * @return Boolean: success status ( true or false ) whether post request was sent successfully or not
      */
-    public static boolean postRequest(String urlStr, String data)
+    public static String postRequest(String urlStr, String data)
     {
         Log.d("server url: ", urlStr);
         final URL url;
@@ -46,6 +48,7 @@ public class ConnectionStream {
         connection.setDoOutput(true);
         OutputStream outputStream = null;
         BufferedWriter writer = null;
+        String response = null; //default json response
 
 
         try {
@@ -57,11 +60,21 @@ public class ConnectionStream {
             writer.write(data);
             writer.flush();
             final int responseCode = connection.getResponseCode();
+
             boolean success = responseCode >= 200 && responseCode < 300;
+            if (success) {
+                BufferedReader r = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder responseBuilder = new StringBuilder();
+                String line;
+                while ((line = r.readLine()) != null) {
+                    responseBuilder.append(line).append('\n');
+                }
+                response = responseBuilder.toString();
+            }
             if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
             }
-            return success;
+            return response;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,12 +91,11 @@ public class ConnectionStream {
                 e.printStackTrace();
             }
 
-            if (connection != null && connection instanceof HttpURLConnection) {
+            if (null != connection && connection instanceof HttpURLConnection) {
                 (connection).disconnect();
             }
         }
-        return false;
-
+        return null;
     }
 
     /**

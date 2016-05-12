@@ -17,8 +17,12 @@
 package wigzo.sdk;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
+
+import wigzo.sdk.helpers.Configuration;
+import wigzo.sdk.helpers.WigzoSharedStorage;
 
 public class WigzoInstanceIDListenerService extends InstanceIDListenerService {
 
@@ -33,6 +37,11 @@ public class WigzoInstanceIDListenerService extends InstanceIDListenerService {
     @Override
     public void onTokenRefresh() {
         // Fetch updated Instance ID token and notify our app's server of any changes (if applicable).
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+        // Setting SENT_TOKEN_TO_SERVER to false since we want to refresh the token.
+        sharedPreferences.edit().putBoolean(Configuration.SENT_TOKEN_TO_SERVER.value, false).apply();
+
         Intent intent = new Intent(this, WigzoRegistrationIntentService.class);
         startService(intent);
     }

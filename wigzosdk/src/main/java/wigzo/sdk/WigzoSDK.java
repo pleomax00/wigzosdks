@@ -7,6 +7,8 @@ import android.util.Log;
 //import com.google.android.gms.common.ConnectionResult;
 //import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -127,8 +129,9 @@ public class WigzoSDK {
         }else{
             this.appKey = storedAppKey;
         }
-        String storedDeviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value, "");
-        if(StringUtils.isEmpty(storedDeviceId)){
+//        String storedDeviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value, "");
+        Boolean initDataSynced = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, false);
+        if(!(initDataSynced)) {
            this.deviceId  = UUID.randomUUID().toString();
            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.DEVICE_ID_KEY.value, this.deviceId).apply();
            final String userData = getUserIdentificationData();
@@ -136,27 +139,42 @@ public class WigzoSDK {
            ExecutorService executorService = Executors.newSingleThreadExecutor();
            Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
                 public Boolean call()  {
-                    Boolean success = ConnectionStream.postRequest(url,userData);
-                    return success;
+                    String response = ConnectionStream.postRequest(url,userData);
+                    if (null != response) {
+                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                        }.getType());
+                        if ("success".equals(jsonResponse.get("status"))) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }});
             try {
                 if(future.get()){
-                    wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value,"true").apply();
+                    wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, true).apply();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-        }else if(StringUtils.isEmpty(wigzoSharedStorage.getSharedStorage().getString(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value,""))){
+        }
+        /*else if(StringUtils.isEmpty(wigzoSharedStorage.getSharedStorage().getString(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value,""))){
             this.deviceId = storedDeviceId;
             final String userData = getUserIdentificationData();
             final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
                 public Boolean call()  {
-                    Boolean success = ConnectionStream.postRequest(url,userData);
-                    return success;
+                    String response = ConnectionStream.postRequest(url,userData);
+                    if (null != response) {
+                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                        }.getType());
+                        if ("success".equals(jsonResponse.get("status"))) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }});
             try {
                 if(future.get()){
@@ -169,7 +187,7 @@ public class WigzoSDK {
             }
         }else {
             this.deviceId = storedDeviceId;
-        }
+        }*/
 
         return this;
     }
