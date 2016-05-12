@@ -26,8 +26,15 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import wigzo.sdk.helpers.Configuration;
+import wigzo.sdk.helpers.ConnectionStream;
+import wigzo.sdk.helpers.WigzoSharedStorage;
 
 public class WigzoRegistrationIntentService extends IntentService {
 
@@ -86,7 +93,22 @@ public class WigzoRegistrationIntentService extends IntentService {
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
-        // Add custom implementation, as needed.
+        Gson gson = new Gson();
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+
+        Map<String, Object> eventData = new HashMap<>();
+        eventData.put("registraionId", token);
+        eventData.put("orgtoken", WigzoSDK.getInstance().getOrgToken());
+
+        final String eventDataStr = gson.toJson(eventData);
+        final String url = Configuration.BASE_URL.value + Configuration.GCM_REGISTRATION_URL.value;
+
+        ConnectionStream.postRequest(url, eventDataStr);
+        Boolean success =
+        if (success) {
+            sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, true).apply();
+        }
     }
 
     /**

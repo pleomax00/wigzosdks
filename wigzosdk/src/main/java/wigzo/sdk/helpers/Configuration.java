@@ -20,6 +20,7 @@ public enum Configuration {
     SESSION_DATA_URL("sessionDataUrl","/androidsdk/getsessiondata"),
     USER_PROFILE_URL("userProfileUrl","/androidsdk/getuserprofiledata"),
     EMAIL_DATA_URL("emailDataUrl","/androidsdk/mapemail"),
+    GCM_REGISTRATION_URL("gcmRegistrationUrl", "/rest/v1/push/android/register-subscription"),
     TIME_DELAY("timeDelay","5");
 
     public String key;
