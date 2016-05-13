@@ -80,8 +80,8 @@ public class WigzoRegistrationIntentService extends IntentService {
             // on a third-party server, this ensures that we'll attempt the update at a later time.
         }
         // Notify UI that registration has completed, so the progress indicator can be hidden.
-        Intent registrationComplete = new Intent(QuickstartPreferences.REGISTRATION_COMPLETE);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+//        Intent registrationComplete = new Intent(QuickstartPreferences.REGISTRATION_COMPLETE);
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 
     /**
