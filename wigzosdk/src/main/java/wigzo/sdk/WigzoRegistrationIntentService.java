@@ -40,7 +40,6 @@ import wigzo.sdk.helpers.WigzoSharedStorage;
 public class WigzoRegistrationIntentService extends IntentService {
 
     private static final String TAG = "RegIntentService";
-    private static final String[] TOPICS = {"global"};
 
     public WigzoRegistrationIntentService() {
         super(TAG);
@@ -99,7 +98,7 @@ public class WigzoRegistrationIntentService extends IntentService {
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
 
         // Send to server only when the token is not yet sent
-        if (!sharedPreferences.getBoolean(Configuration.SENT_TOKEN_TO_SERVER.value, false)) {
+        if (!sharedPreferences.getBoolean(Configuration.SENT_GCM_TOKEN_TO_SERVER.value, false)) {
             Map<String, Object> eventData = new HashMap<>();
             eventData.put("registrationId", token);
             eventData.put("orgtoken", WigzoSDK.getInstance().getOrgToken());
@@ -112,7 +111,7 @@ public class WigzoRegistrationIntentService extends IntentService {
                 Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
                 }.getType());
                 if ("success".equals(jsonResponse.get("status"))) {
-                    sharedPreferences.edit().putBoolean(Configuration.SENT_TOKEN_TO_SERVER.value, true).apply();
+                    sharedPreferences.edit().putBoolean(Configuration.SENT_GCM_TOKEN_TO_SERVER.value, true).apply();
                 }
             }
         }
@@ -156,9 +155,7 @@ public class WigzoRegistrationIntentService extends IntentService {
     // [START subscribe_topics]
     private void subscribeTopics(String token) throws IOException {
         GcmPubSub pubSub = GcmPubSub.getInstance(this);
-        for (String topic : TOPICS) {
-            pubSub.subscribe(token, "/topics/" + topic, null);
-        }
+        pubSub.subscribe(token, "/topics/" + WigzoSDK.getInstance().getOrgToken(), null);
     }
     // [END subscribe_topics]
 

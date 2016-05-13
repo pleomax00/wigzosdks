@@ -14,7 +14,7 @@ public enum Configuration {
     DEVICE_ID_KEY("deviceIdKey","DEVICE_ID_KEY"),
     APP_KEY("appKey","APP_KEY"),
     EMAIL_KEY("emailKey","EMAIL_KEY"),
-    SENT_TOKEN_TO_SERVER("sentTokenToServer", "SENT_TOKEN_TO_SERVER"),
+    SENT_GCM_TOKEN_TO_SERVER("sentTokenToServer", "SENT_GCM_TOKEN_TO_SERVER"),
     BASE_URL("baseUrl","http://ankit.wigzoes.com"),
     INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
     EVENT_DATA_URL("eventDataUrl","/androidsdk/geteventdata"),
@@ -22,7 +22,7 @@ public enum Configuration {
     USER_PROFILE_URL("userProfileUrl","/androidsdk/getuserprofiledata"),
     EMAIL_DATA_URL("emailDataUrl","/androidsdk/mapemail"),
     GCM_REGISTRATION_URL("gcmRegistrationUrl", "/rest/v1/push/android/register-subscription"),
-    GCM_DEVICE_MAPPING_URL("gcmDeviceMappingUrl", ""),
+    GCM_DEVICE_MAPPING_URL("gcmDeviceMappingUrl", "/androidsdk/map-gcm"),
     TIME_DELAY("timeDelay","5"),
     GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED");
 
