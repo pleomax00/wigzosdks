@@ -28,9 +28,11 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import wigzo.sdk.helpers.Configuration;
+
 public class WigzoGcmListenerService extends GcmListenerService {
 
-    private static final String TAG = "WigzoGcmListenerService";
+    //private static final String TAG = "WigzoGcmListenerService";
 
     /**
      * Called when message is received.
@@ -43,8 +45,8 @@ public class WigzoGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
+        Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "From: " + from);
+        Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + message);
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.

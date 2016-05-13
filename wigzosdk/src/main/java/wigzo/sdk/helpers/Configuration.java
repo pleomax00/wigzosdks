@@ -8,6 +8,8 @@ public enum Configuration {
     DEVICE_ID_TAG("deviceIdTag","DeviceInfo"),
     DEFAULT_SDK_VERSION("defaultSdkVersion","1.0"),
     WIGZO_SDK_TAG("wigzoSdkTag","Wigzo"),
+    WIGZO_GCM_LISTENER_SERVICE_TAG("wigzoGCMListenerServiceTag","WigzoGcmListenerService"),
+    WIGZO_REG_INTENT_SERVICE_TAG("wigzoRegIntentServiceTag","RegIntentService"),
     WIGZO_INIT_DATA_SYNC_FLAG_KEY("wigzoInitiDataSyncFlag","WIGZO_INIT_DATA_SYNC_FLAG_KEY"),
     STORAGE_KEY("storageKey","WIGZO_SHARED_STORAGE"),
     EVENTS_KEY("eventKey","WIGZO_EVENTS"),

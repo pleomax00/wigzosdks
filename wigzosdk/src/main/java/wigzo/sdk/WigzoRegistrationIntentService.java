@@ -39,10 +39,10 @@ import wigzo.sdk.helpers.WigzoSharedStorage;
 
 public class WigzoRegistrationIntentService extends IntentService {
 
-    private static final String TAG = "RegIntentService";
+    //private static final String TAG = "RegIntentService";
 
     public WigzoRegistrationIntentService() {
-        super(TAG);
+        super(Configuration.WIGZO_REG_INTENT_SERVICE_TAG.value);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class WigzoRegistrationIntentService extends IntentService {
             String token = instanceID.getToken(WigzoSDK.getInstance().getSenderId(),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // [END get_token]
-            Log.i(TAG, "GCM Registration Token: " + token);
+            Log.i(Configuration.WIGZO_REG_INTENT_SERVICE_TAG.value, "GCM Registration Token: " + token);
 
             // TODO: Implement this method to send any registration to your app's servers.
             sendRegistrationToServer(token);
@@ -75,7 +75,7 @@ public class WigzoRegistrationIntentService extends IntentService {
             // otherwise your server should have already received the token.
             // [END register_for_gcm]
         } catch (Exception e) {
-            Log.d(TAG, "Failed to complete token refresh", e);
+            Log.d(Configuration.WIGZO_REG_INTENT_SERVICE_TAG.value, "Failed to complete token refresh", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
         }
