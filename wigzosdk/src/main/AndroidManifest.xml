@@ -8,7 +8,7 @@
         android:supportsRtl="true">
 
         <!-- [START gcm_receiver] -->
-        <receiver
+        <!--receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND" >
@@ -16,17 +16,17 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="com.testapp" />
             </intent-filter>
-        </receiver>
+        </receiver-->
         <!-- [END gcm_receiver] -->
 
         <!-- [START gcm_listener] -->
-        <service
+        <!--service
             android:name="wigzo.sdk.WigzoGcmListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
-        </service>
+        </service-->
         <!-- [END gcm_listener] -->
         <!-- [START instanceId_listener] -->
         <service

@@ -1,7 +1,9 @@
 package wigzo.sdk;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -15,15 +17,13 @@ import java.util.Random;
  * Created by ankit on 16/5/16.
  */
 public class WigzoNotification {
-    public static void simpleNotification(String title, String body, Map<String, Object> intentDataMap, Integer notification_id) {
+    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, Map<String, Object> intentDataMap, Integer notification_id) {
         // if notification_id is provided use it.
         int mNotificationId = null != notification_id ? notification_id : new Random().nextInt();
-        Log.d("----------------------", WigzoSDK.getInstance().getContext().toString());
-        Log.d("----------------------", WigzoSDK.getInstance().getOrgToken());
-        int icon = WigzoSDK.getInstance().getContext().getApplicationInfo().icon;
+        int icon = applicationContext.getApplicationInfo().icon;
 
 
-        Intent resultIntent = new Intent(WigzoSDK.getInstance().getContext(), WigzoSDK.getInstance().getTargetActivity());
+        Intent resultIntent = new Intent(applicationContext, targetActivity);
 
         if (null != intentDataMap) {
             for (Map.Entry<String, Object> entry : intentDataMap.entrySet())
@@ -44,14 +44,14 @@ public class WigzoNotification {
         // no need to create an artificial back stack.
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
-                        WigzoSDK.getInstance().getContext(),
+                        applicationContext,
                         0,
                         resultIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(WigzoSDK.getInstance().getContext())
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setSmallIcon(icon)
                 .setContentTitle(title)
                 .setContentText(body)
@@ -62,7 +62,7 @@ public class WigzoNotification {
 
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr =
-                (NotificationManager) WigzoSDK.getInstance().getContext().getSystemService(WigzoSDK.getInstance().getContext().NOTIFICATION_SERVICE);
+                (NotificationManager) applicationContext.getSystemService(applicationContext.NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, notificationBuilder.build());
     }

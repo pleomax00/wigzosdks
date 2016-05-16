@@ -16,6 +16,7 @@
 
 package wigzo.sdk;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -37,7 +38,10 @@ import java.util.Map;
 
 import wigzo.sdk.helpers.Configuration;
 
-public class WigzoGcmListenerService extends GcmListenerService {
+public abstract class WigzoGcmListenerService extends GcmListenerService {
+
+
+    protected abstract Class <? extends Activity> getTargetActivity();
 
     //private static final String TAG = "WigzoGcmListenerService";
 
@@ -65,7 +69,7 @@ public class WigzoGcmListenerService extends GcmListenerService {
         }.getType());
 
         if (StringUtils.equals(type, "simple_push")) {
-            WigzoNotification.simpleNotification(title, body, intentDataMap, notification_id);
+            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentDataMap, notification_id);
         }
 
         if (from.startsWith("/topics/")) {
