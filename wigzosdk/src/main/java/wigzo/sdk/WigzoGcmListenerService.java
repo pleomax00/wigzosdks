@@ -63,8 +63,11 @@ public abstract class WigzoGcmListenerService extends GcmListenerService {
         String type = (String) data.get("type");
         String title = (String) data.get("title");
         String body = (String) data.get("body");
-        Integer notification_id = (Integer) data.get("notification_id");
         String intentData = (String) data.get("intent_data");
+
+        String notification_id_str = (String) data.get("notification_id");
+        Integer notification_id = StringUtils.isEmpty(notification_id_str) ? null : Integer.parseInt(notification_id_str);
+
         Map<String, Object> intentDataMap = gson.fromJson(intentData, new TypeToken<HashMap<String, Object>>() {
         }.getType());
 
