@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
 import wigzo.sdk.helpers.ConnectionStream;
+import wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
  * An instance of this class represents Profile of user.
@@ -117,7 +118,8 @@ public class UserProfile {
      */
     public void saveUserProfile(){
         if(WigzoSDK.getInstance().checkWigzoData()) {
-            String deviceId = WigzoSDK.getInstance().getDeviceId();
+            WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+            String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
             String orgToken = WigzoSDK.getInstance().getOrgToken();
             String appKey = WigzoSDK.getInstance().getAppKey();
             Gson gson = new Gson();
