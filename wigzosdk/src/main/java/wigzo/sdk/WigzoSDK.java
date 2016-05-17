@@ -1,5 +1,6 @@
 package wigzo.sdk;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -44,7 +45,9 @@ public class WigzoSDK {
     private long startTime;
     private String emailId;
     private Gson gson;
-    private String senderId = "1080912767729";
+    private String senderId;
+
+    Class <? extends Activity> targetActivity;
 
     public String getSenderId() {
         return senderId;
@@ -164,10 +167,11 @@ public class WigzoSDK {
     }
 
 
-    public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken, String senderId){
+    public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken, String senderId, Class <? extends Activity> targetActivity){
         initializeWigzoData(context,orgToken);
         if(StringUtils.isNotEmpty(senderId)){
             this.senderId = senderId;
+            this.targetActivity = targetActivity;
             gcmRegister();
         }else {
             throw new IllegalArgumentException("Valid Sender Id is required!");
@@ -354,4 +358,9 @@ public class WigzoSDK {
     public synchronized String getAppKey() {
         return appKey;
     }
+
+    public Class<? extends Activity> getTargetActivity() {
+        return targetActivity;
+    }
+
 }

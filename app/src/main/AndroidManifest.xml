@@ -10,22 +10,45 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/w_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name="wigzo.app.ClassA">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".ClassB"
             android:label="@string/app_name">
 
         </activity>
 
+        <activity android:name=".PushCatcherActivity"></activity>
+
+        <uses-permission android:name="android.permission.VIBRATE" />
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.testapp" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name="wigzo.app.WigzoGcmListenerServiceImpl"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+>>>>>>> 03bb0cf22621551da463d8f96219d093816c56d8
     </application>
 
 </manifest>

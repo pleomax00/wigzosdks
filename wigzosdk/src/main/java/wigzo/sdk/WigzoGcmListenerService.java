@@ -16,6 +16,7 @@
 
 package wigzo.sdk;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -27,10 +28,20 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import wigzo.sdk.helpers.Configuration;
 
-public class WigzoGcmListenerService extends GcmListenerService {
+public abstract class WigzoGcmListenerService extends GcmListenerService {
+
+
+    protected abstract Class <? extends Activity> getTargetActivity();
 
     //private static final String TAG = "WigzoGcmListenerService";
 
@@ -44,15 +55,40 @@ public class WigzoGcmListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
+        Gson gson = new Gson();
         String message = data.getString("message");
         Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "From: " + from);
         Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + message);
+
+        String type = (String) data.get("type");
+        String title = (String) data.get("title");
+        String body = (String) data.get("body");
+        String intentData = (String) data.get("intent_data");
+
+        String secondSoundStr = (String) data.get("second_sound");
+        Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
+
+        String notificationIdStr = (String) data.get("notification_id");
+        Integer notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
+
+        Map<String, Object> intentDataMap = gson.fromJson(intentData, new TypeToken<HashMap<String, Object>>() {
+        }.getType());
+
+        if (StringUtils.equals(type, "simple_push")) {
+            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentDataMap, notificationId, secondSound);
+        }
+        else if (StringUtils.equals(type, "image_push")) {
+            String imageUrl = (String) data.get("image_url");
+            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentDataMap, notificationId, secondSound);
+        }
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
         } else {
             // normal downstream message.
         }
+
+//        data.
 
         // [START_EXCLUDE]
         /**
