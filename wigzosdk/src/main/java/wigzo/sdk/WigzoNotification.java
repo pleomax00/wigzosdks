@@ -30,36 +30,42 @@ import java.util.concurrent.TimeUnit;
  * Created by ankit on 16/5/16.
  */
 public class WigzoNotification {
-    public static void notification(Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, Map<String, Object> intentDataMap, Integer notificationId, Integer secondSound) {
+    public static void notification(Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, Integer notificationId, Integer secondSound) {
         // if notification_id is provided use it.
         final int mNotificationId = null != notificationId ? notificationId : new Random().nextInt();
         int icon = applicationContext.getApplicationInfo().icon;
 
 
-        Intent resultIntent = new Intent(applicationContext, targetActivity);
+        Intent proxyIntent = new Intent(applicationContext, ProxyActivity.class);
 
-        if (null != intentDataMap) {
-            for (Map.Entry<String, Object> entry : intentDataMap.entrySet())
+       /* if (null != intentData) {
+            for (Map.Entry<String, Object> entry : intentData.entrySet())
             {
                 if (entry.getValue() instanceof CharSequence) {
-                    resultIntent.putExtra(entry.getKey(), (CharSequence) entry.getValue());
+                    proxyIntent.putExtra(entry.getKey(), (CharSequence) entry.getValue());
                 }
                 else if (entry.getValue() instanceof Number) {
-                    resultIntent.putExtra(entry.getKey(), (Number) entry.getValue());
+                    proxyIntent.putExtra(entry.getKey(), (Number) entry.getValue());
                 }
                 else if (entry.getValue() instanceof Boolean) {
-                    resultIntent.putExtra(entry.getKey(), (Boolean) entry.getValue());
+                    proxyIntent.putExtra(entry.getKey(), (Boolean) entry.getValue());
                 }
             }
-        }
+        }*/
+
+
 
         // Because clicking the notification opens a new ("special") activity, there's
         // no need to create an artificial back stack.
+
+        proxyIntent.putExtra("targetActivity", targetActivity);
+        proxyIntent.putExtra("intentData", intentData);
+
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
                         applicationContext,
                         0,
-                        resultIntent,
+                        proxyIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
@@ -111,14 +117,14 @@ public class WigzoNotification {
         }
     }
 
-    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, Map<String, Object> intentDataMap, Integer notificationId, Integer secondSound) {
+    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, Integer notificationId, Integer secondSound) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
             .setContentTitle(title)
             .setContentText(body);
-        notification(applicationContext, targetActivity, notificationBuilder,  intentDataMap, notificationId, secondSound);
+        notification(applicationContext, targetActivity, notificationBuilder,  intentData, notificationId, secondSound);
     }
 
-    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, Map<String, Object> intentDataMap, Integer notificationId, Integer secondSound) {
+    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, Integer notificationId, Integer secondSound) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setContentTitle(title)
                 .setContentText(body);
@@ -136,7 +142,7 @@ public class WigzoNotification {
              notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
             notificationBuilder.setStyle(notiStyle);
         }
-        notification(applicationContext, targetActivity, notificationBuilder,  intentDataMap, notificationId, secondSound);
+        notification(applicationContext, targetActivity, notificationBuilder,  intentData, notificationId, secondSound);
     }
 
 
