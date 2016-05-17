@@ -24,8 +24,8 @@ public class MainActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
         }
         WigzoSDK sdk = WigzoSDK.getInstance();
+        sdk.initializeWigzoData(this, "56065c5b-db30-4b89-bd76-0a9c2938c90b");
         sdk.onStart();
-        sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988");
         EventInfo eventInfo3 = new EventInfo("Bought","Bought");
         eventInfo3.saveEvent();
 
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         eventInfo2.saveEvent();
         sdk.gcmRegister();
         UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
-        //user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
+        user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
         Map<String, String> customData = new HashMap<>();
         customData.put("key1","value1");
         customData.put("key2","value2");

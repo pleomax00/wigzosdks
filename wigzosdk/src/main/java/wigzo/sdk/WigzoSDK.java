@@ -245,6 +245,7 @@ public class WigzoSDK {
                 eventData.put("eventData", eventsStr);
                 final String eventDataStr = this.gson.toJson(eventData);
                 final String url = Configuration.BASE_URL.value + Configuration.EVENT_DATA_URL.value;
+
                 ConnectionStream.postRequest(url, eventDataStr);
                 List<EventInfo> newEvents = wigzoSharedStorage.getEventList();
                 newEvents.removeAll(eventInfos);
@@ -291,6 +292,16 @@ public class WigzoSDK {
      */
     public synchronized void onStart() {
        //CrashDetails.inForeground();
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
+        long time = 0l;
+        if(this.startTime == 0){
+            long currentTime = System.currentTimeMillis()/1000l;
+            wigzoSharedStorage.getSharedStorage().edit().putLong(Configuration.PREV_TIME_SPENT_KEY.value,currentTime).apply();
+            time = wigzoSharedStorage.getSharedStorage().getLong(Configuration.PREV_TIME_SPENT_KEY.value,0l);
+        }else {
+            wigzoSharedStorage.getSharedStorage().edit().putLong(Configuration.PREV_TIME_SPENT_KEY.value, this.startTime).apply();
+
+        }
         this.startTime = System.currentTimeMillis()/1000l;
 
     }
@@ -299,29 +310,36 @@ public class WigzoSDK {
      * Method to track session end time. This should be called when app is about to close and not in all activities
      */
     public synchronized void onStop(){
-
-        long duration = (System.currentTimeMillis()/1000l) - this.startTime;
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
+        long prevTimeSpent = wigzoSharedStorage.getSharedStorage().getLong(Configuration.PREV_TIME_SPENT_KEY.value,0l);
+        long duration = (System.currentTimeMillis()/1000l) - prevTimeSpent;
+        duration = duration + wigzoSharedStorage.getSharedStorage().getLong(Configuration.TIME_SPENT_KEY.value,0l);
         String durationStr = Long.toString(duration);
-        boolean checkStatus = checkWigzoData();
-        if(checkStatus) {
-            final Map<String, String> sessionData = new HashMap<>();
-            WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
-            String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
-            sessionData.put("deviceId", deviceId);
-            sessionData.put("orgToken", this.orgToken);
-            sessionData.put("sessionData", durationStr);
-            Gson gson = new Gson();
-            final String sessionDataStr = gson.toJson(sessionData);
-            final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    ConnectionStream.postRequest(url, sessionDataStr);
-                }
-            });
-       /* WigzoSharedStorage storage = new WigzoSharedStorage(this.context);
-        storage.getSharedStorage().edit().clear().commit();*/
+        if(duration >= 60) {
+            wigzoSharedStorage.getSharedStorage().edit().putLong(Configuration.TIME_SPENT_KEY.value,0l).apply();
+            boolean checkStatus = checkWigzoData();
+            if (checkStatus) {
+                final Map<String, String> sessionData = new HashMap<>();
+                String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value, "");
+                String appKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value, "");
+                sessionData.put("deviceId", deviceId);
+                sessionData.put("orgToken", this.orgToken);
+                sessionData.put("appKey", appKey);
+                sessionData.put("sessionData", durationStr);
+                Gson gson = new Gson();
+                final String sessionDataStr = gson.toJson(sessionData);
+                final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        ConnectionStream.postRequest(url, sessionDataStr);
+                    }
+                });
+
+            }
+        }else {
+            wigzoSharedStorage.getSharedStorage().edit().putLong(Configuration.TIME_SPENT_KEY.value,duration).apply();
         }
     }
 
