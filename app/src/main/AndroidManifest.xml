@@ -22,6 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".PushCatcherActivity"></activity>
+
+        <uses-permission android:name="android.permission.VIBRATE" />
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"

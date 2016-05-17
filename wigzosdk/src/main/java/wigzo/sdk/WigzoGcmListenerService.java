@@ -65,14 +65,21 @@ public abstract class WigzoGcmListenerService extends GcmListenerService {
         String body = (String) data.get("body");
         String intentData = (String) data.get("intent_data");
 
-        String notification_id_str = (String) data.get("notification_id");
-        Integer notification_id = StringUtils.isEmpty(notification_id_str) ? null : Integer.parseInt(notification_id_str);
+        String secondSoundStr = (String) data.get("second_sound");
+        Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
+
+        String notificationIdStr = (String) data.get("notification_id");
+        Integer notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
 
         Map<String, Object> intentDataMap = gson.fromJson(intentData, new TypeToken<HashMap<String, Object>>() {
         }.getType());
 
         if (StringUtils.equals(type, "simple_push")) {
-            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentDataMap, notification_id);
+            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentDataMap, notificationId, secondSound);
+        }
+        else if (StringUtils.equals(type, "image_push")) {
+            String imageUrl = (String) data.get("image_url");
+            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentDataMap, notificationId, secondSound);
         }
 
         if (from.startsWith("/topics/")) {
