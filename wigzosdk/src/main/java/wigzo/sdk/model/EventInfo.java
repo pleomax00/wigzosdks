@@ -106,7 +106,7 @@ public class EventInfo {
 
     public static class Operation {
         public enum OperationType {
-            SAVE_EVENT,
+            SAVE_ONE,
             REMOVE_PARTIALLY
         }
 
@@ -116,16 +116,16 @@ public class EventInfo {
 
         public Operation() {}
 
-        public static Operation saveEvent (EventInfo eventInfo) {
+        public static Operation saveOne(EventInfo eventInfo) {
             Operation operation = new Operation();
-            operation.operationType = OperationType.SAVE_EVENT;
+            operation.operationType = OperationType.SAVE_ONE;
             operation.eventInfo = eventInfo;
             return operation;
         }
 
-        public static Operation removeEvents (List<EventInfo> eventInfoList) {
+        public static Operation removePartially(List<EventInfo> eventInfoList) {
             Operation operation = new Operation();
-            operation.operationType = OperationType.SAVE_EVENT;
+            operation.operationType = OperationType.REMOVE_PARTIALLY;
             operation.eventInfoList = eventInfoList;
             return operation;
         }
@@ -144,7 +144,7 @@ public class EventInfo {
      * This method is used to store events(or Activities)
      */
     public void saveEvent() {
-        final Operation operation = Operation.saveEvent(this);
+        final Operation operation = Operation.saveOne(this);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.submit(new Runnable() {
             @Override
@@ -186,7 +186,7 @@ public class EventInfo {
             eventInfoList = gson.fromJson(eventsStr, new TypeToken<List<EventInfo>>() { }.getType());
         }
         // operations begin
-        if (operation.operationType == Operation.OperationType.SAVE_EVENT) {
+        if (operation.operationType == Operation.OperationType.SAVE_ONE) {
             eventInfoList.add(operation.eventInfo);
         }
         else if (operation.operationType == Operation.OperationType.REMOVE_PARTIALLY) {
