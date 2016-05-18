@@ -12,6 +12,10 @@ public enum Configuration {
     WIGZO_REG_INTENT_SERVICE_TAG("wigzoRegIntentServiceTag","RegIntentService"),
     WIGZO_INIT_DATA_SYNC_FLAG_KEY("wigzoInitiDataSyncFlag","WIGZO_INIT_DATA_SYNC_FLAG_KEY"),
     STORAGE_KEY("storageKey","WIGZO_SHARED_STORAGE"),
+    USER_PROFILE_DATA_KEY("userProfileDataKey","USER_PROFILE_DATA_KEY"),
+    USER_PROFILE_SYNC_KEY("userProfileSyncKey","USER_PROFILE_SYNC_KEY"),
+    USER_PROFILE_PICTURE_KEY("userProfilePictureKey","USER_PROFILE_PICTURE_KEY"),
+    EMAIL_SYNC_KEY("emailSyncKey","EMAIL_SYNC_KEY"),
     EVENTS_KEY("eventKey","WIGZO_EVENTS"),
     DEVICE_ID_KEY("deviceIdKey","DEVICE_ID_KEY"),
     APP_KEY("appKey","APP_KEY"),
@@ -27,10 +31,11 @@ public enum Configuration {
     EMAIL_DATA_URL("emailDataUrl","/androidsdk/mapemail"),
     GCM_REGISTRATION_URL("gcmRegistrationUrl", "/rest/v1/push/android/register-subscription"),
     GCM_DEVICE_MAPPING_URL("gcmDeviceMappingUrl", "/androidsdk/map-gcm"),
-    TIME_DELAY("timeDelay","30"),
-    GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED"),
+    TIME_DELAY("timeDelay","45"),
     GCM_READ_KEY("gcmReadKey", "GCM_READ_KEY"),
-    GCM_OPEN_KEY("gcmOpenKey", "GCM_OPEN_KEY");
+    GCM_OPEN_KEY("gcmOpenKey", "GCM_OPEN_KEY"),
+    GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED");
+
 
     public String key;
     public String value;

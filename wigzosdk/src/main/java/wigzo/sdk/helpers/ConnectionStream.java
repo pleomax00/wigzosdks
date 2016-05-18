@@ -105,12 +105,13 @@ public class ConnectionStream {
      * @param picturePath : path from where picture is to be retrieved
      * @return Boolean: success status ( true or false ) whether post request was sent successfully or not
      */
-    public static boolean postMultimediaRequest(String urlStr, String data, String picturePath)
+    public static String postMultimediaRequest(String urlStr, String data, String picturePath)
     {
         Log.d("server url: ", urlStr);
         urlStr = urlStr +"?userdata="+data;
         URL url;
         HttpURLConnection connection = null;
+        String response = null; //default json response
         try {
             url = new URL(urlStr);
             connection = (HttpURLConnection) url.openConnection();
@@ -165,10 +166,19 @@ public class ConnectionStream {
 
             final int responseCode = connection.getResponseCode();
             boolean success = responseCode >= 200 && responseCode < 300;
+            if (success) {
+                BufferedReader r = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder responseBuilder = new StringBuilder();
+                String line;
+                while ((line = r.readLine()) != null) {
+                    responseBuilder.append(line).append('\n');
+                }
+                response = responseBuilder.toString();
+            }
             if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
             }
-            return success;
+            return response;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,7 +204,7 @@ public class ConnectionStream {
                 (connection).disconnect();
             }
         }
-        return false;
+        return null;
 
     }
 

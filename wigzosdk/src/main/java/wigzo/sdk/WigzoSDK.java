@@ -55,7 +55,6 @@ public class WigzoSDK {
     /**
      * Static class which returns singleton instance of WigzoSDK
      */
-    // see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
     private static class SingletonHolder {
         static final WigzoSDK instance = new WigzoSDK();
     }
@@ -83,6 +82,8 @@ public class WigzoSDK {
         executorService.scheduleWithFixedDelay(new Runnable() {
             public void run() {
                 checkAndPushEvent();
+                checkAndSendUserProfile();
+                checkAndSendEmail();
 
             }},timer,timer, TimeUnit.SECONDS);
     }
@@ -187,6 +188,7 @@ public class WigzoSDK {
 
 
     /**
+
      * This method is used to store events(or Activities)
      * @param eventInfo instance of EventInfo
      *//*
@@ -201,6 +203,7 @@ public class WigzoSDK {
     }*/
 
     /**
+
      * Once the email id of user is obtained, this method is used to map email id to user if it was not mapped when UserProfile instance was created
      * @param emailId email id of user
      */
@@ -211,20 +214,14 @@ public class WigzoSDK {
             Map<String, String> emailData = new HashMap<>();
             this.emailId = emailId;
             WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
-            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EMAIL_KEY.value, emailId).apply();
             String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
             emailData.put("deviceId", deviceId);
             emailData.put("orgToken", this.orgToken);
             emailData.put("email", this.emailId);
             final String emailDataStr = this.gson.toJson(emailData);
-            final String url = Configuration.BASE_URL.value + Configuration.EMAIL_DATA_URL.value;
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    ConnectionStream.postRequest(url, emailDataStr);
-                }
-            });
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EMAIL_KEY.value, emailDataStr).apply();
+            wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.EMAIL_SYNC_KEY.value,true).apply();
+            checkAndSendEmail();
         }else{
 
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo initial data is not initiallized.Cannot send event information");
@@ -250,26 +247,34 @@ public class WigzoSDK {
             eventData.put("appKey",this.appKey);
             eventData.put("deviceInfo", deviceInfo.getMetrics(this.context));
 
-            List<EventInfo> eventInfos = EventInfo.getEventList();
+            final List<EventInfo> eventInfos = EventInfo.getEventList();
             if(!eventInfos.isEmpty()) {
                 final String eventsStr = this.gson.toJson(eventInfos);
 //                wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
                 eventData.put("eventData", eventsStr);
                 final String eventDataStr = this.gson.toJson(eventData);
                 final String url = Configuration.BASE_URL.value + Configuration.EVENT_DATA_URL.value;
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.submit(new Runnable() {
+                    @Override
+                       public void run() {
+                           String response = ConnectionStream.postRequest(url, eventDataStr);
+                           if (null != response) {
+                               Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                               }.getType());
+                               if ("success".equals(jsonResponse.get("status"))) {
+                                   EventInfo.Operation operation = EventInfo.Operation.removePartially(eventInfos);
+                                   EventInfo.editOperation(operation);
 
-                String response = ConnectionStream.postRequest(url, eventDataStr);
-                if (null != response) {
-                    Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
-                    }.getType());
-                    if ("success".equals(jsonResponse.get("status"))) {
-                        EventInfo.Operation operation = EventInfo.Operation.removePartially(eventInfos);
-                        EventInfo.editOperation(operation);
 //                        List<EventInfo> newEvents = wigzoSharedStorage.getEventList();
 //                        newEvents.removeAll(eventInfos);
 //                        wigzoSharedStorage.getSharedStorage().edit().putString("WIGZO_EVENTS", gson.toJson(newEvents)).apply();
-                    }
-                }
+                               }
+                           }
+                       }
+                   });
+
+
             }
         }else{
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
@@ -358,6 +363,109 @@ public class WigzoSDK {
         }
     }
 
+    public synchronized void checkAndSendUserProfile(){
+            if(checkWigzoData()) {
+                final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(getContext());
+                Boolean syncData = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.USER_PROFILE_SYNC_KEY.value,false);
+                if(syncData){
+                    final String hasProfilePicture = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_PROFILE_PICTURE_KEY.value,"");
+                    final String userProfileDataStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_PROFILE_DATA_KEY.value,"");
+                    final String url = Configuration.BASE_URL.value + Configuration.USER_PROFILE_URL.value;
+                    if(StringUtils.isNotEmpty(userProfileDataStr)){
+                        if(StringUtils.isEmpty(hasProfilePicture)){
+                             ExecutorService executorService = Executors.newSingleThreadExecutor();
+                             executorService.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    String response = ConnectionStream.postRequest(url, userProfileDataStr);
+                                    if (null != response) {
+                                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                                        }.getType());
+                                        if ("success".equals(jsonResponse.get("status"))) {
+                                            wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_PROFILE_SYNC_KEY.value,false).apply();
+                                            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_PROFILE_DATA_KEY.value,"").apply();
+                                        }
+                                        else{
+                                            wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_PROFILE_SYNC_KEY.value,true).apply();
+                                        }
+                                    }
+                                }
+                             });
+                        }else {
+                            ExecutorService executorService = Executors.newSingleThreadExecutor();
+                            executorService.submit(new Runnable() {
+                               @Override
+                               public void run() {
+                                   String response = ConnectionStream.postMultimediaRequest(url, userProfileDataStr, hasProfilePicture);
+                                    if(null!=response)
+                                    {
+                                         Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                                         }.getType());
+                                     if ("success".equals(jsonResponse.get("status"))) {
+                                         wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_PROFILE_SYNC_KEY.value, false).apply();
+                                         wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_PROFILE_DATA_KEY.value,"").apply();
+                                     } else {
+                                        wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_PROFILE_SYNC_KEY.value, true).apply();
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }else{
+                        Log.w(Configuration.WIGZO_SDK_TAG.value, "No user profile data to send");
+
+                    }
+                }
+            }else{
+                Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
+
+            }
+    }
+
+    private synchronized void checkAndSendEmail(){
+        if(checkWigzoData()){
+            final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(getContext());
+            Boolean syncData = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.EMAIL_SYNC_KEY.value,false);
+            final String emailData = wigzoSharedStorage.getSharedStorage().getString(Configuration.EMAIL_KEY.value,"");
+            final String url = Configuration.BASE_URL.value + Configuration.EMAIL_DATA_URL.value;
+            if(syncData){
+                if(StringUtils.isNotEmpty(emailData)){
+
+                    ExecutorService executorService = Executors.newSingleThreadExecutor();
+                    executorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            String response = ConnectionStream.postRequest(url, emailData);
+                            if(null!=response)
+                            {
+                                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                                }.getType());
+                                if ("success".equals(jsonResponse.get("status"))) {
+                                    wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.EMAIL_SYNC_KEY.value, false).apply();
+                                    wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EMAIL_KEY.value,"").apply();
+                                } else {
+                                    wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.EMAIL_SYNC_KEY.value, true).apply();
+                                }
+                            }
+                        }
+                    });
+
+                }else {
+                    Log.w(Configuration.WIGZO_SDK_TAG.value,"No email data to send");
+                }
+            }
+
+
+
+        }else{
+            Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
+
+        }
+
+
+    }
+
+
     public synchronized boolean isLoggingEnabled() {
         return this.enableLogging;
     }
@@ -370,8 +478,5 @@ public class WigzoSDK {
         return appKey;
     }
 
-    public Class<? extends Activity> getTargetActivity() {
-        return targetActivity;
-    }
 
 }
