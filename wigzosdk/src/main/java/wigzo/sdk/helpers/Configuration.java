@@ -27,7 +27,7 @@ public enum Configuration {
     EMAIL_DATA_URL("emailDataUrl","/androidsdk/mapemail"),
     GCM_REGISTRATION_URL("gcmRegistrationUrl", "/rest/v1/push/android/register-subscription"),
     GCM_DEVICE_MAPPING_URL("gcmDeviceMappingUrl", "/androidsdk/map-gcm"),
-    TIME_DELAY("timeDelay","5"),
+    TIME_DELAY("timeDelay","30"),
     GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED");
 
     public String key;

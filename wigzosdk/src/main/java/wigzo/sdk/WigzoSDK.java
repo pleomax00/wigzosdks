@@ -105,7 +105,8 @@ public class WigzoSDK {
      * Must be called before other SDK methods can be used.
      * @param context Context of application installing sdk
      * @param orgToken Organization token
-     *
+     * @return Instance of WigzoSDK
+     * @throws IllegalStateException if either Context is missing or orgToken is missing
      */
     public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken) {
 
@@ -137,7 +138,7 @@ public class WigzoSDK {
         if(!(initDataSynced)) {
            String deviceId  = UUID.randomUUID().toString();
            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.DEVICE_ID_KEY.value, deviceId).apply();
-           final String userData = getUserIdentificationData();
+           final String userData = getDeviceIdentificationData();
            final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
            ExecutorService executorService = Executors.newSingleThreadExecutor();
            Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
@@ -166,7 +167,16 @@ public class WigzoSDK {
         return this;
     }
 
-
+    /**
+     * Initializes the Wigzo SDK. Call from your main Activity's onCreate() method.
+     * Must be called before other SDK methods can be used.
+     * @param context Context of application installing sdk
+     * @param orgToken Organization token
+     * @param senderId
+     * @param targetActivity
+     * @return instance of WigzoSDK
+     * @throws IllegalStateException if either Context/orgToken/senderId/targetActivity is missing
+     */
     public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken, String senderId, Class <? extends Activity> targetActivity){
         initializeWigzoData(context,orgToken);
         if(StringUtils.isNotEmpty(senderId)){
@@ -229,7 +239,7 @@ public class WigzoSDK {
     /**
      * Method to send events to wigzo server
      */
-    private synchronized void checkAndPushEvent(){
+    private void checkAndPushEvent(){
 
         boolean checkStatus = checkWigzoData();
         if(checkStatus) {
@@ -250,11 +260,16 @@ public class WigzoSDK {
                 final String eventDataStr = this.gson.toJson(eventData);
                 final String url = Configuration.BASE_URL.value + Configuration.EVENT_DATA_URL.value;
 
-                ConnectionStream.postRequest(url, eventDataStr);
-                List<EventInfo> newEvents = wigzoSharedStorage.getEventList();
-                newEvents.removeAll(eventInfos);
-                wigzoSharedStorage.getSharedStorage().edit().putString("WIGZO_EVENTS", gson.toJson(newEvents)).apply();
-
+                String response = ConnectionStream.postRequest(url, eventDataStr);
+                if (null != response) {
+                    Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                    }.getType());
+                    if ("success".equals(jsonResponse.get("status"))) {
+                        List<EventInfo> newEvents = wigzoSharedStorage.getEventList();
+                        newEvents.removeAll(eventInfos);
+                        wigzoSharedStorage.getSharedStorage().edit().putString("WIGZO_EVENTS", gson.toJson(newEvents)).apply();
+                    }
+                }
             }
         }else{
 
@@ -264,12 +279,10 @@ public class WigzoSDK {
     }
 
     /**
-     * Method to prepare Map of User Identification data. Map contains deviceId and orgToken
-     * @return
+     * Method to prepare Map of Device Identification data. Map contains deviceId and orgToken
+     * @return :
      */
-    public String getUserIdentificationData(){
-
-
+    public String getDeviceIdentificationData(){
         Map<String , Object> userData = new HashMap<>();
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
         String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
@@ -285,7 +298,8 @@ public class WigzoSDK {
     public boolean checkWigzoData(){
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
         String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
-        if(StringUtils.isEmpty(deviceId) || StringUtils.isEmpty(this.orgToken) || this.context == null){
+        Boolean syncStatus = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value,false);
+        if(StringUtils.isEmpty(deviceId) || StringUtils.isEmpty(this.orgToken) || this.context == null || !syncStatus){
             return false;
         }
         return true;
@@ -297,11 +311,9 @@ public class WigzoSDK {
     public synchronized void onStart() {
        //CrashDetails.inForeground();
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
-        long time = 0l;
         if(this.startTime == 0){
             long currentTime = System.currentTimeMillis()/1000l;
             wigzoSharedStorage.getSharedStorage().edit().putLong(Configuration.PREV_TIME_SPENT_KEY.value,currentTime).apply();
-            time = wigzoSharedStorage.getSharedStorage().getLong(Configuration.PREV_TIME_SPENT_KEY.value,0l);
         }else {
             wigzoSharedStorage.getSharedStorage().edit().putLong(Configuration.PREV_TIME_SPENT_KEY.value, this.startTime).apply();
 
