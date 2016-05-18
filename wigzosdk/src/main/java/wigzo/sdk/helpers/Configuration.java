@@ -32,7 +32,10 @@ public enum Configuration {
     GCM_REGISTRATION_URL("gcmRegistrationUrl", "/rest/v1/push/android/register-subscription"),
     GCM_DEVICE_MAPPING_URL("gcmDeviceMappingUrl", "/androidsdk/map-gcm"),
     TIME_DELAY("timeDelay","45"),
+    GCM_READ_KEY("gcmReadKey", "GCM_READ_KEY"),
+    GCM_OPEN_KEY("gcmOpenKey", "GCM_OPEN_KEY"),
     GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED");
+
 
     public String key;
     public String value;
