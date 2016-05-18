@@ -215,7 +215,9 @@ public class WigzoSDK {
             this.emailId = emailId;
             WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
             String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
+            String appKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value,"");
             emailData.put("deviceId", deviceId);
+            emailData.put("appKey",appKey);
             emailData.put("orgToken", this.orgToken);
             emailData.put("email", this.emailId);
             final String emailDataStr = this.gson.toJson(emailData);
