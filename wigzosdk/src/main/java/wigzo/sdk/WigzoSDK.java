@@ -190,7 +190,7 @@ public class WigzoSDK {
      * This method is used to store events(or Activities)
      * @param eventInfo instance of EventInfo
      *//*
-    public synchronized void saveEvent(final EventInfo eventInfo) {
+    public synchronized void saveOne(final EventInfo eventInfo) {
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
         List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
@@ -263,7 +263,7 @@ public class WigzoSDK {
                     Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
                     }.getType());
                     if ("success".equals(jsonResponse.get("status"))) {
-                        EventInfo.Operation operation = EventInfo.Operation.removeEvents(eventInfos);
+                        EventInfo.Operation operation = EventInfo.Operation.removePartially(eventInfos);
                         EventInfo.editOperation(operation);
 //                        List<EventInfo> newEvents = wigzoSharedStorage.getEventList();
 //                        newEvents.removeAll(eventInfos);
