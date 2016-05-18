@@ -31,13 +31,7 @@ public class ClassB extends Activity {
         metadata1.setTags("Phone");
         eventInfo1.setMetadata(metadata1);
         eventInfo1.saveEvent();
-        UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
-        user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
-        Map<String, String> customData = new HashMap<>();
-        customData.put("key1","value1");
-        customData.put("key2","value2");
-        user.setCustomData(customData);
-        user.saveUserProfile();
+        //WigzoSDK.getInstance().mapEmail("minaz.ali@wigzo.com");
 
     }
 

@@ -7,7 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import wigzo.sdk.WigzoSDK;
+import wigzo.sdk.model.UserProfile;
 
 /**
  * Created by wigzo on 17/5/16.
@@ -33,6 +37,14 @@ public class ClassA extends Activity {
             }
         });
 
+        /*UserProfile user = new UserProfile("abc","abc","suyash@wigzo.com","wigzo.com");
+        user.setPicturePath("/sdcard/Pictures/OGQ/pic.jpg");
+        Map<String, String> customData = new HashMap<>();
+        customData.put("key1","value1");
+        customData.put("key2","value2");
+        user.setCustomData(customData);
+        user.saveUserProfile();
+*/
 
     }
     public void startActivity(){

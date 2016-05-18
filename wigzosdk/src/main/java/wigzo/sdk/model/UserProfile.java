@@ -3,6 +3,7 @@ package wigzo.sdk.model;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -118,11 +119,11 @@ public class UserProfile {
      */
     public void saveUserProfile(){
         if(WigzoSDK.getInstance().checkWigzoData()) {
-            WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+            final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
             String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
             String orgToken = WigzoSDK.getInstance().getOrgToken();
             String appKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value,"");
-            Gson gson = new Gson();
+            final Gson gson = new Gson();
             Map<String, Object> userDataMap = new HashMap<>();
             userDataMap.put("deviceId", deviceId);
             userDataMap.put("orgToken", orgToken);
@@ -130,18 +131,11 @@ public class UserProfile {
             userDataMap.put("userData", this);
             final String picturePath = this.picturePath;
             final String userDataStr = gson.toJson(userDataMap);
-            final String url = Configuration.BASE_URL.value + Configuration.USER_PROFILE_URL.value;
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    if (StringUtils.isEmpty(picturePath)) {
-                        ConnectionStream.postRequest(url, userDataStr);
-                    } else {
-                        ConnectionStream.postMultimediaRequest(url, userDataStr, picturePath);
-                    }
-                }
-            });
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_PROFILE_DATA_KEY.value,userDataStr).apply();
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_PROFILE_PICTURE_KEY.value,picturePath).apply();
+            wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_PROFILE_SYNC_KEY.value,true).apply();
+            WigzoSDK.getInstance().checkAndSendUserProfile();
+
         }else{
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initiallized.Cannot send user information");
 

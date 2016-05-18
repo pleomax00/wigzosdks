@@ -16,7 +16,7 @@ public class PushCatcherActivity extends AppCompatActivity {
 
         WigzoSDK sdk = WigzoSDK.getInstance();
         sdk.onStart();
-        sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988", "1080912767729", PushCatcherActivity.class);
+        sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988", "1080912767729");
 
         extras = getIntent().getExtras();
         TextView nameView = (TextView) findViewById(R.id.nameView);
