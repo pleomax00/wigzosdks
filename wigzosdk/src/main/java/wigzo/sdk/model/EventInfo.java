@@ -1,15 +1,15 @@
 package wigzo.sdk.model;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
@@ -104,10 +104,37 @@ public class EventInfo {
         }
     }
 
+    public static class Operation {
+        public enum OperationType {
+            SAVE_EVENT,
+            REMOVE_PARTIALLY
+        }
+
+        OperationType operationType;
+        EventInfo eventInfo;
+        List<EventInfo> eventInfoList;
+
+        public Operation() {}
+
+        public static Operation saveEvent (EventInfo eventInfo) {
+            Operation operation = new Operation();
+            operation.operationType = OperationType.SAVE_EVENT;
+            operation.eventInfo = eventInfo;
+            return operation;
+        }
+
+        public static Operation removeEvents (List<EventInfo> eventInfoList) {
+            Operation operation = new Operation();
+            operation.operationType = OperationType.SAVE_EVENT;
+            operation.eventInfoList = eventInfoList;
+            return operation;
+        }
+    }
+
     @Override
-    public boolean equals(Object o) {
-        if(o instanceof EventInfo){
-            EventInfo eventInfo = (EventInfo)o;
+    public boolean equals(Object obj) {
+        if(obj instanceof EventInfo){
+            EventInfo eventInfo = (EventInfo) obj;
             return this.timestamp.equalsIgnoreCase(eventInfo.timestamp);
         }
         return false;
@@ -117,15 +144,56 @@ public class EventInfo {
      * This method is used to store events(or Activities)
      */
     public void saveEvent() {
+        final Operation operation = Operation.saveEvent(this);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                EventInfo.editOperation(operation);
+            }
+        });
 
-        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        /*WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
         eventInfos.add(this);
         Gson gson = new Gson();
         final String eventsStr = gson.toJson(eventInfos);
-        wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
+        wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();*/
 
     }
 
+//    public synchronized static
+    public synchronized static List<EventInfo> getEventList() {
+        Gson gson = new Gson();
+        List<EventInfo> eventInfoList = new ArrayList<>();
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+
+        String eventsStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.EVENTS_KEY.value, "");
+        if(StringUtils.isNotEmpty(eventsStr))
+            eventInfoList = gson.fromJson(eventsStr, new TypeToken<List<EventInfo>>() { }.getType());
+        return eventInfoList;
+    }
+
+
+    public synchronized static void editOperation(Operation operation) {
+        Gson gson = new Gson();
+        List<EventInfo> eventInfoList = new ArrayList<>();
+
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        String eventsStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.EVENTS_KEY.value, "");
+
+        if(StringUtils.isNotEmpty(eventsStr)) {
+            eventInfoList = gson.fromJson(eventsStr, new TypeToken<List<EventInfo>>() { }.getType());
+        }
+        // operations begin
+        if (operation.operationType == Operation.OperationType.SAVE_EVENT) {
+            eventInfoList.add(operation.eventInfo);
+        }
+        else if (operation.operationType == Operation.OperationType.REMOVE_PARTIALLY) {
+            eventInfoList.removeAll(operation.eventInfoList);
+        }
+        eventsStr = gson.toJson(eventInfoList);
+        wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
+    }
 
 }
