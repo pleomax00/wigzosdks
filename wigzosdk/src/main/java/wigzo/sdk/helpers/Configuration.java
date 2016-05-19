@@ -5,6 +5,10 @@ package wigzo.sdk.helpers;
  */
 public enum Configuration {
 
+    // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
+    BASE_URL("baseUrl","http://ankit.wigzoes.com"),
+    // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
+    INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
     DEVICE_ID_TAG("deviceIdTag","DeviceInfo"),
     DEFAULT_SDK_VERSION("defaultSdkVersion","1.0"),
     WIGZO_SDK_TAG("wigzoSdkTag","Wigzo"),
@@ -23,8 +27,6 @@ public enum Configuration {
     PREV_TIME_SPENT_KEY("prevTimeSpent","PREV_TIME_SPENT_KEY"),
     TIME_SPENT_KEY("timeSpentKey","TIME_SPENT_KEY"),
     SENT_GCM_TOKEN_TO_SERVER("sentTokenToServer", "SENT_GCM_TOKEN_TO_SERVER"),
-    BASE_URL("baseUrl","http://ankit.wigzoes.com"),
-    INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
     EVENT_DATA_URL("eventDataUrl","/androidsdk/geteventdata"),
     SESSION_DATA_URL("sessionDataUrl","/androidsdk/getsessiondata"),
     USER_PROFILE_URL("userProfileUrl","/androidsdk/getuserprofiledata"),
