@@ -27,7 +27,7 @@
         <!-- [START gcm_listener] -->
         <!--
         service
-            android:name="wigzo.sdk.WigzoGcmListenerService"
+            android:name="wigzo.sdk.AbstractWigzoGcmListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
