@@ -38,14 +38,4 @@ public class WigzoSharedStorage {
         }
         sharedStorage = context.getSharedPreferences(Configuration.STORAGE_KEY.value, Context.MODE_PRIVATE);
     }
-
- /*   public List<EventInfo> getEventList(){
-        List<EventInfo> eventInfoList = new ArrayList<>();
-        Gson gson = new Gson();
-        String eventsStr = sharedStorage.getString(Configuration.EVENTS_KEY.value, "");
-        if(StringUtils.isNotEmpty(eventsStr))
-            eventInfoList = gson.fromJson(eventsStr, new TypeToken<List<EventInfo>>() { }.getType());
-        return eventInfoList;
-    }
-*/
 }
