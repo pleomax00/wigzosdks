@@ -28,6 +28,8 @@ import wigzo.sdk.helpers.ConnectionStream;
 import wigzo.sdk.helpers.WigzoSharedStorage;
 import wigzo.sdk.model.DeviceInfo;
 import wigzo.sdk.model.EventInfo;
+import wigzo.sdk.model.GcmOpen;
+import wigzo.sdk.model.GcmRead;
 
 /**
  * This class is the public API for the Wigzo Android SDK.
@@ -84,7 +86,8 @@ public class WigzoSDK {
                 checkAndPushEvent();
                 checkAndSendUserProfile();
                 checkAndSendEmail();
-
+                sendGcmRead();
+                sendGcmOpen();
             }},timer,timer, TimeUnit.SECONDS);
     }
 
@@ -280,6 +283,61 @@ public class WigzoSDK {
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
         }
 
+    }
+
+
+    private void sendGcmRead() {
+        final List<GcmRead> gcmReadList = GcmRead.getGcmReadList(getContext());
+        if(!gcmReadList.isEmpty()) {
+            HashMap<String, Object> payload = new HashMap<>();
+            payload.put("data", gcmReadList);
+
+            final String url = Configuration.BASE_URL.value + Configuration.GCM_READ_URL.value;
+            final String payloadStr = this.gson.toJson(payload);
+
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    String response = ConnectionStream.postRequest(url, payloadStr);
+                    if (null != response) {
+                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                        }.getType());
+                        if ("success".equals(jsonResponse.get("status"))) {
+                            GcmRead.Operation operation = GcmRead.Operation.removePartially(gcmReadList);
+                            GcmRead.editOperation(getContext(), operation);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private void sendGcmOpen() {
+        final List<GcmOpen> gcmOpenList = GcmOpen.getGcmOpenList(getContext());
+        if(!gcmOpenList.isEmpty()) {
+            HashMap<String, Object> payload = new HashMap<>();
+            payload.put("data", gcmOpenList);
+
+            final String url = Configuration.BASE_URL.value + Configuration.GCM_OPEN_URL.value;
+            final String payloadStr = this.gson.toJson(payload);
+
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    String response = ConnectionStream.postRequest(url, payloadStr);
+                    if (null != response) {
+                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                        }.getType());
+                        if ("success".equals(jsonResponse.get("status"))) {
+                            GcmOpen.Operation operation = GcmOpen.Operation.removePartially(gcmOpenList);
+                            GcmOpen.editOperation(getContext(), operation);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /**

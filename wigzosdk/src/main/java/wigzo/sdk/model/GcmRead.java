@@ -44,22 +44,22 @@ public class GcmRead {
         }
     }
 
-    private long id;
+    private String uuid;
     private String timestamp;
 
     public GcmRead(){};
 
-    public GcmRead(long id, String timestamp) {
-        this.id = id;
-        this.timestamp = timestamp;
+    public GcmRead(String uuid) {
+        this.uuid = uuid;
+        this.timestamp = String.valueOf(System.currentTimeMillis());
     }
 
-    public long getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getTimestamp() {
@@ -68,6 +68,15 @@ public class GcmRead {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof GcmRead){
+            GcmRead gcmRead = (GcmRead) obj;
+            return this.uuid.equalsIgnoreCase(gcmRead.uuid);
+        }
+        return false;
     }
 
     public synchronized static List<GcmRead> getGcmReadList(Context context) {

@@ -23,7 +23,7 @@ public enum Configuration {
     PREV_TIME_SPENT_KEY("prevTimeSpent","PREV_TIME_SPENT_KEY"),
     TIME_SPENT_KEY("timeSpentKey","TIME_SPENT_KEY"),
     SENT_GCM_TOKEN_TO_SERVER("sentTokenToServer", "SENT_GCM_TOKEN_TO_SERVER"),
-    BASE_URL("baseUrl","http://minaz.wigzoes.com"),
+    BASE_URL("baseUrl","http://ankit.wigzoes.com"),
     INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
     EVENT_DATA_URL("eventDataUrl","/androidsdk/geteventdata"),
     SESSION_DATA_URL("sessionDataUrl","/androidsdk/getsessiondata"),
@@ -34,7 +34,9 @@ public enum Configuration {
     TIME_DELAY("timeDelay","45"),
     GCM_READ_KEY("gcmReadKey", "GCM_READ_KEY"),
     GCM_OPEN_KEY("gcmOpenKey", "GCM_OPEN_KEY"),
-    GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED");
+    GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED"),
+    GCM_READ_URL("gcmReadUrl", "/rest/v1/push/android/track/read-multiple"),
+    GCM_OPEN_URL("gcmOpenUrl", "/rest/v1/push/android/track/open-multiple");
 
 
     public String key;

@@ -26,11 +26,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import wigzo.sdk.model.GcmRead;
+
 /**
  * Created by ankit on 16/5/16.
  */
 public class WigzoNotification {
-    public static void notification(Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, Integer notificationId, Integer secondSound) {
+    public static void notification(final Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, final String uuid, Integer notificationId, Integer secondSound) {
         // if notification_id is provided use it.
         final int mNotificationId = null != notificationId ? notificationId : new Random().nextInt();
         int icon = applicationContext.getApplicationInfo().icon;
@@ -59,6 +61,7 @@ public class WigzoNotification {
         // no need to create an artificial back stack.
 
         proxyIntent.putExtra("targetActivity", targetActivity);
+        proxyIntent.putExtra("uuid", uuid);
         proxyIntent.putExtra("intentData", intentData);
 
         PendingIntent resultPendingIntent =
@@ -98,7 +101,7 @@ public class WigzoNotification {
         // Play sound
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         final Ringtone ringtone = RingtoneManager.getRingtone(applicationContext, defaultSoundUri);
-        final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
+        final ScheduledExecutorService soundWorker = Executors.newSingleThreadScheduledExecutor();
         Runnable playSound = new Runnable() {
             public void run() {
                 System.out.println("here");
@@ -107,24 +110,37 @@ public class WigzoNotification {
             }
         };
 
-        worker.schedule(playSound, 0, TimeUnit.SECONDS);
+        soundWorker.schedule(playSound, 0, TimeUnit.SECONDS);
         // Play second sound
         if (null != secondSound && secondSound > 0) {
             if (secondSound > 10) {
                 secondSound = 10;
             }
-            worker.schedule(playSound, secondSound, TimeUnit.SECONDS);
+            soundWorker.schedule(playSound, secondSound, TimeUnit.SECONDS);
+        }
+
+        // increase counter
+        if (StringUtils.isNotEmpty(uuid)) {
+            final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
+            gcmReadWorker.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    GcmRead gcmRead = new GcmRead(uuid);
+                    GcmRead.Operation operation = GcmRead.Operation.saveOne(gcmRead);
+                    GcmRead.editOperation(applicationContext, operation);
+                }
+            }, 0, TimeUnit.SECONDS);
         }
     }
 
-    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, Integer notificationId, Integer secondSound) {
+    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, String uuid, Integer notificationId, Integer secondSound) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
             .setContentTitle(title)
             .setContentText(body);
-        notification(applicationContext, targetActivity, notificationBuilder,  intentData, notificationId, secondSound);
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, secondSound);
     }
 
-    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, Integer notificationId, Integer secondSound) {
+    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, String uuid, Integer notificationId, Integer secondSound) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setContentTitle(title)
                 .setContentText(body);
@@ -142,7 +158,7 @@ public class WigzoNotification {
              notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
             notificationBuilder.setStyle(notiStyle);
         }
-        notification(applicationContext, targetActivity, notificationBuilder,  intentData, notificationId, secondSound);
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, secondSound);
     }
 
 

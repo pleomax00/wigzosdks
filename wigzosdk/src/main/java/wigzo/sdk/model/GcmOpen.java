@@ -44,22 +44,22 @@ public class GcmOpen {
         }
     }
 
-    private long id;
+    private String uuid;
     private String timestamp;
 
     public GcmOpen(){};
 
-    public GcmOpen(long id, String timestamp) {
-        this.id = id;
-        this.timestamp = timestamp;
+    public GcmOpen(String uuid) {
+        this.uuid = uuid;
+        this.timestamp = String.valueOf(System.currentTimeMillis());
     }
 
-    public long getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getTimestamp() {
@@ -68,6 +68,15 @@ public class GcmOpen {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof GcmOpen){
+            GcmOpen gcmOpen = (GcmOpen) obj;
+            return this.uuid.equalsIgnoreCase(gcmOpen.uuid);
+        }
+        return false;
     }
 
     public synchronized static List<GcmOpen> getGcmOpenList(Context context) {
