@@ -13,14 +13,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -143,6 +141,7 @@ public class WigzoNotification {
     public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, String uuid, Integer notificationId, Integer secondSound) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setContentTitle(title)
+                .setSmallIcon(applicationContext.getApplicationInfo().icon)
                 .setContentText(body);
 
         if(StringUtils.isNotEmpty(imageUrl)){

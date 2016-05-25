@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="wigzo.app.ClassA">
+        <activity android:name="wigzo.app.MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,7 +48,6 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
->>>>>>> 03bb0cf22621551da463d8f96219d093816c56d8
     </application>
 
 </manifest>
