@@ -38,12 +38,12 @@ import java.util.Map;
 
 import wigzo.sdk.helpers.Configuration;
 
-public abstract class WigzoGcmListenerService extends GcmListenerService {
+public abstract class AbstractWigzoGcmListenerService extends GcmListenerService {
 
 
     protected abstract Class <? extends Activity> getTargetActivity();
 
-    //private static final String TAG = "WigzoGcmListenerService";
+    //private static final String TAG = "AbstractWigzoGcmListenerService";
 
     /**
      * Called when message is received.

@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import wigzo.sdk.WigzoSDK;
 
-public class PushCatcherActivity extends AppCompatActivity {
+public class TargetActivity extends AppCompatActivity {
     Bundle extras;
 
     @Override
