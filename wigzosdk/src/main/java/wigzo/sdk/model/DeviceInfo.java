@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
 
 /**
@@ -36,9 +35,7 @@ public class DeviceInfo {
     public DeviceInfo(){}
 
     protected void setId(String id) {
-       // if (WigzoSDK.getInstance().isLoggingEnabled()) {
             Log.w(Configuration.DEVICE_ID_TAG.value, "Device ID is " + id );
-        //}
         this.id = id;
     }
 
@@ -133,21 +130,19 @@ public class DeviceInfo {
      * TelephonyManager from the specified context.
      * @param context context to use to retrieve the TelephonyManager from
      * @return the display name of the current network operator, or the empty
-     *         string if it cannot be accessed or determined
+     * string if it cannot be accessed or determined
      */
-    static String getCarrier(final Context context) {
-        String carrier = "";
+    static String getServiceProvider(final Context context) {
+        String serviceProviderName = "";
         final TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (manager != null) {
-            carrier = manager.getNetworkOperatorName();
+            serviceProviderName = manager.getNetworkOperatorName();
         }
-        if (carrier == null || carrier.length() == 0) {
-            carrier = "";
-            //if (WigzoSDK.getInstance().isLoggingEnabled()) {
+        if (serviceProviderName == null || serviceProviderName.length() == 0) {
+            serviceProviderName = "";
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "No carrier found");
-            //}
         }
-        return carrier;
+        return serviceProviderName;
     }
 
     /**
@@ -164,39 +159,36 @@ public class DeviceInfo {
      * is not present.
      */
     static String getAppVersion(final Context context) {
-        String result = Configuration.DEFAULT_SDK_VERSION.value;
+        String appVersion = Configuration.DEFAULT_SDK_VERSION.value;
         try {
-            result = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            appVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         }
         catch (PackageManager.NameNotFoundException e) {
-            //if (WigzoSDK.getInstance().isLoggingEnabled()) {
                 Log.i(Configuration.WIGZO_SDK_TAG.value, "No app version found");
-            //}
         }
-        return result;
+        Log.i(Configuration.WIGZO_SDK_TAG.value, "App version :"+appVersion);
+
+        return appVersion;
     }
 
     /**
      * Returns the package name of the app that installed this app
      */
     static String getStore(final Context context) {
-        String result = "";
+        String appStore = "";
         if(android.os.Build.VERSION.SDK_INT >= 3 ) {
             try {
-                result = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+                appStore = context.getPackageManager().getInstallerPackageName(context.getPackageName());
             } catch (Exception e) {
-                //if (WigzoSDK.getInstance().isLoggingEnabled()) {
                     Log.i(Configuration.WIGZO_SDK_TAG.value, "Can't get Installer package");
-                //}
+
             }
-            if (result == null || result.length() == 0) {
-                result = "";
-                //if (WigzoSDK.getInstance().isLoggingEnabled()) {
-                    Log.i(Configuration.WIGZO_SDK_TAG.value, "No store found");
-                //}
+            if (appStore == null || appStore.length() == 0) {
+                appStore = "";
+                    Log.i(Configuration.WIGZO_SDK_TAG.value, "No store found! ");
             }
         }
-        return result;
+        return appStore;
     }
 
     /**
@@ -208,12 +200,10 @@ public class DeviceInfo {
         deviceInfo.put("device", getDevice());
         deviceInfo.put("os", getOS());
         deviceInfo.put("osVersion", getOSVersion());
-        //deviceInfo.put("carrier", getCarrier(context));
-        //deviceInfo.put("resolution", getResolution(context));
-       // deviceInfo.put("density", getDensity(context));
+        deviceInfo.put("serviceProvider", getServiceProvider(context));
         deviceInfo.put("ipAddress", getIpAddress());
         deviceInfo.put("appVersion", getAppVersion(context));
-        //deviceInfo.put("installingApp", getStore(context));
+        deviceInfo.put("installingApp", getStore(context));
         Gson gson = new Gson();
 
         String result = gson.toJson(deviceInfo);
@@ -222,10 +212,16 @@ public class DeviceInfo {
             result = java.net.URLEncoder.encode(result, "UTF-8");
         } catch (UnsupportedEncodingException ignored) {
             // should never happen because Android guarantees UTF-8 support
+            Log.e(Configuration.WIGZO_SDK_TAG.value,"UnSupported encoding!- UTF-8");
         }
 
         return result;
     }
+
+    /**
+     *
+     * @return IpAddress of device
+     */
 
     public String getIpAddress(){
         String ipAddress = null;
@@ -236,11 +232,12 @@ public class DeviceInfo {
                     InetAddress inetAddress = enumIpAddr.nextElement();
                     if (!inetAddress.isLoopbackAddress()) {
                         ipAddress = inetAddress.getHostAddress().toString();
-
                     }
                 }
             }
-        } catch (SocketException ex) {}
+        } catch (SocketException ex) {
+            Log.e(Configuration.WIGZO_SDK_TAG.value,"No device ipAddress found!");
+        }
 
     return ipAddress;
 

@@ -3,18 +3,14 @@ package wigzo.sdk.model;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import org.apache.commons.lang3.StringUtils;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
-import wigzo.sdk.helpers.ConnectionStream;
 import wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
@@ -123,12 +119,14 @@ public class UserProfile {
             String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
             String orgToken = WigzoSDK.getInstance().getOrgToken();
             String appKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value,"");
+            String lastLoggedInTime = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_LOGGEDINTIME.key,"");
             final Gson gson = new Gson();
             Map<String, Object> userDataMap = new HashMap<>();
             userDataMap.put("deviceId", deviceId);
             userDataMap.put("orgToken", orgToken);
             userDataMap.put("appKey", appKey);
             userDataMap.put("userData", this);
+            userDataMap.put("lastLoggedIn",lastLoggedInTime);
             final String picturePath = this.picturePath;
             final String userDataStr = gson.toJson(userDataMap);
             wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_PROFILE_DATA_KEY.value,userDataStr).apply();
@@ -140,6 +138,19 @@ public class UserProfile {
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initiallized.Cannot send user information");
 
         }
+
+    }
+
+    public static void saveUserLoggedInStattus(boolean status ){
+        final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if(status){
+            Calendar c = Calendar.getInstance();
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String formattedDate = df.format(c.getTime());
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDINTIME.key,formattedDate).apply();
+        }
+        wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_IN.key,status).apply();
 
     }
 }
