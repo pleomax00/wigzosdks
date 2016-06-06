@@ -4,13 +4,12 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
+import wigzo.sdk.helpers.OrganizationEvents;
 import wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
@@ -144,11 +143,10 @@ public class UserProfile {
     public static void saveUserLoggedInStatus(boolean status ){
         final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         if(status){
-            Calendar c = Calendar.getInstance();
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formattedDate = df.format(c.getTime());
-            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDINTIME.key,formattedDate).apply();
+            String loggedInTime = String.valueOf(System.currentTimeMillis());
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDINTIME.key,loggedInTime).apply();
+            EventInfo eventInfo = new EventInfo( OrganizationEvents.Events.LOGGEDIN.key,loggedInTime );
+            eventInfo.saveEvent();
         }
         wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_IN.key,status).apply();
 
@@ -156,11 +154,10 @@ public class UserProfile {
     public static void saveUserLoggedOutStatus(boolean status ){
         final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         if(status){
-            Calendar c = Calendar.getInstance();
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formattedDate = df.format(c.getTime());
-            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDOUTTIME.key,formattedDate).apply();
+            String loggedOutTime = String.valueOf(System.currentTimeMillis());
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDOUTTIME.key,loggedOutTime).apply();
+            EventInfo eventInfo = new EventInfo( OrganizationEvents.Events.LOGGEDOUT.key,loggedOutTime);
+            eventInfo.saveEvent();
         }
         wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_OUT.key,status).apply();
 
