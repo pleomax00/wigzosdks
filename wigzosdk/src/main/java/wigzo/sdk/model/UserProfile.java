@@ -126,7 +126,7 @@ public class UserProfile {
             userDataMap.put("orgToken", orgToken);
             userDataMap.put("appKey", appKey);
             userDataMap.put("userData", this);
-            userDataMap.put("lastLoggedIn",lastLoggedInTime);
+
             final String picturePath = this.picturePath;
             final String userDataStr = gson.toJson(userDataMap);
             wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_PROFILE_DATA_KEY.value,userDataStr).apply();
@@ -141,7 +141,7 @@ public class UserProfile {
 
     }
 
-    public static void saveUserLoggedInStattus(boolean status ){
+    public static void saveUserLoggedInStatus(boolean status ){
         final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         if(status){
             Calendar c = Calendar.getInstance();
@@ -151,6 +151,18 @@ public class UserProfile {
             wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDINTIME.key,formattedDate).apply();
         }
         wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_IN.key,status).apply();
+
+    }
+    public static void saveUserLoggedOutStatus(boolean status ){
+        final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if(status){
+            Calendar c = Calendar.getInstance();
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String formattedDate = df.format(c.getTime());
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDOUTTIME.key,formattedDate).apply();
+        }
+        wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_OUT.key,status).apply();
 
     }
 }

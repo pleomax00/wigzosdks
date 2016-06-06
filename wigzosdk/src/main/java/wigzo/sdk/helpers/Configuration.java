@@ -41,7 +41,9 @@ public enum Configuration {
     GCM_READ_URL("gcmReadUrl", "/rest/v1/push/android/track/read-multiple"),
     GCM_OPEN_URL("gcmOpenUrl", "/rest/v1/push/android/track/open-multiple"),
     USER_LOGGED_IN("loggedIn",  "logged_in"),
-    USER_LOGGEDINTIME("loggedInTime","logged_in_time");
+    USER_LOGGED_OUT("loggedOut","logged_out"),
+    USER_LOGGEDINTIME("loggedInTime","logged_in_time"),
+    USER_LOGGEDOUTTIME("loggedOutTime","logged_out_time");
 
 
     public String key;

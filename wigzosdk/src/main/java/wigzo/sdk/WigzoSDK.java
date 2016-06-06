@@ -41,7 +41,7 @@ public class WigzoSDK {
    // private String deviceId;
     private String appKey;
     private String orgToken;
-    private boolean enableLogging = true;
+    private boolean enableLogging = false;
     private long startTime;
     private String emailId;
     private Gson gson;
@@ -533,6 +533,13 @@ public class WigzoSDK {
 
 
     public synchronized boolean isLoggingEnabled() {
+        final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(getContext());
+        Boolean status = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.USER_LOGGED_IN.key,false);
+        if(status){
+            this.enableLogging = true;
+        }
+
+
         return this.enableLogging;
     }
 

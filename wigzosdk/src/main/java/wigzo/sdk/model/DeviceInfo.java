@@ -140,7 +140,7 @@ public class DeviceInfo {
         }
         if (serviceProviderName == null || serviceProviderName.length() == 0) {
             serviceProviderName = "";
-                Log.i(Configuration.WIGZO_SDK_TAG.value, "No carrier found");
+                Log.i(Configuration.WIGZO_SDK_TAG.value, "No service provider found");
         }
         return serviceProviderName;
     }
@@ -159,7 +159,7 @@ public class DeviceInfo {
      * is not present.
      */
     static String getAppVersion(final Context context) {
-        String appVersion = Configuration.DEFAULT_SDK_VERSION.value;
+        String appVersion = Configuration.DEFAULT_APP_VERSION.value;
         try {
             appVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         }
