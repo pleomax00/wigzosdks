@@ -140,6 +140,10 @@ public class UserProfile {
 
     }
 
+    /**
+     * @info method saveUserLoggedInStatus(boolean status) saves the status as true when user LoggedIn successfully.
+     * @param status
+     */
     public static void saveUserLoggedInStatus(boolean status ){
         final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         if(status){
@@ -151,6 +155,11 @@ public class UserProfile {
         wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_IN.key,status).apply();
 
     }
+
+    /**
+     * @info Method saveUserLoggedOutStatus(boolean status) saves the status as true when user successfully LoggedOut.
+     * @param status
+     */
     public static void saveUserLoggedOutStatus(boolean status ){
         final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         if(status){
