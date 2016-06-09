@@ -39,12 +39,12 @@ public enum Configuration {
     GCM_OPEN_KEY("gcmOpenKey", "GCM_OPEN_KEY"),
     GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED"),
     GCM_READ_URL("gcmReadUrl", "/rest/v1/push/android/track/read-multiple"),
-    GCM_OPEN_URL("gcmOpenUrl", "/rest/v1/push/android/track/open-multiple"),
-    USER_LOGGED_IN("loggedIn",  "logged_in"),
+    GCM_OPEN_URL("gcmOpenUrl", "/rest/v1/push/android/track/open-multiple");
+    /*USER_LOGGED_IN("loggedIn",  "logged_in"),
     USER_LOGGED_OUT("loggedOut","logged_out"),
     USER_LOGGEDINTIME("loggedInTime","logged_in_time"),
     USER_LOGGEDOUTTIME("loggedOutTime","logged_out_time");
-
+*/
 
     public String key;
     public String value;

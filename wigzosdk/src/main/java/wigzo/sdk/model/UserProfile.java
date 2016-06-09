@@ -118,7 +118,7 @@ public class UserProfile {
             String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
             String orgToken = WigzoSDK.getInstance().getOrgToken();
             String appKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value,"");
-            String lastLoggedInTime = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_LOGGEDINTIME.key,"");
+           // String lastLoggedInTime = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_LOGGEDINTIME.key,"");
             final Gson gson = new Gson();
             Map<String, Object> userDataMap = new HashMap<>();
             userDataMap.put("deviceId", deviceId);
@@ -143,7 +143,7 @@ public class UserProfile {
     /**
      * @info method saveUserLoggedInStatus(boolean status) saves the status as true when user LoggedIn successfully.
      * @param status
-     */
+     *//*
     public static void saveUserLoggedInStatus(boolean status ){
         final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         if(status){
@@ -156,10 +156,10 @@ public class UserProfile {
 
     }
 
-    /**
+    *//**
      * @info Method saveUserLoggedOutStatus(boolean status) saves the status as true when user successfully LoggedOut.
      * @param status
-     */
+     *//*
     public static void saveUserLoggedOutStatus(boolean status ){
         final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         if(status){
@@ -170,5 +170,5 @@ public class UserProfile {
         }
         wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_OUT.key,status).apply();
 
-    }
+    }*/
 }
