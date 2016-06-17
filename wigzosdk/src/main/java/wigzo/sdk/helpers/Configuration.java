@@ -11,6 +11,7 @@ public enum Configuration {
     INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
     DEVICE_ID_TAG("deviceIdTag","DeviceInfo"),
     DEFAULT_SDK_VERSION("defaultSdkVersion","1.0"),
+    DEFAULT_APP_VERSION("defaultAppVersion","1.0"),
     WIGZO_SDK_TAG("wigzoSdkTag","Wigzo"),
     WIGZO_GCM_LISTENER_SERVICE_TAG("wigzoGCMListenerServiceTag","AbstractWigzoGcmListenerService"),
     WIGZO_REG_INTENT_SERVICE_TAG("wigzoRegIntentServiceTag","RegIntentService"),
@@ -39,7 +40,11 @@ public enum Configuration {
     GCM_DEVICE_MAPPED("gcmDeviceMapped", "GCM_DEVICE_MAPPED"),
     GCM_READ_URL("gcmReadUrl", "/rest/v1/push/android/track/read-multiple"),
     GCM_OPEN_URL("gcmOpenUrl", "/rest/v1/push/android/track/open-multiple");
-
+    /*USER_LOGGED_IN("loggedIn",  "logged_in"),
+    USER_LOGGED_OUT("loggedOut","logged_out"),
+    USER_LOGGEDINTIME("loggedInTime","logged_in_time"),
+    USER_LOGGEDOUTTIME("loggedOutTime","logged_out_time");
+*/
 
     public String key;
     public String value;

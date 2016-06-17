@@ -3,18 +3,13 @@ package wigzo.sdk.model;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import wigzo.sdk.WigzoSDK;
 import wigzo.sdk.helpers.Configuration;
-import wigzo.sdk.helpers.ConnectionStream;
+import wigzo.sdk.helpers.OrganizationEvents;
 import wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
@@ -123,12 +118,14 @@ public class UserProfile {
             String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
             String orgToken = WigzoSDK.getInstance().getOrgToken();
             String appKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value,"");
+           // String lastLoggedInTime = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_LOGGEDINTIME.key,"");
             final Gson gson = new Gson();
             Map<String, Object> userDataMap = new HashMap<>();
             userDataMap.put("deviceId", deviceId);
             userDataMap.put("orgToken", orgToken);
             userDataMap.put("appKey", appKey);
             userDataMap.put("userData", this);
+
             final String picturePath = this.picturePath;
             final String userDataStr = gson.toJson(userDataMap);
             wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_PROFILE_DATA_KEY.value,userDataStr).apply();
@@ -142,4 +139,36 @@ public class UserProfile {
         }
 
     }
+
+    /**
+     * @info method saveUserLoggedInStatus(boolean status) saves the status as true when user LoggedIn successfully.
+     * @param status
+     *//*
+    public static void saveUserLoggedInStatus(boolean status ){
+        final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if(status){
+            String loggedInTime = String.valueOf(System.currentTimeMillis());
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDINTIME.key,loggedInTime).apply();
+            EventInfo eventInfo = new EventInfo( OrganizationEvents.Events.LOGGEDIN.key,loggedInTime );
+            eventInfo.saveEvent();
+        }
+        wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_IN.key,status).apply();
+
+    }
+
+    *//**
+     * @info Method saveUserLoggedOutStatus(boolean status) saves the status as true when user successfully LoggedOut.
+     * @param status
+     *//*
+    public static void saveUserLoggedOutStatus(boolean status ){
+        final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if(status){
+            String loggedOutTime = String.valueOf(System.currentTimeMillis());
+            wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.USER_LOGGEDOUTTIME.key,loggedOutTime).apply();
+            EventInfo eventInfo = new EventInfo( OrganizationEvents.Events.LOGGEDOUT.key,loggedOutTime);
+            eventInfo.saveEvent();
+        }
+        wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.USER_LOGGED_OUT.key,status).apply();
+
+    }*/
 }

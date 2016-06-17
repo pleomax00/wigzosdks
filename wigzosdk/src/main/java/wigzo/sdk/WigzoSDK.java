@@ -1,16 +1,14 @@
 package wigzo.sdk;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-//import com.google.android.gms.common.ConnectionResult;
-//import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -535,6 +533,7 @@ public class WigzoSDK {
 
 
     public synchronized boolean isLoggingEnabled() {
+
         return this.enableLogging;
     }
 
