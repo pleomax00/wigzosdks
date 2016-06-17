@@ -61,6 +61,8 @@ public abstract class AbstractWigzoGcmListenerService extends GcmListenerService
         Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + message);
 
         String type = (String) data.get("type");
+        String linkType = (String) data.get("link_type");
+        String link = (String) data.get("link");
         String title = (String) data.get("title");
         String body = (String) data.get("body");
         String intentData = (String) data.get("intent_data");
@@ -78,11 +80,11 @@ public abstract class AbstractWigzoGcmListenerService extends GcmListenerService
 //        }.getType());
 
         if (StringUtils.equals(type, "simple_push")) {
-            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentData, uuid, notificationId, secondSound);
+            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentData, uuid, notificationId, linkType, link, secondSound);
         }
         else if (StringUtils.equals(type, "image_push")) {
             String imageUrl = (String) data.get("image_url");
-            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentData, uuid, notificationId, secondSound);
+            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentData, uuid, notificationId, linkType, link, secondSound);
         }
 
         if (from.startsWith("/topics/")) {

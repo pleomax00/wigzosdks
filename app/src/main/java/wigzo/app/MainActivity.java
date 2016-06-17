@@ -1,8 +1,11 @@
 package wigzo.app;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -26,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         WigzoSDK sdk = WigzoSDK.getInstance();
         //sdk.initializeWigzoData(this, "56065c5b-db30-4b89-bd76-0a9c2938c90b");
 
-        //sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988", "1080912767729") //, TargetActivity.class);
+        sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988", "1080912767729"); //, TargetActivity.class);
         sdk.onStart();
 
         EventInfo eventInfo3 = new EventInfo("Bought","Bought");
@@ -60,5 +63,12 @@ public class MainActivity extends AppCompatActivity {
         sdk.onStop();
         //onDestroy();
 
+    }
+
+    public void onDeepLinkClick(View view) {
+        String url = "http://www.wigzoes.com/deeplink";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 }

@@ -7,21 +7,25 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="wigzo.app.MainActivity">
+    tools:context="wigzo.app.DirectLinkActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/textView2" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Direct Link activity"
+        android:id="@+id/textView"
+        android:layout_marginTop="116dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DeepLink"
-        android:id="@+id/open_deep_link"
-        android:layout_marginTop="103dp"
-        android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:onClick="onDeepLinkClick"/>
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="No Data sent"
+        android:id="@+id/direct_data_view"
+        android:layout_marginTop="88dp"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
