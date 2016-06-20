@@ -1,8 +1,11 @@
 package wigzo.app;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -60,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
         sdk.onStop();
         //onDestroy();
 
+    }
+
+    public void onDeepLinkClick(View view) {
+        String url = "http://www.wigzoes.com/deeplink";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 
     @Override

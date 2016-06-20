@@ -3,6 +3,7 @@ package wigzo.sdk;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -31,6 +32,8 @@ public class ProxyActivity extends AppCompatActivity {
         Class<? extends Activity> targetActivity = (Class<? extends Activity>) extras.get("targetActivity");
         final String uuid = (String) extras.get("uuid");
         String intentData = (String) extras.get("intentData");
+        String linkType = (String) extras.get("linkType");
+        String link = (String) extras.get("link");
 
         if (StringUtils.isNotEmpty(uuid)) {
             final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
@@ -46,25 +49,28 @@ public class ProxyActivity extends AppCompatActivity {
 
         }
 
-        Map<String, Object> intentDataMap = gson.fromJson(intentData, new TypeToken<HashMap<String, Object>>() {
-        }.getType());
+        if (StringUtils.equals(linkType, "TARGET_ACTIVITY")) {
+            Map<String, Object> intentDataMap = gson.fromJson(intentData, new TypeToken<HashMap<String, Object>>() {
+            }.getType());
 
-        Intent targetIntent = new Intent(this, targetActivity);
+            Intent targetIntent = new Intent(this, targetActivity);
 
-        if (null != intentDataMap) {
-            for (Map.Entry<String, Object> entry : intentDataMap.entrySet())
-            {
-                if (entry.getValue() instanceof CharSequence) {
-                    targetIntent.putExtra(entry.getKey(), (CharSequence) entry.getValue());
-                }
-                else if (entry.getValue() instanceof Number) {
-                    targetIntent.putExtra(entry.getKey(), (Number) entry.getValue());
-                }
-                else if (entry.getValue() instanceof Boolean) {
-                    targetIntent.putExtra(entry.getKey(), (Boolean) entry.getValue());
+            if (null != intentDataMap) {
+                for (Map.Entry<String, Object> entry : intentDataMap.entrySet()) {
+                    if (entry.getValue() instanceof CharSequence) {
+                        targetIntent.putExtra(entry.getKey(), (CharSequence) entry.getValue());
+                    } else if (entry.getValue() instanceof Number) {
+                        targetIntent.putExtra(entry.getKey(), (Number) entry.getValue());
+                    } else if (entry.getValue() instanceof Boolean) {
+                        targetIntent.putExtra(entry.getKey(), (Boolean) entry.getValue());
+                    }
                 }
             }
+            startActivity(targetIntent);
+        } else if (StringUtils.equals(linkType, "URL")) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(link));
+            startActivity(intent);
         }
-        startActivity(targetIntent);
     }
 }
