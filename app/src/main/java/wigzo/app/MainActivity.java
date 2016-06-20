@@ -8,10 +8,12 @@ import android.os.Bundle;
 import android.view.View;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import wigzo.sdk.WigzoSDK;
+import wigzo.sdk.helpers.OrganizationEvents;
 import wigzo.sdk.model.EventInfo;
 import wigzo.sdk.model.UserProfile;
 
@@ -29,8 +31,13 @@ public class MainActivity extends AppCompatActivity {
         WigzoSDK sdk = WigzoSDK.getInstance();
         sdk.initializeWigzoData(this, "56065c5b-db30-4b89-bd76-0a9c2938c90b");
 
-        sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988", "1080912767729"); //, TargetActivity.class);
-        sdk.onStart();
+    /*    sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988", "1080912767729"); //, TargetActivity.class);
+        sdk.onStart();*/
+
+        EventInfo eventInfo4 = new EventInfo(OrganizationEvents.Events.LOGGEDIN.key,String.valueOf(System.currentTimeMillis()).toString());
+        /*EventInfo.Metadata metadata = new EventInfo.Metadata("1","Iphone","Iphone 6SE",null);
+        eventInfo4.setMetadata(metadata);*/
+        eventInfo4.saveEvent();
 
         EventInfo eventInfo3 = new EventInfo("Bought","Bought");
         eventInfo3.saveEvent();
