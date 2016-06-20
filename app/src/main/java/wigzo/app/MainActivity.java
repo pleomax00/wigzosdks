@@ -65,12 +65,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        UserProfile.saveUserLoggedInStatus(true);
+        //UserProfile.saveUserLoggedInStatus(true);
     }
 
     @Override
     protected void onStop() {
-        UserProfile.saveUserLoggedOutStatus(true);
+       // UserProfile.saveUserLoggedOutStatus(true);
         super.onStop();
 
     }

@@ -7,10 +7,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import wigzo.sdk.WigzoSDK;
+import wigzo.sdk.helpers.OrganizationEvents;
+import wigzo.sdk.model.EventInfo;
 import wigzo.sdk.model.UserProfile;
 
 /**
@@ -25,6 +28,10 @@ public class ClassA extends Activity {
         Log.d("Called! :" , "onCreate method is called!   A");
         WigzoSDK sdk = WigzoSDK.getInstance();
         sdk.initializeWigzoData(this, "56065c5b-db30-4b89-bd76-0a9c2938c90b");
+        EventInfo eventInfo = new EventInfo(OrganizationEvents.Events.LOGGEDIN.key,(new Date()).toString());
+        EventInfo.Metadata metadata = new EventInfo.Metadata("1","Iphone","Iphone 6SE",null);
+        eventInfo.setMetadata(metadata);
+        eventInfo.saveEvent();
 
         go = (Button)findViewById(R.id.go);
         go.setOnClickListener(new View.OnClickListener(){

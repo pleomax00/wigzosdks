@@ -6,7 +6,7 @@ package wigzo.sdk.helpers;
 public enum Configuration {
 
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
-    BASE_URL("baseUrl","http://ankit.wigzoes.com"),
+    BASE_URL("baseUrl","http://minaz.wigzoes.com"),
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
     INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
     DEVICE_ID_TAG("deviceIdTag","DeviceInfo"),
