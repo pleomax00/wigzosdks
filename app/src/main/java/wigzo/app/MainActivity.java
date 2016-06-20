@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     /*    sdk.initializeWigzoData(this, "2c271df3-713f-4802-ae4c-b0dec708c988", "1080912767729"); //, TargetActivity.class);
         sdk.onStart();*/
 
-        EventInfo eventInfo4 = new EventInfo(OrganizationEvents.Events.LOGGEDIN.key,String.valueOf(System.currentTimeMillis()).toString());
+        EventInfo eventInfo4 = new EventInfo(OrganizationEvents.Events.LOGGEDIN.label,String.valueOf(System.currentTimeMillis()).toString());
         /*EventInfo.Metadata metadata = new EventInfo.Metadata("1","Iphone","Iphone 6SE",null);
         eventInfo4.setMetadata(metadata);*/
         eventInfo4.saveEvent();

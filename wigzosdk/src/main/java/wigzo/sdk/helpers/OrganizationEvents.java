@@ -21,7 +21,7 @@ public class OrganizationEvents {
         ADDTOCART("addtocart", "Add To Cart"), BOOK( "book", "Book"),CHECKOUT( "checkout", "Checkout"),
         REGISTERED("registered", "Registered"), LIKE( "like", "Like"), SHARE( "share", "Share"), ADDTOWISHLIST( "addtowishlist", "Add To Wishlist"),
         LISTEN( "listen", "Listen"), ADDTOPLAYLIST( "addtoplaylist", "Add To Playlist"), WATCH( "watch", "Watch"), WATCHLATER( "watchlater", "Watch Later" ),
-        LOGGEDIN("loggedin","LoggedIn"),LOGGEDOUT("loggedout","LoggedOut");
+        LOGGEDIN("loggedin","LastLoggedIn"),LOGGEDOUT("loggedout","LastLoggedOut");
 
         public String key;
         public String label;
