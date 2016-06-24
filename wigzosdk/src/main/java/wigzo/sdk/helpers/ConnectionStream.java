@@ -71,7 +71,8 @@ public class ConnectionStream {
                 }
                 response = responseBuilder.toString();
             }
-            if (!success && WigzoSDK.getInstance().isLoggingEnabled()) {
+            if (!success ) // && WigzoSDK.getInstance().isLoggingEnabled()
+            {
                 Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from submitting user identification data: " + "");
             }
             return response;
