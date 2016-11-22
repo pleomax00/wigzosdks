@@ -23,9 +23,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmPubSub;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -50,25 +48,29 @@ public class WigzoRegistrationIntentService extends IntentService {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         try {
+            // This code is no more required
+
+
             // [START register_for_gcm]
             // Initially this call goes out to the network to retrieve the token, subsequent calls
             // are local.
             // R.string.gcm_defaultSenderId (the Sender ID) is typically derived from google-services.json.
             // See https://developers.google.com/cloud-messaging/android/start for details on this file.
             // [START get_token]
-            InstanceID instanceID = InstanceID.getInstance(this);
+
+            /*InstanceID instanceID = InstanceID.getInstance(this);
             String token = instanceID.getToken(WigzoSDK.getInstance().getSenderId(),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // [END get_token]
-            Log.i(Configuration.WIGZO_REG_INTENT_SERVICE_TAG.value, "GCM Registration Token: " + token);
+            Log.i(Configuration.WIGZO_REG_INTENT_SERVICE_TAG.value, "GCM Registration Token: " + token);*/
 
-            // TODO: Implement this method to send any registration to your app's servers.
+            /*// TODO: Implement this method to send any registration to your app's servers.
             sendRegistrationToServer(token);
 
             mapGcmToDeviceId(token);
 
             // Subscribe to topic channels
-            subscribeTopics(token);
+            subscribeTopics(token);*/
 
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
@@ -154,8 +156,13 @@ public class WigzoRegistrationIntentService extends IntentService {
      */
     // [START subscribe_topics]
     private void subscribeTopics(String token) throws IOException {
-        GcmPubSub pubSub = GcmPubSub.getInstance(this);
-        pubSub.subscribe(token, "/topics/" + WigzoSDK.getInstance().getOrgToken(), null);
+        /*GcmPubSub pubSub = GcmPubSub.getInstance(this);
+        pubSub.subscribe(token, "/topics/" + WigzoSDK.getInstance().getOrgToken(), null);*/
+
+        //FirebaseMessaging.getInstance().subscribeToTopic("mytopic");
+        FirebaseMessaging.getInstance().subscribeToTopic("/topics/" + WigzoSDK.getInstance().getOrgToken());
+
+
     }
     // [END subscribe_topics]
 

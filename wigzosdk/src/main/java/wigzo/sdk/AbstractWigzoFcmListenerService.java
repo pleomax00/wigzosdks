@@ -27,7 +27,9 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,27 +40,27 @@ import java.util.Map;
 
 import wigzo.sdk.helpers.Configuration;
 
-public abstract class AbstractWigzoGcmListenerService extends GcmListenerService {
+import static android.R.attr.data;
+
+public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingService {
 
 
     protected abstract Class <? extends Activity> getTargetActivity();
 
-    //private static final String TAG = "AbstractWigzoGcmListenerService";
+    //private static final String TAG = "AbstractWigzoFcmListenerService";
 
-    /**
-     * Called when message is received.
-     *
-     * @param from SenderID of the sender.
-     * @param data Data bundle containing message data as key/value pairs.
-     *             For Set of keys use data.keySet().
-     */
     // [START receive_message]
     @Override
-    public void onMessageReceived(String from, Bundle data) {
+    public void onMessageReceived(RemoteMessage message) {
+
+        String from = message.getFrom();
+        Map data = message.getData();
+
         Gson gson = new Gson();
-        String message = data.getString("message");
+
+        String data_message = data.get("message").toString();
         Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "From: " + from);
-        Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + message);
+        Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + data_message);
 
         String type = (String) data.get("type");
         String linkType = (String) data.get("link_type");
