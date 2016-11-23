@@ -109,9 +109,10 @@ public class WigzoRegistrationIntentService extends IntentService {
             final String url = Configuration.BASE_URL.value + Configuration.GCM_REGISTRATION_URL.value;
 
             String response = ConnectionStream.postRequest(url, eventDataStr);
+
             if (null != response) {
-                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
-                }.getType());
+                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {}.getType());
+
                 if ("success".equals(jsonResponse.get("status"))) {
                     sharedPreferences.edit().putBoolean(Configuration.SENT_GCM_TOKEN_TO_SERVER.value, true).apply();
                 }
@@ -122,12 +123,19 @@ public class WigzoRegistrationIntentService extends IntentService {
 
     private void mapGcmToDeviceId(String token) {
         Gson gson = new Gson();
+
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+
         Boolean initDataSynced = sharedPreferences.getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, false);
+
         Boolean isGcmDeviceMapped = sharedPreferences.getBoolean(Configuration.GCM_DEVICE_MAPPED.value, false);
+
         if (initDataSynced && !isGcmDeviceMapped) {
+
             Map<String, Object> eventData = new HashMap<>();
+
             String deviceId = sharedPreferences.getString(Configuration.DEVICE_ID_KEY.value, "");
 
             eventData.put("registrationId", token);
@@ -135,12 +143,15 @@ public class WigzoRegistrationIntentService extends IntentService {
             eventData.put("deviceId", deviceId);
 
             final String eventDataStr = gson.toJson(eventData);
+
             final String url = Configuration.BASE_URL.value + Configuration.GCM_DEVICE_MAPPING_URL.value;
 
             String response = ConnectionStream.postRequest(url, eventDataStr);
+
             if (null != response) {
-                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
-                }.getType());
+
+                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {}.getType());
+
                 if ("success".equals(jsonResponse.get("status"))) {
                     sharedPreferences.edit().putBoolean(Configuration.GCM_DEVICE_MAPPED.value, true);
                 }
@@ -160,7 +171,8 @@ public class WigzoRegistrationIntentService extends IntentService {
         pubSub.subscribe(token, "/topics/" + WigzoSDK.getInstance().getOrgToken(), null);*/
 
         //FirebaseMessaging.getInstance().subscribeToTopic("mytopic");
-        FirebaseMessaging.getInstance().subscribeToTopic("/topics/" + WigzoSDK.getInstance().getOrgToken());
+        //FirebaseMessaging.getInstance().subscribeToTopic("/topics/" + WigzoSDK.getInstance().getOrgToken());
+        FirebaseMessaging.getInstance().subscribeToTopic("/org-subscribe/" + WigzoSDK.getInstance().getOrgToken());
 
 
     }

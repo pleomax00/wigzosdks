@@ -104,7 +104,9 @@ public class WigzoSDK {
 //    }
 
     public void gcmRegister() {
-        Intent intent = new Intent(getContext(), WigzoRegistrationIntentService.class);
+        //TODO change intent WigzoRegistrationIntentService to WigzoInstanceIDService
+        Intent intent = new Intent(getContext(), WigzoInstanceIDService.class);
+        //Intent intent = new Intent(getContext(), WigzoRegistrationIntentService.class);
         getContext().startService(intent);
     }
 
@@ -133,28 +135,57 @@ public class WigzoSDK {
 
         this.gson = new Gson();
 
+        //Initialise shared preferences to store data in mobile for future use
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+
+        //Get AppKey from Shared preferences (will not exist on first run)
         String storedAppKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value,"");
+
+        //if stored key does not exist then assign a new UUID AppKey
         if(StringUtils.isEmpty(storedAppKey)){
+
+            //Assign UUID to AppKey
             this.appKey = UUID.randomUUID().toString();
+
+            //Save AppKey in Shared Preferences
             wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.APP_KEY.value, this.appKey).apply();
-        }else{
+        }
+        //if AppKey already exists then assign AppKey from Shared Preferences
+        else{
             this.appKey = storedAppKey;
         }
-//        String storedDeviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value, "");
+
+        //Boolean to check if data has already been synced
         Boolean initDataSynced = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, false);
+
         if(!(initDataSynced)) {
+
+            //Assign Device ID
             String deviceId  = UUID.randomUUID().toString();
+
+            //Store Device Id in Shared Preferences
             wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.DEVICE_ID_KEY.value, deviceId).apply();
+
+            //Get User Data json string to send to Wigzo server
             final String userData = getDeviceIdentificationData();
+
+            //TODO Change Base URL from "http://minaz.wigzoes.com" to other company URL
+            //Url to send user data (BASE_URL("http://minaz.wigzoes.com"), INITIAL_DATA_URL("/androidsdk/getinitialdata"))
             final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
+
+            //Initialise Executor Service to send user data to server
             ExecutorService executorService = Executors.newSingleThreadExecutor();
+
             Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
                 public Boolean call()  {
+                    //Post data to server
                     String response = ConnectionStream.postRequest(url,userData);
+
+                    //Check if post request returned success if the response is not null
                     if (null != response) {
                         Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
                         }.getType());
+
                         if ("success".equals(jsonResponse.get("status"))) {
                             return true;
                         }
@@ -162,8 +193,11 @@ public class WigzoSDK {
                     return false;
                 }});
             try {
+
+                //if post request was successful save the Synced data flag as true in shared preferences
                 if(future.get()){
                     wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, true).apply();
+
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -184,11 +218,21 @@ public class WigzoSDK {
      * @return instance of WigzoSDK
      * @throws IllegalStateException if either Context/orgToken/senderId is missing
      */
+
+    //initializeWigzoData method overload if fcm id is passed
     public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken, String senderId){
+
+        //first jnitialise in the normal manner
         initializeWigzoData(context,orgToken);
+
+        //if token is not empty then store the token as sender id
         if(StringUtils.isNotEmpty(senderId)){
+
             this.senderId = senderId;
+
+            //Start Registration service
             gcmRegister();
+
         }else {
             throw new IllegalArgumentException("Valid Sender Id is required!");
         }
@@ -354,11 +398,19 @@ public class WigzoSDK {
      */
     public String getDeviceIdentificationData(){
         Map<String , Object> deviceData = new HashMap<>();
+
+        //Initialise Shared Preferences
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
+
+        //get device id from shared preferences
         String deviceId = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_ID_KEY.value,"");
+
+        //put user details in Map to send to server
         deviceData.put("deviceId",deviceId);
         deviceData.put("orgToken",this.orgToken);
         deviceData.put("appKey",this.appKey);
+
+        //return prepared json string from map
         return this.gson.toJson(deviceData);
     }
 
