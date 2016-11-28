@@ -17,6 +17,7 @@
 package com.wigzo.wigzotestapp;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
@@ -38,7 +39,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, "Refreshed token: " + refreshedToken);
+        Log.d(TAG, "Refreshed token MyFirebaseinstanceIDService: " + refreshedToken);
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
@@ -58,6 +59,6 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     private void sendRegistrationToServer(String token) {
         // TODO: Implement this method to send token to your app server.
         String ORG_TOKEN = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE).getString("ORG_TOKEN", "e519ab60-e759-4020-ba2d-d72fcd7450bc");
-        WigzoSDK.getInstance().initializeWigzoData(getApplicationContext(), ORG_TOKEN, FirebaseInstanceId.getInstance().getToken());
+        WigzoSDK.getInstance().initializeWigzoData(getApplicationContext(), ORG_TOKEN, token);
     }
 }

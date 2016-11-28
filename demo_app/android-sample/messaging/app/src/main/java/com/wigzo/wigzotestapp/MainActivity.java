@@ -16,6 +16,7 @@
 
 package com.wigzo.wigzotestapp;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -39,13 +43,39 @@ public class MainActivity extends AppCompatActivity {
 
     SharedPreferences pref;
     SharedPreferences.Editor edit;
+    Button eventClick;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseMessaging.getInstance().subscribeToTopic("MyTopic");
+        eventClick = (Button) findViewById(R.id.event);
+
+        //Check for google play services availability
+        checkGooglePlayServicesAvailability();
+
+        //To generate token without adding subscription
+        Intent i = new Intent(MainActivity.this, MyFirebaseInstanceIDService.class);
+        startService(i);
+
+        //FirebaseMessaging.getInstance().subscribeToTopic("MyTopic");
+
+        /*Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while(true) {
+                        sleep(1000);
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();*/
 
         getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE).edit().putString("ORG_TOKEN", ORG_TOKEN).apply();
 
@@ -62,6 +92,11 @@ public class MainActivity extends AppCompatActivity {
             for (String key : getIntent().getExtras().keySet()) {
                 Object value = getIntent().getExtras().get(key);
                 Log.d(TAG, "Key: " + key + " Value: " + value);
+            }
+
+            if (getIntent().getExtras().get("notification") != null)
+            {
+                eventClick.setText(getIntent().getExtras().get("notification").toString());
             }
         }
         // [END handle_data_extras]
@@ -96,11 +131,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         });
-        Button eventClick = (Button) findViewById(R.id.event);
+
         eventClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EventInfo event = new EventInfo ( OrganizationEvents.Events.VIEW.key,"NewSdkTestCall");
+                event.saveEvent();
 
             }
         });
@@ -119,6 +155,23 @@ public class MainActivity extends AppCompatActivity {
         else {
             Log.e("FIRSTRUN_____", "" + pref.getBoolean("APP_FIRST_RUN", true));
         }*/
+    }
+
+    private void checkGooglePlayServicesAvailability()
+    {
+        int googlePlayServicesResultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getApplicationContext());
+
+        if (googlePlayServicesResultCode != ConnectionResult.SUCCESS)
+        {
+            if (GoogleApiAvailability.getInstance().isUserResolvableError(googlePlayServicesResultCode))
+            {
+                GoogleApiAvailability.getInstance().getErrorDialog(this, googlePlayServicesResultCode, 1001);
+            }
+            else
+            {
+
+            }
+        }
     }
 
 }

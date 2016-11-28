@@ -32,6 +32,9 @@ dependencies {
 
     compile 'com.google.firebase:firebase-messaging:9.8.0'
 
+    //remove if gives problem. this is added to check latest version of Google play services in the device available for fcm
+    compile 'com.google.android.gms:play-services-base:9.8.0'
+
     // Testing dependencies
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
