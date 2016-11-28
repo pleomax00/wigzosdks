@@ -44,8 +44,20 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
      * you retrieve the token.
      */
     // [START refresh_token]
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Log.e("WigzoInstanceIDService", ": onCreate() called");
+
+        onTokenRefresh();
+    }
     @Override
     public void onTokenRefresh() {
+
+        Log.e("WigzoInstanceIDService", ": onTokenRefresh() called");
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
@@ -56,14 +68,23 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, "Refreshed token: " + refreshedToken);
+        Log.e(TAG, "Refreshed token WigzoInstanceIDService: " + refreshedToken);
         // TODO: Implement this method to send any registration to your app's servers: This is done.
-        sendRegistrationToFCMServer(refreshedToken);
+
+        sendRegistrationToServer(refreshedToken);
+
+        mapGcmToDeviceId(refreshedToken);
+
+        try {
+            subscribeTopics(WigzoSDK.getInstance().getOrgToken());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
     // [END refresh_token]
 
-    //also termed as sendRegistrationToServer in google docs
-    private void sendRegistrationToFCMServer(String token) {
+    private void sendRegistrationToServer(String token) {
         Gson gson = new Gson();
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
@@ -155,7 +176,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
         //FirebaseMessaging.getInstance().subscribeToTopic("mytopic");
         //FirebaseMessaging.getInstance().subscribeToTopic("/topics/" + WigzoSDK.getInstance().getOrgToken());
-        FirebaseMessaging.getInstance().subscribeToTopic("/org-subscribe/" + WigzoSDK.getInstance().getOrgToken());
+        FirebaseMessaging.getInstance().subscribeToTopic("orgsubscribe-" + WigzoSDK.getInstance().getOrgToken());
 
 
     }
