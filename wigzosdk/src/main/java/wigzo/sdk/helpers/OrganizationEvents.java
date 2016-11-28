@@ -15,26 +15,27 @@ public class OrganizationEvents {
      * Enum containing all events for all types of organizations.
      */
     public enum Events {
-        OTHER( "other", "Other"),
+        ADDTOCART("addtocart", "Add To Cart"),
+        ADDTOPLAYLIST( "addtoplaylist", "Add To Playlist"),
+        ADDTOWISHLIST( "addtowishlist", "Add To Wishlist"),
+        BOOK( "book", "Book"),
+        BUY("buy", "Buy"),
+        CHECKOUT( "checkout", "Checkout"),
         ITEM( "item", "Item"),
         JOIN( "join", "Join"),
-        RATE("rate", "Rate"),
-        VIEW("view", "View"),
-        BUY("buy", "Buy"),
-        SEARCH("search", "Search"),
-        ADDTOCART("addtocart", "Add To Cart"),
-        BOOK( "book", "Book"),
-        CHECKOUT( "checkout", "Checkout"),
-        REGISTERED("registered", "Registered"),
         LIKE( "like", "Like"),
-        SHARE( "share", "Share"),
-        ADDTOWISHLIST( "addtowishlist", "Add To Wishlist"),
         LISTEN( "listen", "Listen"),
-        ADDTOPLAYLIST( "addtoplaylist", "Add To Playlist"),
-        WATCH( "watch", "Watch"),
-        WATCHLATER( "watchlater", "Watch Later" ),
         LOGGEDIN("loggedin","LastLoggedIn"),
-        LOGGEDOUT("loggedout","LastLoggedOut");
+        LOGGEDOUT("loggedout","LastLoggedOut"),
+        OTHER( "other", "Other"),
+        RATE("rate", "Rate"),
+        REGISTERED("registered", "Registered"),
+        SEARCH("search", "Search"),
+        SHARE( "share", "Share"),
+        VIEW("view", "View"),
+        WATCH( "watch", "Watch"),
+        WATCHLATER( "watchlater", "Watch Later" );
+
 
         public String key;
         public String label;
