@@ -58,7 +58,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
      */
     private void sendRegistrationToServer(String token) {
         // TODO: Implement this method to send token to your app server.
-        String ORG_TOKEN = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE).getString("ORG_TOKEN", "e519ab60-e759-4020-ba2d-d72fcd7450bc");
+        String ORG_TOKEN = getApplicationContext().getSharedPreferences("MyPref", MODE_PRIVATE).getString("ORG_TOKEN", "56065c5b-db30-4b89-bd76-0a9c2938c90b");
         WigzoSDK.getInstance().initializeWigzoData(getApplicationContext(), ORG_TOKEN, token);
     }
 }

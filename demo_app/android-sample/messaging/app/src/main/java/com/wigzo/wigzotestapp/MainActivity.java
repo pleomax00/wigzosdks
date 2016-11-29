@@ -39,7 +39,7 @@ import wigzo.sdk.model.EventInfo;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final String ORG_TOKEN = "e519ab60-e759-4020-ba2d-d72fcd7450bc";
+    private static final String ORG_TOKEN = "56065c5b-db30-4b89-bd76-0a9c2938c90b";
 
     SharedPreferences pref;
     SharedPreferences.Editor edit;

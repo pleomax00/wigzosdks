@@ -19,6 +19,7 @@ package wigzo.sdk;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
@@ -29,6 +30,11 @@ import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import wigzo.sdk.helpers.Configuration;
 import wigzo.sdk.helpers.ConnectionStream;
@@ -85,7 +91,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
     // [END refresh_token]
 
     private void sendRegistrationToServer(String token) {
-        Gson gson = new Gson();
+        final Gson gson = new Gson();
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
 
@@ -102,10 +108,11 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
             //Convert eventData to json string
             final String eventDataStr = gson.toJson(eventData);
 
-            //Endpoint Url
-            final String url = Configuration.BASE_URL.value + Configuration.GCM_REGISTRATION_URL.value;
+            //Endpoint Url TODO change url
+            //final String url = Configuration.BASE_URL.value + Configuration.GCM_REGISTRATION_URL.value;
+            final String url = "https://professorx.wigzopush.com/rest/v1/push/android/register-subscription";
 
-            //post data to end point Url
+            /*//post data to end point Url
             String response = ConnectionStream.postRequest(url, eventDataStr);
 
             if (null != response) {
@@ -117,6 +124,38 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
                     sharedPreferences.edit().putBoolean(Configuration.SENT_GCM_TOKEN_TO_SERVER.value, true).apply();
 
                 }
+            }*/
+
+
+
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+            Future<Boolean> future = executorService.submit(new Callable<Boolean>(){
+                public Boolean call()  {
+                    //Post data to server
+                    String response = ConnectionStream.postRequest(url,eventDataStr);
+
+                    //Check if post request returned success if the response is not null
+                    if (null != response) {
+                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {}.getType());
+                        if ("success".equals(jsonResponse.get("status"))) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }});
+
+            try {
+
+                //if post request was successful save the Synced data flag as true in shared preferences
+                if(future.get()){
+                    Toast.makeText(getApplicationContext(), "Sent", Toast.LENGTH_SHORT).show();
+
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         }
 
