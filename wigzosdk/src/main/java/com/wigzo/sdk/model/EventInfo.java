@@ -1,4 +1,4 @@
-package wigzo.sdk.model;
+package com.wigzo.sdk.model;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import wigzo.sdk.WigzoSDK;
-import wigzo.sdk.helpers.Configuration;
-import wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.WigzoSDK;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
  * An instance of this class represents an event(or activity).
  * Event information includes -
- * {@link EventInfo#eventName} - Name of underlying event. It can either be standard event name(as defined under {@link wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.
+ * {@link EventInfo#eventName} - Name of underlying event. It can either be standard event name(as defined under {@link com.wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.
  * {@link EventInfo#eventValue} - Value of underlying event. e.g. rating info in case of Rate event
  * {@link EventInfo#metadata}. For more info see - {@link Metadata}
  * @author Minaz Ali
@@ -34,7 +34,7 @@ public class EventInfo {
 
     /**
      * Constructor to create {@link EventInfo} object whenever an event( or activity ) takes place
-     * @param eventName : Name of Event ( or activity), must not be null. It can either be standard event name(as defined under {@link wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.
+     * @param eventName : Name of Event ( or activity), must not be null. It can either be standard event name(as defined under {@link com.wigzo.sdk.helpers.OrganizationEvents.Events}) or a custom event name.
      * @param eventValue : Value of Event ( or Activity), must not be null
      */
     public EventInfo(String eventName, String eventValue) {

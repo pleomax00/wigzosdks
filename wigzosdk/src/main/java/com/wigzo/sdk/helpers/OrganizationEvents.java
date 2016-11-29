@@ -1,4 +1,4 @@
-package wigzo.sdk.helpers;
+package com.wigzo.sdk.helpers;
 
 
 /**

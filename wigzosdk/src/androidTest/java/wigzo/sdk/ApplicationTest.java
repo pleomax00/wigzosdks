@@ -1,4 +1,4 @@
-package wigzo.sdk;
+package com.wigzo.sdk;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

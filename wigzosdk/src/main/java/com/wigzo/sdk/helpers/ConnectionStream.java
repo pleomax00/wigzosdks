@@ -1,4 +1,4 @@
-package wigzo.sdk.helpers;
+package com.wigzo.sdk.helpers;
 
 import android.util.Log;
 
@@ -14,8 +14,6 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-
-import wigzo.sdk.WigzoSDK;
 
 
 public class ConnectionStream {

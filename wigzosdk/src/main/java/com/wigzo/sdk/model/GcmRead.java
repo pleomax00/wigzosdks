@@ -1,4 +1,4 @@
-package wigzo.sdk.model;
+package com.wigzo.sdk.model;
 
 import android.content.Context;
 
@@ -10,8 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import wigzo.sdk.helpers.Configuration;
-import wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
  * Created by wigzo on 18/5/16.

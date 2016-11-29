@@ -1,17 +1,7 @@
-package wigzo.sdk.helpers;
+package com.wigzo.sdk.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import wigzo.sdk.model.EventInfo;
 
 /**
  * This class provides a persistence layer for the sdk.

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package wigzo.sdk;
+package com.wigzo.sdk;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -30,9 +29,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import wigzo.sdk.helpers.Configuration;
-import wigzo.sdk.helpers.ConnectionStream;
-import wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.ConnectionStream;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 

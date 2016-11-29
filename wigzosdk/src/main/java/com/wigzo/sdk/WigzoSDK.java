@@ -1,4 +1,4 @@
-package wigzo.sdk;
+package com.wigzo.sdk;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,13 +21,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import wigzo.sdk.helpers.Configuration;
-import wigzo.sdk.helpers.ConnectionStream;
-import wigzo.sdk.helpers.WigzoSharedStorage;
-import wigzo.sdk.model.DeviceInfo;
-import wigzo.sdk.model.EventInfo;
-import wigzo.sdk.model.GcmOpen;
-import wigzo.sdk.model.GcmRead;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.ConnectionStream;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.model.DeviceInfo;
+import com.wigzo.sdk.model.EventInfo;
+import com.wigzo.sdk.model.GcmOpen;
+import com.wigzo.sdk.model.GcmRead;
 
 /**
  * This class is the public API for the Wigzo Android SDK.

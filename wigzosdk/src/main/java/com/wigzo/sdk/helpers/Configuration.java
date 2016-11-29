@@ -1,4 +1,4 @@
-package wigzo.sdk.helpers;
+package com.wigzo.sdk.helpers;
 
 /**
  * Created by wigzo
@@ -6,7 +6,7 @@ package wigzo.sdk.helpers;
 public enum Configuration {
 
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
-    BASE_URL("baseUrl","http://minaz.wigzoes.com"),
+    BASE_URL("baseUrl","https://professorx.wigzopush.com"),
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
     APP_KEY("appKey","APP_KEY"),
     DEFAULT_APP_VERSION("defaultAppVersion","1.0"),

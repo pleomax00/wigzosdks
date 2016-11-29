@@ -1,4 +1,4 @@
-package wigzo.sdk.model;
+package com.wigzo.sdk.model;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.Configuration;
 
 /**
  * An instance of this class represents information of device.

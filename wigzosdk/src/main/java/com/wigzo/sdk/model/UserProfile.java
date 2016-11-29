@@ -1,4 +1,4 @@
-package wigzo.sdk.model;
+package com.wigzo.sdk.model;
 
 import android.util.Log;
 
@@ -7,10 +7,9 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 import java.util.Map;
 
-import wigzo.sdk.WigzoSDK;
-import wigzo.sdk.helpers.Configuration;
-import wigzo.sdk.helpers.OrganizationEvents;
-import wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.WigzoSDK;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
  * An instance of this class represents Profile of user.

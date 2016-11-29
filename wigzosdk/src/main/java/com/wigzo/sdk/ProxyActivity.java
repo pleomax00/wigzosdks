@@ -1,4 +1,4 @@
-package wigzo.sdk;
+package com.wigzo.sdk;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,8 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import wigzo.sdk.model.GcmOpen;
-import wigzo.sdk.model.GcmRead;
+import com.wigzo.sdk.model.GcmOpen;
 
 public class ProxyActivity extends AppCompatActivity {
 
