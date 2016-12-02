@@ -1,0 +1,39 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = project.PUBLISH_GROUP_ID // CREATE A GROUP ID FOR YOUR LIBRARY
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                groupId project.PUBLISH_GROUP_ID // CREATE A GROUP ID FOR YOUR LIBRARY
+                artifactId project.PUBLISH_ARTIFACT_ID // THE NAME OF YOUR MODULE
+
+                name 'AndroidSDK' // YOUR LIBRARY NAME
+                description 'Wigzo Android SDK ' // YOUR LIBRARY DESCRIPTION
+                url 'https://github.com/pleomax00/wigzosdks' // YOUR SITE
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'ashishpal06' //YOUR ID
+                        name 'Ashish Pal' //YOUR NAME
+                        email 'ashish@wigzo.com' //YOUR EMAIL
+                    }
+                }
+                scm {
+                    connection 'https://github.com/pleomax00/wigzosdks.git' // YOUR GIT REPO
+                    developerConnection 'https://github.com/pleomax00/wigzosdks.git' // YOUR GIT REPO
+                    url 'https://github.com/pleomax00/wigzosdks' // YOUR SITE
+
+                }
+            }
+        }
+    }
+}
