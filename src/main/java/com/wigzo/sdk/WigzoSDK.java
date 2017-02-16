@@ -72,6 +72,8 @@ public class WigzoSDK {
         return this.context;
     }
 
+    protected synchronized void setContext(Context context) { this.context = context; }
+
 
     /**
      * Returns the WigzoSdk singleton.
@@ -598,7 +600,7 @@ public class WigzoSDK {
 
         //Initialising shared preferences
         wigzoSharedStorageForAppliLifeCycle = context
-                .getSharedPreferences(Configuration.APP_RUNNING_STATUS.value, Context.MODE_PRIVATE);
+                .getSharedPreferences("AppStatusPref", Context.MODE_PRIVATE);
 
         //updated app running status in shared preferences
         wigzoSharedStorageForAppliLifeCycle.edit()

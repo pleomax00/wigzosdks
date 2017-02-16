@@ -18,6 +18,7 @@ package com.wigzo.sdk;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.Context;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -37,21 +38,66 @@ import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingService {
 
-
-    protected abstract Class <? extends Activity> getTargetActivity();
     private String title = "";
     private String body = "";
+    private HashMap<String, String> payload = new HashMap<>();
 
+    /**
+     * return the Activity which should open when notification is clicked.
+     * Logic to return the activity can be based upon Notification title, body
+     * or payload-key-value pairs.
+     * <code><pre>
+     *
+     *     Example:
+     *
+     *     if(getWigzoNotificationPayload.get("key").equals("value"))
+     *     {
+     *          return MainActivity.class
+     *     }
+     * </pre></code>
+     * */
+    protected abstract Class <? extends Activity> getTargetActivity();
+
+    /**
+     *
+     *  Listens to the notifications arrived when app is already open
+     * <code><pre>
+     *     ((AppCompatActivity)context).runOnUiThread(new Runnable() {
+     *          {@code @Override }
+     *           public void run() {
+     *
+     *               // write your code to show dialog for In App Messages here
+     *               // use the following methods:
+     *               // getWigzoNotificationPayload() : to get the notification Payload
+     *               // getWigzoNotificationTitle     : to get the notification Title
+     *               // getWigzoNotificationBody      : to get the notification Body
+     *
+     *           }
+     *     });
+     * </pre></code>
+     *
+    */
+    protected abstract void notificationListener(Context context);
+
+    /**
+     * returns the Key-Value pairs received via notification
+     * */
     protected HashMap<String, String> getWigzoNotificationPayload()
     {
         return payload;
     }
 
+    /**
+     * returns the Notification Title as String
+     * */
     protected String getWigzoNotificationTitle()
     {
         return title;
     }
 
+    /**
+     * returns the Notification Body as String
+     * */
     protected String getWigzoNotificationBody()
     {
         return title;
@@ -59,40 +105,31 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
 
     public static RemoteMessage msg = null;
 
-    //private static final String TAG = "AbstractWigzoFcmListenerService";
-
-    private HashMap<String, String> payload = new HashMap<>();
-
     // [START receive_message]
     @Override
     public void onMessageReceived(RemoteMessage message) {
 
         String from = message.getFrom();
-        //Map data = message.getData();
-
-        Gson gson = new Gson();
 
         Map data = message.getData();
 
         Log.e("test", "Parent Called");
 
-       // String data_message = data.get("message").toString();
         Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "From: " + from);
-        //Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + data_message);
 
         String notificationIdStr = (String) data.get("notification_id");
         String intentData = (String) data.get("intent_data");
         String imageUrl = (String) data.get("image_url");
         String secondSoundStr = (String) data.get("second_sound");
-        body = (String) data.get("body");
         String type = (String) data.get("type");
-        title = (String) data.get("title");
         String uuid = (String) data.get("uuid");
         String linkType = "TARGET_ACTIVITY";
         String link = "http://www.google.com";
 
-        Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
+        body = (String) data.get("body");
+        title = (String) data.get("title");
 
+        Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
         Integer notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
 
         Log.i("msg rcvd", "Id: " + notificationId);
@@ -116,13 +153,13 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
             }
         }
 
+        else notificationListener(WigzoSDK.getInstance().getContext());
+
         if (from.startsWith("/topics/")) {
             // message received from some topic.
         } else {
             // normal downstream message.
         }
-
-//        data.
 
         // [START_EXCLUDE]
         /**
