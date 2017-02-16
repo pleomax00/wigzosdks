@@ -17,6 +17,7 @@
 package com.wigzo.sdk;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -25,55 +26,94 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingService {
 
 
     protected abstract Class <? extends Activity> getTargetActivity();
+    private String title = "";
+    private String body = "";
+
+    protected HashMap<String, String> getWigzoNotificationPayload()
+    {
+        return payload;
+    }
+
+    protected String getWigzoNotificationTitle()
+    {
+        return title;
+    }
+
+    protected String getWigzoNotificationBody()
+    {
+        return title;
+    }
+
+    public static RemoteMessage msg = null;
 
     //private static final String TAG = "AbstractWigzoFcmListenerService";
+
+    private HashMap<String, String> payload = new HashMap<>();
 
     // [START receive_message]
     @Override
     public void onMessageReceived(RemoteMessage message) {
 
         String from = message.getFrom();
-        Map data = message.getData();
+        //Map data = message.getData();
 
         Gson gson = new Gson();
 
-        String data_message = data.get("message").toString();
+        Map data = message.getData();
+
+        Log.e("test", "Parent Called");
+
+       // String data_message = data.get("message").toString();
         Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "From: " + from);
-        Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + data_message);
-
-        String type = (String) data.get("type");
-        String linkType = (String) data.get("link_type");
-        String link = (String) data.get("link");
-        String title = (String) data.get("title");
-        String body = (String) data.get("body");
-        String intentData = (String) data.get("intent_data");
-
-        String secondSoundStr = (String) data.get("second_sound");
-        Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
+        //Log.d(Configuration.WIGZO_GCM_LISTENER_SERVICE_TAG.value, "Message: " + data_message);
 
         String notificationIdStr = (String) data.get("notification_id");
+        String intentData = (String) data.get("intent_data");
+        String imageUrl = (String) data.get("image_url");
+        String secondSoundStr = (String) data.get("second_sound");
+        body = (String) data.get("body");
+        String type = (String) data.get("type");
+        title = (String) data.get("title");
+        String uuid = (String) data.get("uuid");
+        String linkType = "TARGET_ACTIVITY";
+        String link = "http://www.google.com";
+
+        Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
+
         Integer notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
 
-        String uuid = (String) data.get("uuid");
+        Log.i("msg rcvd", "Id: " + notificationId);
+        Log.i("msg rcvd", "IData: " + intentData);
+        Log.i("msg rcvd", "Image URL: " + imageUrl);
+        Log.i("msg rcvd", "SSound: " + secondSound);
+        Log.i("msg rcvd", "Body: " + body);
+        Log.i("msg rcvd", "Type: " + type);
+        Log.i("msg rcvd", "Title: " + title);
+        Log.i("msg rcvd", "intentData: " + intentData);
 
+        payload = new Gson()
+                .fromJson(intentData, new TypeToken<HashMap<String, String>>() {}.getType());
 
-//        Map<String, Object> intentDataMap = gson.fromJson(intentData, new TypeToken<HashMap<String, Object>>() {
-//        }.getType());
+        if (!WigzoSDK.getInstance().isAppRunning()) {
 
-        if (StringUtils.equals(type, "simple_push")) {
-            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentData, uuid, notificationId, linkType, link, secondSound);
-        }
-        else if (StringUtils.equals(type, "image_push")) {
-            String imageUrl = (String) data.get("image_url");
-            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentData, uuid, notificationId, linkType, link, secondSound);
+            if (StringUtils.equals(type, "simple_push")) {
+                WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentData, uuid, notificationId, linkType, link, secondSound);
+            } else if (StringUtils.equals(type, "image_push")) {
+                WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentData, uuid, notificationId, linkType, link, secondSound);
+            }
         }
 
         if (from.startsWith("/topics/")) {

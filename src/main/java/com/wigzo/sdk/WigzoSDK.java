@@ -2,6 +2,7 @@ package com.wigzo.sdk;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -46,6 +47,7 @@ public class WigzoSDK {
     private String emailId;
     private Gson gson;
     private String senderId;
+    private SharedPreferences wigzoSharedStorageForAppliLifeCycle;
 
     /**
      * Getter for Sender Id
@@ -54,7 +56,6 @@ public class WigzoSDK {
     public String getSenderId() {
         return senderId;
     }
-
 
     /**
      * Static class which returns singleton instance of WigzoSDK
@@ -328,8 +329,6 @@ public class WigzoSDK {
                         }
                     }
                 });
-
-
             }
         }else{
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
@@ -531,12 +530,10 @@ public class WigzoSDK {
                     }
                 }else{
                     Log.w(Configuration.WIGZO_SDK_TAG.value, "No user profile data to send");
-
                 }
             }
         }else{
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
-
         }
     }
 
@@ -572,22 +569,13 @@ public class WigzoSDK {
                     Log.w(Configuration.WIGZO_SDK_TAG.value,"No email data to send");
                 }
             }
-
-
-
         }else{
             Log.e(Configuration.WIGZO_SDK_TAG.value, "Wigzo SDK data is not initialized.Cannot send event information");
-
         }
-
-
     }
 
 
-    public synchronized boolean isLoggingEnabled() {
-
-        return this.enableLogging;
-    }
+    public synchronized boolean isLoggingEnabled() { return this.enableLogging; }
 
     public synchronized String getOrgToken() {
         return orgToken;
@@ -598,4 +586,53 @@ public class WigzoSDK {
     }
 
 
+
+    /**
+     * This method stores the running status of the app.
+     * @param appRunningStatus -> true, App is Running, else false
+     * @param context, is provided to initialise SharedPreferences at the first run.
+     *context is not required to be passed everytime, and so method overloading is done.
+     * */
+
+    protected void appStatus(String appRunningStatus, Context context) {
+
+        //Initialising shared preferences
+        wigzoSharedStorageForAppliLifeCycle = context
+                .getSharedPreferences(Configuration.APP_RUNNING_STATUS.value, Context.MODE_PRIVATE);
+
+        //updated app running status in shared preferences
+        wigzoSharedStorageForAppliLifeCycle.edit()
+                .putString(Configuration.APP_RUNNING_STATUS.value, appRunningStatus).apply();
+
+        Log.e("State", wigzoSharedStorageForAppliLifeCycle.getString(Configuration.APP_RUNNING_STATUS.value, "false"));
+    }
+
+    protected void appStatus(String appRunningStatus) {
+
+        //updated app running status in shared preferences
+        wigzoSharedStorageForAppliLifeCycle.edit()
+                .putString(Configuration.APP_RUNNING_STATUS.value, appRunningStatus).apply();
+
+        Log.e("State", wigzoSharedStorageForAppliLifeCycle.getString(Configuration.APP_RUNNING_STATUS.value, "false"));
+    }
+
+    /**
+     * isAppRunning() method checks the state of the app. this method is called
+     * from {@link AbstractWigzoFcmListenerService} to generate notifications.
+     * If the app state is running then No notification will be generated, instead, notification
+     * data can be used to display In App Messages.
+     */
+
+    boolean isAppRunning()
+    {
+        //Fetch App Running Status from shared preferences and return corresponding bool.
+        String appStatus = wigzoSharedStorageForAppliLifeCycle
+                .getString(Configuration.APP_RUNNING_STATUS.value, "false");
+
+        //Check if app is running. Return true if running
+        if (StringUtils.equalsIgnoreCase(appStatus, "true"))
+            return true;
+
+        return false;
+    }
 }

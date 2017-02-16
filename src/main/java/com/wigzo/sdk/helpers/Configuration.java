@@ -6,7 +6,8 @@ package com.wigzo.sdk.helpers;
 public enum Configuration {
 
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
-    BASE_URL("baseUrl","https://professorx.wigzopush.com"),
+    //BASE_URL("baseUrl","https://professorx.wigzopush.com"),
+    BASE_URL("baseUrl","https://darkknight.wigzopush.com"),
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
     APP_KEY("appKey","APP_KEY"),
     DEFAULT_APP_VERSION("defaultAppVersion","1.0"),
@@ -39,7 +40,8 @@ public enum Configuration {
     WIGZO_GCM_LISTENER_SERVICE_TAG("wigzoGCMListenerServiceTag","AbstractWigzoFcmListenerService"),
     WIGZO_INIT_DATA_SYNC_FLAG_KEY("wigzoInitiDataSyncFlag","WIGZO_INIT_DATA_SYNC_FLAG_KEY"),
     WIGZO_REG_INTENT_SERVICE_TAG("wigzoRegIntentServiceTag","RegIntentService"),
-    WIGZO_SDK_TAG("wigzoSdkTag","Wigzo");
+    WIGZO_SDK_TAG("wigzoSdkTag","Wigzo"),
+    APP_RUNNING_STATUS("appRunningSatus", "AppRunningStatus");
 
     /*APP_KEY("appKey","APP_KEY"),
     INITIAL_DATA_URL("initialDataUrl","/androidsdk/getinitialdata"),
