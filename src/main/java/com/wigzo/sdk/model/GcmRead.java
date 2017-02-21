@@ -46,11 +46,13 @@ public class GcmRead {
 
     private String uuid;
     private String timestamp;
+    private int campaignId;
 
     public GcmRead(){};
 
-    public GcmRead(String uuid) {
+    public GcmRead(String uuid, int campaignId) {
         this.uuid = uuid;
+        this.campaignId = campaignId;
         this.timestamp = String.valueOf(System.currentTimeMillis());
     }
 
@@ -69,6 +71,10 @@ public class GcmRead {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+
+    public int getnotificationId() { return campaignId; }
+
+    public void setNotificationId(int id) { this.campaignId = id; }
 
     @Override
     public boolean equals(Object obj) {

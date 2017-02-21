@@ -592,14 +592,13 @@ public class WigzoSDK {
     /**
      * This method stores the running status of the app.
      * @param appRunningStatus -> true, App is Running, else false
-     * @param context, is provided to initialise SharedPreferences at the first run.
      *context is not required to be passed everytime, and so method overloading is done.
      * */
 
-    protected void appStatus(String appRunningStatus, Context context) {
+    protected void appStatus(String appRunningStatus) {
 
         //Initialising shared preferences
-        wigzoSharedStorageForAppliLifeCycle = context
+        wigzoSharedStorageForAppliLifeCycle = getContext()
                 .getSharedPreferences("AppStatusPref", Context.MODE_PRIVATE);
 
         //updated app running status in shared preferences
@@ -609,17 +608,8 @@ public class WigzoSDK {
         Log.e("State", wigzoSharedStorageForAppliLifeCycle.getString(Configuration.APP_RUNNING_STATUS.value, "false"));
     }
 
-    protected void appStatus(String appRunningStatus) {
-
-        //updated app running status in shared preferences
-        wigzoSharedStorageForAppliLifeCycle.edit()
-                .putString(Configuration.APP_RUNNING_STATUS.value, appRunningStatus).apply();
-
-        Log.e("State", wigzoSharedStorageForAppliLifeCycle.getString(Configuration.APP_RUNNING_STATUS.value, "false"));
-    }
-
     /**
-     * isAppRunning() method checks the state of the app. this method is called
+     * Checks the state of the app. this method is called
      * from {@link AbstractWigzoFcmListenerService} to generate notifications.
      * If the app state is running then No notification will be generated, instead, notification
      * data can be used to display In App Messages.

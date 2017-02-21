@@ -45,12 +45,12 @@ public class GcmOpen {
     }
 
     private String uuid;
+    private int campaignId;
     private String timestamp;
 
-    public GcmOpen(){};
-
-    public GcmOpen(String uuid) {
+    public GcmOpen(String uuid, int campaignId) {
         this.uuid = uuid;
+        this.campaignId = campaignId;
         this.timestamp = String.valueOf(System.currentTimeMillis());
     }
 
@@ -69,6 +69,10 @@ public class GcmOpen {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+
+    public int getnotificationId() { return campaignId; }
+
+    public void setNotificationId(int id) { this.campaignId = id; }
 
     @Override
     public boolean equals(Object obj) {

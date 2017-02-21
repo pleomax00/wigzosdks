@@ -13,6 +13,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,9 +31,15 @@ import com.wigzo.sdk.model.GcmRead;
  * Created by ankit on 16/5/16.
  */
 public class WigzoNotification {
-    public static void notification(final Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, final String uuid, Integer notificationId, String linkType, String link, Integer secondSound) {
+
+    private static int mNotificationId = 0;
+    private static int campaignId = 0;
+
+    public static void notification(final Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, final String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer id) {
         // if notification_id is provided use it.
-        final int mNotificationId = null != notificationId ? notificationId : new Random().nextInt();
+        mNotificationId = null != notificationId ? notificationId : new Random().nextInt();
+        campaignId = null != id ? id : 0;
+
         int icon = applicationContext.getApplicationInfo().icon;
 
 
@@ -63,6 +70,7 @@ public class WigzoNotification {
         proxyIntent.putExtra("intentData", intentData);
         proxyIntent.putExtra("linkType", linkType);
         proxyIntent.putExtra("link", link);
+        proxyIntent.putExtra("campaignId", campaignId);
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -95,6 +103,8 @@ public class WigzoNotification {
         // Gets an instance of the NotificationManager service
         NotificationManager mNotifyMgr =
                 (NotificationManager) applicationContext.getSystemService(applicationContext.NOTIFICATION_SERVICE);
+
+        Log.e("NotificatioId", "" + mNotificationId);
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, notificationBuilder.build());
 
@@ -125,7 +135,7 @@ public class WigzoNotification {
             gcmReadWorker.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    GcmRead gcmRead = new GcmRead(uuid);
+                    GcmRead gcmRead = new GcmRead(uuid, campaignId);
                     GcmRead.Operation operation = GcmRead.Operation.saveOne(gcmRead);
                     GcmRead.editOperation(applicationContext, operation);
                 }
@@ -133,14 +143,14 @@ public class WigzoNotification {
         }
     }
 
-    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound) {
+    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
             .setContentTitle(title)
             .setContentText(body);
-        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound);
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
     }
 
-    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound) {
+    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setContentTitle(title)
                 .setSmallIcon(applicationContext.getApplicationInfo().icon)
@@ -159,7 +169,7 @@ public class WigzoNotification {
              notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
             notificationBuilder.setStyle(notiStyle);
         }
-        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound);
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
     }
 
 

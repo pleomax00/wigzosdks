@@ -17,29 +17,32 @@
 package com.wigzo.sdk;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.model.GcmOpen;
+import com.wigzo.sdk.model.GcmRead;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
-import com.wigzo.sdk.helpers.Configuration;
-import com.wigzo.sdk.helpers.WigzoSharedStorage;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingService {
 
     private String title = "";
     private String body = "";
+    private String uuid = "";
+    private Integer campaignId = 0;
     private HashMap<String, String> payload = new HashMap<>();
 
     /**
@@ -56,7 +59,7 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      *     }
      * </pre></code>
      * */
-    protected abstract Class <? extends Activity> getTargetActivity();
+    protected abstract Class<? extends Activity> getTargetActivity();
 
     /**
      *
@@ -76,31 +79,34 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      *     });
      * </pre></code>
      *
-    */
+     */
     protected abstract void notificationListener(Context context);
+
+    /**
+     * Return <B>"true"</B> if you want to display In App Messages using Wigzo SDK.
+     * To Display your custom dialog return <B>"false"</B>
+     * */
+    protected abstract boolean showWigzoDialog();
 
     /**
      * returns the Key-Value pairs received via notification
      * */
-    protected HashMap<String, String> getWigzoNotificationPayload()
-    {
+    protected HashMap<String, String> getWigzoNotificationPayload() {
         return payload;
     }
 
     /**
      * returns the Notification Title as String
      * */
-    protected String getWigzoNotificationTitle()
-    {
+    protected String getWigzoNotificationTitle() {
         return title;
     }
 
     /**
      * returns the Notification Body as String
      * */
-    protected String getWigzoNotificationBody()
-    {
-        return title;
+    protected String getWigzoNotificationBody() {
+        return body;
     }
 
     public static RemoteMessage msg = null;
@@ -122,15 +128,19 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         String imageUrl = (String) data.get("image_url");
         String secondSoundStr = (String) data.get("second_sound");
         String type = (String) data.get("type");
-        String uuid = (String) data.get("uuid");
-        String linkType = "TARGET_ACTIVITY";
-        String link = "http://www.google.com";
+        String campaignIdStr = (String) data.get("id");
 
+        uuid = (String) data.get("uuid");
         body = (String) data.get("body");
         title = (String) data.get("title");
 
+        String linkType = "TARGET_ACTIVITY";
+        String link = "http://www.google.com";
+
+
         Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
         Integer notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
+        campaignId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(campaignIdStr);
 
         Log.i("msg rcvd", "Id: " + notificationId);
         Log.i("msg rcvd", "IData: " + intentData);
@@ -140,20 +150,56 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         Log.i("msg rcvd", "Type: " + type);
         Log.i("msg rcvd", "Title: " + title);
         Log.i("msg rcvd", "intentData: " + intentData);
+        Log.i("msg rcvd", "id: " + campaignId);
+
+        Log.e("notification", message.getData().toString());
 
         payload = new Gson()
-                .fromJson(intentData, new TypeToken<HashMap<String, String>>() {}.getType());
+                .fromJson(intentData, new TypeToken<HashMap<String, String>>() {
+                }.getType());
 
         if (!WigzoSDK.getInstance().isAppRunning()) {
 
             if (StringUtils.equals(type, "simple_push")) {
-                WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentData, uuid, notificationId, linkType, link, secondSound);
+                WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
             } else if (StringUtils.equals(type, "image_push")) {
-                WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentData, uuid, notificationId, linkType, link, secondSound);
+                WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
+            }
+        } else {
+            if (!showWigzoDialog())
+                notificationListener(WigzoSDK.getInstance().getContext());
+            else
+            {
+                ((AppCompatActivity)WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        WigzoDialogTemplate wigzoDialogTemplate
+                                =new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
+                                , getWigzoNotificationTitle(), getWigzoNotificationBody()
+                                , getWigzoNotificationPayload());
+                        wigzoDialogTemplate.show();
+                    }
+                });
+
+                // increase counter for notification recieved and opened
+                if (StringUtils.isNotEmpty(uuid)) {
+                    final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
+                    gcmReadWorker.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            GcmRead gcmRead = new GcmRead(uuid, campaignId);
+                            GcmRead.Operation operationRead = GcmRead.Operation.saveOne(gcmRead);
+                            GcmRead.editOperation(WigzoSDK.getInstance().getContext(), operationRead);
+
+                            GcmOpen gcmOpen = new GcmOpen(uuid, campaignId);
+                            GcmOpen.Operation operationOpen = GcmOpen.Operation.saveOne(gcmOpen);
+                            GcmOpen.editOperation(WigzoSDK.getInstance().getContext(), operationOpen);
+                        }
+                    }, 0, TimeUnit.SECONDS);
+                }
             }
         }
-
-        else notificationListener(WigzoSDK.getInstance().getContext());
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
