@@ -65,10 +65,17 @@ public class ProxyActivity extends AppCompatActivity {
                 }
             }
             startActivity(targetIntent);
+            finish();
         } else if (StringUtils.equals(linkType, "URL")) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(link));
             startActivity(intent);
+            finish();
         }
+    }
+
+    Context getProxyContext()
+    {
+        return ProxyActivity.this;
     }
 }

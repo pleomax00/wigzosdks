@@ -7,6 +7,13 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.ConnectionStream;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.model.DeviceInfo;
+import com.wigzo.sdk.model.EventInfo;
+import com.wigzo.sdk.model.GcmOpen;
+import com.wigzo.sdk.model.GcmRead;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,14 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.wigzo.sdk.helpers.Configuration;
-import com.wigzo.sdk.helpers.ConnectionStream;
-import com.wigzo.sdk.helpers.WigzoSharedStorage;
-import com.wigzo.sdk.model.DeviceInfo;
-import com.wigzo.sdk.model.EventInfo;
-import com.wigzo.sdk.model.GcmOpen;
-import com.wigzo.sdk.model.GcmRead;
 
 /**
  * This class is the public API for the Wigzo Android SDK.
@@ -69,7 +68,7 @@ public class WigzoSDK {
      * @return Context of the application installing the SDK
      */
     public synchronized Context getContext() {
-        return this.context;
+        return this.context /*== null ? new ProxyActivity().getProxyContext() : this.context*/;
     }
 
     protected synchronized void setContext(Context context) { this.context = context; }
@@ -323,6 +322,7 @@ public class WigzoSDK {
                             if ("success".equals(jsonResponse.get("status"))) {
                                 EventInfo.Operation operation = EventInfo.Operation.removePartially(eventInfos);
                                 EventInfo.editOperation(operation);
+                                Log.e("EventInfo", "Event Sent");
 
 //                        List<EventInfo> newEvents = wigzoSharedStorage.getEventList();
 //                        newEvents.removeAll(eventInfos);

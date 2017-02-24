@@ -40,11 +40,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="#3E80B4"
         android:layout_marginBottom="10dp"
         android:orientation="horizontal" >
 
         <Button
+            android:layout_margin="8dp"
             android:id="@+id/btn_yes"
             android:layout_width="100dp"
             android:layout_height="30dp"
@@ -55,10 +55,10 @@
             android:textStyle="bold" />
 
         <Button
+            android:layout_margin="8dp"
             android:id="@+id/btn_no"
             android:layout_width="100dp"
             android:layout_height="30dp"
-            android:layout_marginLeft="5dp"
             android:background="@android:color/white"
             android:clickable="true"
             android:text="Cancel"

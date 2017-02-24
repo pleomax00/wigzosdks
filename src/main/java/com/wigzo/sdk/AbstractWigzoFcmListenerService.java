@@ -58,12 +58,11 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      *          return MainActivity.class
      *     }
      * </pre></code>
-     * */
+     */
     protected abstract Class<? extends Activity> getTargetActivity();
 
     /**
-     *
-     *  Listens to the notifications arrived when app is already open
+     * Listens to the notifications arrived when app is already open
      * <code><pre>
      *     ((AppCompatActivity)context).runOnUiThread(new Runnable() {
      *          {@code @Override }
@@ -78,33 +77,32 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      *           }
      *     });
      * </pre></code>
-     *
      */
     protected abstract void notificationListener(Context context);
 
     /**
      * Return <B>"true"</B> if you want to display In App Messages using Wigzo SDK.
      * To Display your custom dialog return <B>"false"</B>
-     * */
+     */
     protected abstract boolean showWigzoDialog();
 
     /**
      * returns the Key-Value pairs received via notification
-     * */
+     */
     protected HashMap<String, String> getWigzoNotificationPayload() {
         return payload;
     }
 
     /**
      * returns the Notification Title as String
-     * */
+     */
     protected String getWigzoNotificationTitle() {
         return title;
     }
 
     /**
      * returns the Notification Body as String
-     * */
+     */
     protected String getWigzoNotificationBody() {
         return body;
     }
@@ -168,36 +166,35 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         } else {
             if (!showWigzoDialog())
                 notificationListener(WigzoSDK.getInstance().getContext());
-            else
-            {
-                ((AppCompatActivity)WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
+            else {
+                ((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
                         WigzoDialogTemplate wigzoDialogTemplate
-                                =new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
+                                = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
                                 , getWigzoNotificationTitle(), getWigzoNotificationBody()
                                 , getWigzoNotificationPayload());
                         wigzoDialogTemplate.show();
                     }
                 });
+            }
 
-                // increase counter for notification recieved and opened
-                if (StringUtils.isNotEmpty(uuid)) {
-                    final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
-                    gcmReadWorker.schedule(new Runnable() {
-                        @Override
-                        public void run() {
-                            GcmRead gcmRead = new GcmRead(uuid, campaignId);
-                            GcmRead.Operation operationRead = GcmRead.Operation.saveOne(gcmRead);
-                            GcmRead.editOperation(WigzoSDK.getInstance().getContext(), operationRead);
+            // increase counter for notification recieved and opened
+            if (StringUtils.isNotEmpty(uuid)) {
+                final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
+                gcmReadWorker.schedule(new Runnable() {
+                    @Override
+                    public void run() {
+                        GcmRead gcmRead = new GcmRead(uuid, campaignId);
+                        GcmRead.Operation operationRead = GcmRead.Operation.saveOne(gcmRead);
+                        GcmRead.editOperation(WigzoSDK.getInstance().getContext(), operationRead);
 
-                            GcmOpen gcmOpen = new GcmOpen(uuid, campaignId);
-                            GcmOpen.Operation operationOpen = GcmOpen.Operation.saveOne(gcmOpen);
-                            GcmOpen.editOperation(WigzoSDK.getInstance().getContext(), operationOpen);
-                        }
-                    }, 0, TimeUnit.SECONDS);
-                }
+                        GcmOpen gcmOpen = new GcmOpen(uuid, campaignId);
+                        GcmOpen.Operation operationOpen = GcmOpen.Operation.saveOne(gcmOpen);
+                        GcmOpen.editOperation(WigzoSDK.getInstance().getContext(), operationOpen);
+                    }
+                }, 0, TimeUnit.SECONDS);
             }
         }
 
