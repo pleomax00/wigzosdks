@@ -18,6 +18,8 @@ package com.wigzo.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -31,6 +33,9 @@ import com.wigzo.sdk.model.GcmRead;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -42,8 +47,17 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
     private String title = "";
     private String body = "";
     private String uuid = "";
+    private String type = "";
+    private String pushType = "";
     private Integer campaignId = 0;
     private HashMap<String, String> payload = new HashMap<>();
+    private Bitmap remote_picture = null;
+    private Integer notificationId = 0;
+    private String linkType = "";
+    private String link = "";
+    private Integer secondSound = 0;
+    private String imageUrl = "";
+    private static Class<? extends Activity> positiveButtonClickActivity = null;
 
     /**
      * return the Activity which should open when notification is clicked.
@@ -81,6 +95,20 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
     protected abstract void notificationListener(Context context);
 
     /**
+     * return the activity which should open on click of the positive button when an In App Message
+     * is received when {@link AbstractWigzoFcmListenerService#showWigzoDialog()} is true. Logic to
+     * return the activity can be based upon Notification title, body or payload-key-value pairs.
+     * <code><pre>
+     *     Example:
+     *     if(getWigzoNotificationPayload.get("key").equals("value"))
+     *     {
+     *          return MainActivity.class
+     *     }
+     * </pre></code>
+     * */
+    public abstract Class<? extends AppCompatActivity> getPositiveButtonClickActivity();
+
+    /**
      * Return <B>"true"</B> if you want to display In App Messages using Wigzo SDK.
      * To Display your custom dialog return <B>"false"</B>
      */
@@ -107,7 +135,13 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         return body;
     }
 
-    public static RemoteMessage msg = null;
+    /**
+     * returns the bitmap if image url is present, null if no image url is present
+     * */
+    protected Bitmap getWigzoNitificationBitmap()
+    {
+        return remote_picture;
+    }
 
     // [START receive_message]
     @Override
@@ -123,7 +157,7 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
 
         String notificationIdStr = (String) data.get("notification_id");
         String intentData = (String) data.get("intent_data");
-        String imageUrl = (String) data.get("image_url");
+        imageUrl = (String) data.get("image_url");
         String secondSoundStr = (String) data.get("second_sound");
         String type = (String) data.get("type");
         String campaignIdStr = (String) data.get("id");
@@ -132,13 +166,20 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         body = (String) data.get("body");
         title = (String) data.get("title");
 
-        String linkType = "TARGET_ACTIVITY";
-        String link = "http://www.google.com";
+        linkType = "TARGET_ACTIVITY";
+        link = "http://www.google.com";
 
+        Gson gson = new Gson();
 
-        Integer secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
-        Integer notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
-        campaignId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(campaignIdStr);
+        Map message_type = gson.fromJson(type, new TypeToken<HashMap<String, Object>>() {
+        }.getType());
+
+        this.type = (String) message_type.get("type");
+        this.pushType = (String) message_type.get("pushType");
+
+        this.secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
+        this.notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
+        this.campaignId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(campaignIdStr);
 
         Log.i("msg rcvd", "Id: " + notificationId);
         Log.i("msg rcvd", "IData: " + intentData);
@@ -152,50 +193,56 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
 
         Log.e("notification", message.getData().toString());
 
-        payload = new Gson()
-                .fromJson(intentData, new TypeToken<HashMap<String, String>>() {
-                }.getType());
+        this.payload = new Gson().fromJson(intentData, new TypeToken<HashMap<String, String>>() {}.getType());
 
-        if (!WigzoSDK.getInstance().isAppRunning()) {
-
-            if (StringUtils.equals(type, "simple_push")) {
-                WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
-            } else if (StringUtils.equals(type, "image_push")) {
-                WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
+        if(StringUtils.isNotEmpty(imageUrl)) {
+            try {
+                this.remote_picture = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } else {
-            if (!showWigzoDialog())
-                notificationListener(WigzoSDK.getInstance().getContext());
+        }
+
+        //check if user wants to send In App Message and Push notification
+        if (StringUtils.equalsIgnoreCase("both", this.pushType)) {
+
+            //send push notification if app is not running
+            //if app is running create In App Message
+            if (!WigzoSDK.getInstance().isAppRunning()) {
+                //call createNotification() method to create notification if app is not running
+                createNotification();
+            }
+
+            //if app is running generate In App Message
             else {
-                ((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                //check if users want to show our builtin dialog of want to show their own custom dialog
+                //if they want to show their own custom dialog then trigger notificationlistener() method
+                if (!showWigzoDialog())
+                    notificationListener(WigzoSDK.getInstance().getContext());
+                //if users want to show our dialog then trigger generateInAppMessage() method
+                else {
+                    generateInAppMessage();
+                }
 
-                        WigzoDialogTemplate wigzoDialogTemplate
-                                = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
-                                , getWigzoNotificationTitle(), getWigzoNotificationBody()
-                                , getWigzoNotificationPayload());
-                        wigzoDialogTemplate.show();
-                    }
-                });
+                // increase counter for notification recieved and opened for In App Message
+                increaseNotificationReceivedOpenedCounter();
             }
+        }
 
-            // increase counter for notification recieved and opened
-            if (StringUtils.isNotEmpty(uuid)) {
-                final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
-                gcmReadWorker.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        GcmRead gcmRead = new GcmRead(uuid, campaignId);
-                        GcmRead.Operation operationRead = GcmRead.Operation.saveOne(gcmRead);
-                        GcmRead.editOperation(WigzoSDK.getInstance().getContext(), operationRead);
+        else if (StringUtils.equalsIgnoreCase("push", this.pushType))
+        {
+            //call createNotification() method to create notification if app is not running
+            createNotification();
+        }
 
-                        GcmOpen gcmOpen = new GcmOpen(uuid, campaignId);
-                        GcmOpen.Operation operationOpen = GcmOpen.Operation.saveOne(gcmOpen);
-                        GcmOpen.editOperation(WigzoSDK.getInstance().getContext(), operationOpen);
-                    }
-                }, 0, TimeUnit.SECONDS);
-            }
+        else if (StringUtils.equalsIgnoreCase("inapp", this.pushType))
+        {
+            //generarte In APp Message
+            generateInAppMessage();
+        }
+
+        else {
+            //do nothing
         }
 
         if (from.startsWith("/topics/")) {
@@ -218,6 +265,57 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
          */
 //        sendNotification(message);
         // [END_EXCLUDE]
+    }
+
+    private void createNotification() {
+        if (StringUtils.equalsIgnoreCase(this.type, "simple")) {
+            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId);
+        } else if (StringUtils.equalsIgnoreCase(this.type, "image")) {
+            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId);
+        }
+
+    }
+
+    private void generateInAppMessage() {
+        ((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(StringUtils.isNotEmpty(imageUrl)) {
+                    WigzoDialogTemplate wigzoDialogTemplate
+                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
+                            , getWigzoNotificationTitle(), getWigzoNotificationBody()
+                            , getWigzoNotificationPayload(), remote_picture, getPositiveButtonClickActivity());
+                    wigzoDialogTemplate.show();
+                }
+                else {
+                    WigzoDialogTemplate wigzoDialogTemplate
+                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
+                            , getWigzoNotificationTitle(), getWigzoNotificationBody()
+                            , getWigzoNotificationPayload(), getPositiveButtonClickActivity());
+                    wigzoDialogTemplate.show();
+                }
+            }
+        });
+    }
+
+    private void increaseNotificationReceivedOpenedCounter()
+    {
+        if (StringUtils.isNotEmpty(uuid)) {
+            final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
+            gcmReadWorker.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    GcmRead gcmRead = new GcmRead(uuid, campaignId);
+                    GcmRead.Operation operationRead = GcmRead.Operation.saveOne(gcmRead);
+                    GcmRead.editOperation(WigzoSDK.getInstance().getContext(), operationRead);
+
+                    GcmOpen gcmOpen = new GcmOpen(uuid, campaignId);
+                    GcmOpen.Operation operationOpen = GcmOpen.Operation.saveOne(gcmOpen);
+                    GcmOpen.editOperation(WigzoSDK.getInstance().getContext(), operationOpen);
+                }
+            }, 0, TimeUnit.SECONDS);
+        }
     }
     // [END receive_message]
 

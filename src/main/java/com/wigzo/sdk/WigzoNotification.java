@@ -15,6 +15,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.wigzo.sdk.model.GcmRead;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -24,8 +26,6 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import com.wigzo.sdk.model.GcmRead;
 
 /**
  * Created by ankit on 16/5/16.

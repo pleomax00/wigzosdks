@@ -2,10 +2,13 @@ package com.wigzo.sdk;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,16 +27,32 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     private Button yes;
     private Button no;
 
+    private ImageView notificationImage;
+
     private Context context;
 
     private String body = "";
     private String title = "";
+    private Bitmap remote_picture = null;
 
-    public WigzoDialogTemplate(Context context, String title, String body, HashMap<String, String> payload) {
+    private Class<? extends AppCompatActivity> targetActivity = null;
+
+    public WigzoDialogTemplate(Context context, String title, String body, HashMap<String, String> payload, Class<? extends AppCompatActivity> targetActivity) {
         super(context);
         this.context = context;
         this.title = title;
         this.body = body;
+        this.targetActivity = targetActivity;
+    }
+
+    public WigzoDialogTemplate(Context context, String title, String body, HashMap<String, String> payload, Bitmap remote_picture, Class<? extends AppCompatActivity> targetActivity) {
+        super(context);
+
+        this.context = context;
+        this.title = title;
+        this.body = body;
+        this.remote_picture = remote_picture;
+        this.targetActivity = targetActivity;
     }
 
     @Override
@@ -51,6 +70,10 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         notification_title = (TextView) findViewById(R.id.notification_title);
         notification_body = (TextView) findViewById(R.id.notification_body);
 
+        notificationImage = (ImageView) findViewById(R.id.notificationImage);
+
+        notificationImage.setImageBitmap(remote_picture);
+
         notification_title.setText(title);
         notification_body.setText(body);
 
@@ -64,6 +87,9 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         int i = v.getId();
         if (i == R.id.btn_yes) {
             Toast.makeText(context, "Ok Clicked", Toast.LENGTH_SHORT).show();
+
+            Intent targetActivityIntent = new Intent(WigzoSDK.getInstance().getContext(), targetActivity);
+            WigzoSDK.getInstance().getContext().startActivity(targetActivityIntent);
             dismiss();
 
         } else if (i == R.id.btn_no) {
