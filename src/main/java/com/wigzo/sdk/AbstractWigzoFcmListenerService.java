@@ -57,6 +57,7 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
     private String link = "";
     private Integer secondSound = 0;
     private String imageUrl = "";
+    private Integer organizationId = 0;
     private static Class<? extends Activity> positiveButtonClickActivity = null;
 
     /**
@@ -161,6 +162,7 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         String secondSoundStr = (String) data.get("second_sound");
         String type = (String) data.get("type");
         String campaignIdStr = (String) data.get("id");
+        String organizationIdStr = (String) data.get("organizationId");
 
         uuid = (String) data.get("uuid");
         body = (String) data.get("body");
@@ -179,17 +181,19 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
 
         this.secondSound = StringUtils.isEmpty(secondSoundStr) ? null : Integer.parseInt(secondSoundStr);
         this.notificationId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(notificationIdStr);
-        this.campaignId = StringUtils.isEmpty(notificationIdStr) ? null : Integer.parseInt(campaignIdStr);
+        this.campaignId = StringUtils.isEmpty(campaignIdStr) ? null : Integer.parseInt(campaignIdStr);
+        this.organizationId = StringUtils.isEmpty(organizationIdStr) ? null : Integer.parseInt(organizationIdStr);
 
-        Log.i("msg rcvd", "Id: " + notificationId);
-        Log.i("msg rcvd", "IData: " + intentData);
-        Log.i("msg rcvd", "Image URL: " + imageUrl);
-        Log.i("msg rcvd", "SSound: " + secondSound);
-        Log.i("msg rcvd", "Body: " + body);
-        Log.i("msg rcvd", "Type: " + type);
-        Log.i("msg rcvd", "Title: " + title);
-        Log.i("msg rcvd", "intentData: " + intentData);
-        Log.i("msg rcvd", "id: " + campaignId);
+        Log.d("msg rcvd", "Id: " + notificationId);
+        Log.d("msg rcvd", "IData: " + intentData);
+        Log.d("msg rcvd", "Image URL: " + imageUrl);
+        Log.d("msg rcvd", "SSound: " + secondSound);
+        Log.d("msg rcvd", "Body: " + body);
+        Log.d("msg rcvd", "Type: " + type);
+        Log.d("msg rcvd", "Title: " + title);
+        Log.d("msg rcvd", "intentData: " + intentData);
+        Log.d("msg rcvd", "id: " + campaignId);
+        Log.d("msg rcvd", "organizationId: " + organizationId);
 
         Log.e("notification", message.getData().toString());
 
@@ -239,6 +243,7 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         {
             //generarte In APp Message
             generateInAppMessage();
+            increaseNotificationReceivedOpenedCounter();
         }
 
         else {
@@ -269,9 +274,9 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
 
     private void createNotification() {
         if (StringUtils.equalsIgnoreCase(this.type, "simple")) {
-            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId);
+            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
         } else if (StringUtils.equalsIgnoreCase(this.type, "image")) {
-            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId);
+            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
         }
 
     }
@@ -306,11 +311,11 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
             gcmReadWorker.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    GcmRead gcmRead = new GcmRead(uuid, campaignId);
+                    GcmRead gcmRead = new GcmRead(uuid, campaignId, organizationId);
                     GcmRead.Operation operationRead = GcmRead.Operation.saveOne(gcmRead);
                     GcmRead.editOperation(WigzoSDK.getInstance().getContext(), operationRead);
 
-                    GcmOpen gcmOpen = new GcmOpen(uuid, campaignId);
+                    GcmOpen gcmOpen = new GcmOpen(uuid, campaignId, organizationId);
                     GcmOpen.Operation operationOpen = GcmOpen.Operation.saveOne(gcmOpen);
                     GcmOpen.editOperation(WigzoSDK.getInstance().getContext(), operationOpen);
                 }

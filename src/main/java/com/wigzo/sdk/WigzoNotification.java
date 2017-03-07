@@ -34,11 +34,13 @@ public class WigzoNotification {
 
     private static int mNotificationId = 0;
     private static int campaignId = 0;
+    private static int organizationId = 0;
 
-    public static void notification(final Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, final String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer id) {
+    public static void notification(final Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, final String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer id, Integer orgId) {
         // if notification_id is provided use it.
         mNotificationId = null != notificationId ? notificationId : new Random().nextInt();
         campaignId = null != id ? id : 0;
+        organizationId = orgId;
 
         int icon = applicationContext.getApplicationInfo().icon;
 
@@ -71,6 +73,7 @@ public class WigzoNotification {
         proxyIntent.putExtra("linkType", linkType);
         proxyIntent.putExtra("link", link);
         proxyIntent.putExtra("campaignId", campaignId);
+        proxyIntent.putExtra("organizationId", organizationId);
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -135,7 +138,7 @@ public class WigzoNotification {
             gcmReadWorker.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    GcmRead gcmRead = new GcmRead(uuid, campaignId);
+                    GcmRead gcmRead = new GcmRead(uuid, campaignId, organizationId);
                     GcmRead.Operation operation = GcmRead.Operation.saveOne(gcmRead);
                     GcmRead.editOperation(applicationContext, operation);
                 }
@@ -143,14 +146,14 @@ public class WigzoNotification {
         }
     }
 
-    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId) {
+    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId, Integer organizationId) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
             .setContentTitle(title)
             .setContentText(body);
-        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
     }
 
-    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId) {
+    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId, Integer organizationId) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setContentTitle(title)
                 .setSmallIcon(applicationContext.getApplicationInfo().icon)
@@ -169,9 +172,6 @@ public class WigzoNotification {
              notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
             notificationBuilder.setStyle(notiStyle);
         }
-        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId);
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
     }
-
-
-
 }

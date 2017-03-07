@@ -33,6 +33,7 @@ public class ProxyActivity extends AppCompatActivity {
         String linkType = (String) extras.get("linkType");
         String link = (String) extras.get("link");
         final int campaignId = extras.getInt("campaignId");
+        final int organizationId = extras.getInt("organizationId");
 
         if (StringUtils.isNotEmpty(uuid)) {
             final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
@@ -40,7 +41,7 @@ public class ProxyActivity extends AppCompatActivity {
             gcmReadWorker.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    GcmOpen gcmOpen = new GcmOpen(uuid, campaignId);
+                    GcmOpen gcmOpen = new GcmOpen(uuid, campaignId, organizationId);
                     GcmOpen.Operation operation = GcmOpen.Operation.saveOne(gcmOpen);
                     GcmOpen.editOperation(applicationContext, operation);
                 }

@@ -4,14 +4,13 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.wigzo.sdk.helpers.Configuration;
-import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 /**
  * Created by wigzo on 18/5/16.
@@ -47,12 +46,14 @@ public class GcmRead {
     private String uuid;
     private String timestamp;
     private int campaignId;
+    private int organizationId;
 
     public GcmRead(){};
 
-    public GcmRead(String uuid, int campaignId) {
+    public GcmRead(String uuid, int campaignId, int organizationId) {
         this.uuid = uuid;
         this.campaignId = campaignId;
+        this.organizationId = organizationId;
         this.timestamp = String.valueOf(System.currentTimeMillis());
     }
 
@@ -75,6 +76,10 @@ public class GcmRead {
     public int getnotificationId() { return campaignId; }
 
     public void setNotificationId(int id) { this.campaignId = id; }
+
+    public int getOrganizationId() { return organizationId; }
+
+    public void setOrganizationId(int organizationId) { this.organizationId = organizationId; }
 
     @Override
     public boolean equals(Object obj) {
