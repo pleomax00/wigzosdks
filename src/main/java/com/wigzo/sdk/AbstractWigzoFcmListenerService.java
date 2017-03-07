@@ -64,34 +64,13 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      * return the Activity which should open when notification is clicked.
      * Logic to return the activity can be based upon Notification title, body
      * or payload-key-value pairs.
-     * <code><pre>
      *
-     *     Example:
-     *
-     *     if(getWigzoNotificationPayload.get("key").equals("value"))
-     *     {
-     *          return MainActivity.class
-     *     }
-     * </pre></code>
      */
     protected abstract Class<? extends Activity> getTargetActivity();
 
     /**
      * Listens to the notifications arrived when app is already open
-     * <code><pre>
-     *     ((AppCompatActivity)context).runOnUiThread(new Runnable() {
-     *          {@code @Override }
-     *           public void run() {
      *
-     *               // write your code to show dialog for In App Messages here
-     *               // use the following methods:
-     *               // getWigzoNotificationPayload() : to get the notification Payload
-     *               // getWigzoNotificationTitle     : to get the notification Title
-     *               // getWigzoNotificationBody      : to get the notification Body
-     *
-     *           }
-     *     });
-     * </pre></code>
      */
     protected abstract void notificationListener(Context context);
 
@@ -99,19 +78,13 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      * return the activity which should open on click of the positive button when an In App Message
      * is received when {@link AbstractWigzoFcmListenerService#showWigzoDialog()} is true. Logic to
      * return the activity can be based upon Notification title, body or payload-key-value pairs.
-     * <code><pre>
-     *     Example:
-     *     if(getWigzoNotificationPayload.get("key").equals("value"))
-     *     {
-     *          return MainActivity.class
-     *     }
-     * </pre></code>
+     *
      * */
     public abstract Class<? extends AppCompatActivity> getPositiveButtonClickActivity();
 
     /**
-     * Return <B>"true"</B> if you want to display In App Messages using Wigzo SDK.
-     * To Display your custom dialog return <B>"false"</B>
+     * Return "true" if you want to display In App Messages using Wigzo SDK.
+     * To Display your custom dialog return "false"
      */
     protected abstract boolean showWigzoDialog();
 

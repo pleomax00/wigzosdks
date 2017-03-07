@@ -250,7 +250,7 @@ public class WigzoSDK {
     public synchronized void saveOne(final EventInfo eventInfo) {
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(this.context);
-        List<EventInfo> eventInfos = wigzoSharedStorage.getEventList();
+        List EventInfo eventInfos = wigzoSharedStorage.getEventList();
         eventInfos.add(eventInfo);
         final String eventsStr = this.gson.toJson(eventInfos);
         wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
@@ -323,10 +323,6 @@ public class WigzoSDK {
                                 EventInfo.Operation operation = EventInfo.Operation.removePartially(eventInfos);
                                 EventInfo.editOperation(operation);
                                 Log.e("EventInfo", "Event Sent");
-
-//                        List<EventInfo> newEvents = wigzoSharedStorage.getEventList();
-//                        newEvents.removeAll(eventInfos);
-//                        wigzoSharedStorage.getSharedStorage().edit().putString("WIGZO_EVENTS", gson.toJson(newEvents)).apply();
                             }
                         }
                     }
@@ -591,7 +587,7 @@ public class WigzoSDK {
 
     /**
      * This method stores the running status of the app.
-     * @param appRunningStatus -> true, App is Running, else false
+     * @param appRunningStatus - true, App is Running, else false
      *context is not required to be passed everytime, and so method overloading is done.
      * */
 
