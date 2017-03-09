@@ -206,13 +206,13 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
             }
         }
 
-        else if (StringUtils.equalsIgnoreCase("push", this.pushType))
+        else if (StringUtils.equalsIgnoreCase("push", this.pushType) && !WigzoSDK.getInstance().isAppRunning())
         {
             //call createNotification() method to create notification if app is not running
             createNotification();
         }
 
-        else if (StringUtils.equalsIgnoreCase("inapp", this.pushType))
+        else if (StringUtils.equalsIgnoreCase("inapp", this.pushType) && WigzoSDK.getInstance().isAppRunning())
         {
             //generarte In APp Message
             generateInAppMessage();
