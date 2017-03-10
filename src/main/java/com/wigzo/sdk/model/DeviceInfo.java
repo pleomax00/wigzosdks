@@ -3,6 +3,7 @@ package com.wigzo.sdk.model;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.support.annotation.Keep;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.google.gson.Gson;
+import com.wigzo.sdk.helpers.Configuration;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -20,13 +22,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import com.wigzo.sdk.helpers.Configuration;
-
 /**
  * An instance of this class represents information of device.
  *
  * @author Minaz Ali
  */
+@Keep
 public class DeviceInfo {
 
     //private static final String TAG = "DeviceId";

@@ -3,6 +3,7 @@ package com.wigzo.sdk;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.Keep;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -33,8 +34,7 @@ import java.util.concurrent.TimeUnit;
  * This class is the public API for the Wigzo Android SDK.
  *  @author Minaz Ali
  */
-
-
+@Keep
 public class WigzoSDK {
 
     private Context context;
@@ -105,7 +105,7 @@ public class WigzoSDK {
 //        return resultCode == ConnectionResult.SUCCESS;
 //    }
 
-    public void gcmRegister() {
+    private void gcmRegister() {
         //TODO change intent WigzoRegistrationIntentService to WigzoInstanceIDService
         Intent intent = new Intent(getContext(), WigzoInstanceIDService.class);
         //Intent intent = new Intent(getContext(), WigzoRegistrationIntentService.class);
@@ -120,6 +120,7 @@ public class WigzoSDK {
      * @return Instance of WigzoSDK
      * @throws IllegalStateException if either Context is missing or orgToken is missing
      */
+
     public synchronized WigzoSDK initializeWigzoData(Context context, String orgToken) {
 
         if (context == null) {

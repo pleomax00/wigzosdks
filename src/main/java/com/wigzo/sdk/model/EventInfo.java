@@ -1,7 +1,12 @@
 package com.wigzo.sdk.model;
 
+import android.support.annotation.Keep;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.WigzoSDK;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,10 +16,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.wigzo.sdk.WigzoSDK;
-import com.wigzo.sdk.helpers.Configuration;
-import com.wigzo.sdk.helpers.WigzoSharedStorage;
-
 /**
  * An instance of this class represents an event(or activity).
  * Event information includes -
@@ -23,7 +24,7 @@ import com.wigzo.sdk.helpers.WigzoSharedStorage;
  * {@link EventInfo#metadata}. For more info see - {@link Metadata}
  * @author Minaz Ali
  */
-
+@Keep
 public class EventInfo {
 
     private String eventName;

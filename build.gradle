@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = 'com.wigzo.lib'
     PUBLISH_ARTIFACT_ID = 'android-sdk'
-    PUBLISH_VERSION = '0.0.52'
+    PUBLISH_VERSION = '0.0.57'
 }
 
 buildscript {
@@ -26,6 +26,9 @@ allprojects {
     }
 
 }
+
+tasks.withType(Javadoc).all { enabled = false }
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
@@ -46,14 +49,10 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-
-        /*testInstrumentationRunner 'wigzo.android.sdk.test.InstrumentationTestRunner'
-        testHandleProfiling true
-        testFunctionalTest true*/
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

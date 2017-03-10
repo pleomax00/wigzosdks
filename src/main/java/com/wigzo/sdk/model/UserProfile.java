@@ -1,15 +1,15 @@
 package com.wigzo.sdk.model;
 
+import android.support.annotation.Keep;
 import android.util.Log;
 
 import com.google.gson.Gson;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wigzo.sdk.WigzoSDK;
 import com.wigzo.sdk.helpers.Configuration;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An instance of this class represents Profile of user.
@@ -26,7 +26,7 @@ import com.wigzo.sdk.helpers.WigzoSharedStorage;
  *
  * @author Minaz Ali
  */
-
+@Keep
 public class UserProfile {
 
     private String fullName;
