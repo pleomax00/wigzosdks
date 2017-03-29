@@ -3,7 +3,6 @@ package com.wigzo.sdk;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.annotation.Keep;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -13,8 +12,8 @@ import com.wigzo.sdk.helpers.ConnectionStream;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
 import com.wigzo.sdk.model.DeviceInfo;
 import com.wigzo.sdk.model.EventInfo;
-import com.wigzo.sdk.model.GcmOpen;
-import com.wigzo.sdk.model.GcmRead;
+import com.wigzo.sdk.model.FcmOpen;
+import com.wigzo.sdk.model.FcmRead;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * This class is the public API for the Wigzo Android SDK.
  *  @author Minaz Ali
  */
-@Keep
+
 public class WigzoSDK {
 
     private Context context;
@@ -68,6 +67,9 @@ public class WigzoSDK {
      * @return Context of the application installing the SDK
      */
     public synchronized Context getContext() {
+        if (null == this.context)
+            this.context = new ProxyActivity().getProxyContext();
+
         return this.context /*== null ? new ProxyActivity().getProxyContext() : this.context*/;
     }
 
@@ -94,21 +96,13 @@ public class WigzoSDK {
                 checkAndPushEvent();
                 checkAndSendUserProfile();
                 checkAndSendEmail();
-                sendGcmRead();
-                sendGcmOpen();
+                sendFcmRead();
+                sendFcmOpen();
             }},timer,timer, TimeUnit.SECONDS);
     }
 
-//    private boolean checkPlayServices() {
-//        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-//        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-//        return resultCode == ConnectionResult.SUCCESS;
-//    }
-
-    private void gcmRegister() {
-        //TODO change intent WigzoRegistrationIntentService to WigzoInstanceIDService
+    private void fcmRegister() {
         Intent intent = new Intent(getContext(), WigzoInstanceIDService.class);
-        //Intent intent = new Intent(getContext(), WigzoRegistrationIntentService.class);
         getContext().startService(intent);
     }
 
@@ -139,7 +133,7 @@ public class WigzoSDK {
         this.gson = new Gson();
 
         //Initialise shared preferences to store data in mobile for future use
-        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context == null ? getContext() : context);
 
         //Get AppKey from Shared preferences (will not exist on first run)
         String storedAppKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value,"");
@@ -234,7 +228,7 @@ public class WigzoSDK {
             this.senderId = senderId;
 
             //Start Registration service
-            gcmRegister();
+            fcmRegister();
 
         }else {
             throw new IllegalArgumentException("Valid Sender Id is required!");
@@ -336,13 +330,13 @@ public class WigzoSDK {
     }
 
 
-    private void sendGcmRead() {
-        final List<GcmRead> gcmReadList = GcmRead.getGcmReadList(getContext());
-        if(!gcmReadList.isEmpty()) {
+    private void sendFcmRead() {
+        final List<FcmRead> fcmReadList = FcmRead.getFcmReadList(getContext());
+        if(!fcmReadList.isEmpty()) {
             HashMap<String, Object> payload = new HashMap<>();
-            payload.put("data", gcmReadList);
+            payload.put("data", fcmReadList);
 
-            final String url = Configuration.BASE_URL.value + Configuration.GCM_READ_URL.value;
+            final String url = Configuration.BASE_URL.value + Configuration.FCM_READ_URL.value;
             final String payloadStr = this.gson.toJson(payload);
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -354,8 +348,8 @@ public class WigzoSDK {
                         Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
                         }.getType());
                         if ("success".equals(jsonResponse.get("status"))) {
-                            GcmRead.Operation operation = GcmRead.Operation.removePartially(gcmReadList);
-                            GcmRead.editOperation(getContext(), operation);
+                            FcmRead.Operation operation = FcmRead.Operation.removePartially(fcmReadList);
+                            FcmRead.editOperation(getContext(), operation);
                         }
                     }
                 }
@@ -363,13 +357,13 @@ public class WigzoSDK {
         }
     }
 
-    private void sendGcmOpen() {
-        final List<GcmOpen> gcmOpenList = GcmOpen.getGcmOpenList(getContext());
-        if(!gcmOpenList.isEmpty()) {
+    private void sendFcmOpen() {
+        final List<FcmOpen> fcmOpenList = FcmOpen.getFcmOpenList(getContext());
+        if(!fcmOpenList.isEmpty()) {
             HashMap<String, Object> payload = new HashMap<>();
-            payload.put("data", gcmOpenList);
+            payload.put("data", fcmOpenList);
 
-            final String url = Configuration.BASE_URL.value + Configuration.GCM_OPEN_URL.value;
+            final String url = Configuration.BASE_URL.value + Configuration.FCM_OPEN_URL.value;
             final String payloadStr = this.gson.toJson(payload);
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -381,8 +375,8 @@ public class WigzoSDK {
                         Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
                         }.getType());
                         if ("success".equals(jsonResponse.get("status"))) {
-                            GcmOpen.Operation operation = GcmOpen.Operation.removePartially(gcmOpenList);
-                            GcmOpen.editOperation(getContext(), operation);
+                            FcmOpen.Operation operation = FcmOpen.Operation.removePartially(fcmOpenList);
+                            FcmOpen.editOperation(getContext(), operation);
                         }
                     }
                 }

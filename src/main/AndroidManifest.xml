@@ -12,7 +12,6 @@
             </intent-filter>
         </service>
         <!-- [END instanceId_listener] -->
-        <service android:name=".WigzoRegistrationIntentService" />
 
         <activity android:name=".ProxyActivity"></activity>
     </application>

@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by wigzo on 18/5/16.
  */
-public class GcmRead {
+public class FcmOpen {
     public static class Operation {
         public enum OperationType {
             SAVE_ONE,
@@ -23,34 +23,32 @@ public class GcmRead {
         }
 
         OperationType operationType;
-        GcmRead gcmRead;
-        List<GcmRead> gcmReadList;
+        FcmOpen fcmOpen;
+        List<FcmOpen> fcmOpenList;
 
         public Operation() {}
 
-        public static Operation saveOne(GcmRead gcmRead) {
+        public static Operation saveOne(FcmOpen fcmOpen) {
             Operation operation = new Operation();
             operation.operationType = OperationType.SAVE_ONE;
-            operation.gcmRead = gcmRead;
+            operation.fcmOpen = fcmOpen;
             return operation;
         }
 
-        public static Operation removePartially(List<GcmRead> gcmReadList) {
+        public static Operation removePartially(List<FcmOpen> fcmOpenList) {
             Operation operation = new Operation();
             operation.operationType = OperationType.REMOVE_PARTIALLY;
-            operation.gcmReadList = gcmReadList;
+            operation.fcmOpenList = fcmOpenList;
             return operation;
         }
     }
 
     private String uuid;
-    private String timestamp;
     private int campaignId;
     private int organizationId;
+    private String timestamp;
 
-    public GcmRead(){};
-
-    public GcmRead(String uuid, int campaignId, int organizationId) {
+    public FcmOpen(String uuid, int campaignId, int organizationId) {
         this.uuid = uuid;
         this.campaignId = campaignId;
         this.organizationId = organizationId;
@@ -83,43 +81,43 @@ public class GcmRead {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof GcmRead){
-            GcmRead gcmRead = (GcmRead) obj;
-            return this.uuid.equalsIgnoreCase(gcmRead.uuid);
+        if(obj instanceof FcmOpen){
+            FcmOpen fcmOpen = (FcmOpen) obj;
+            return this.uuid.equalsIgnoreCase(fcmOpen.uuid);
         }
         return false;
     }
 
-    public synchronized static List<GcmRead> getGcmReadList(Context context) {
+    public synchronized static List<FcmOpen> getFcmOpenList(Context context) {
         Gson gson = new Gson();
-        List<GcmRead> gcmReadList = new ArrayList<>();
+        List<FcmOpen> fcmOpenList = new ArrayList<>();
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
 
-        String gcmReadsStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.GCM_READ_KEY.value, "");
-        if(StringUtils.isNotEmpty(gcmReadsStr))
-            gcmReadList = gson.fromJson(gcmReadsStr, new TypeToken<List<GcmRead>>() { }.getType());
-        return gcmReadList;
+        String fcmOpensStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.FCM_OPEN_KEY.value, "");
+        if(StringUtils.isNotEmpty(fcmOpensStr))
+            fcmOpenList = gson.fromJson(fcmOpensStr, new TypeToken<List<FcmOpen>>() { }.getType());
+        return fcmOpenList;
     }
 
 
     public synchronized static void editOperation(Context context, Operation operation) {
         Gson gson = new Gson();
-        List<GcmRead> gcmReadList = new ArrayList<>();
+        List<FcmOpen> fcmOpenList = new ArrayList<>();
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
-        String gcmReadsStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.GCM_READ_KEY.value, "");
+        String fcmOpensStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.FCM_OPEN_KEY.value, "");
 
-        if(StringUtils.isNotEmpty(gcmReadsStr)) {
-            gcmReadList = gson.fromJson(gcmReadsStr, new TypeToken<List<GcmRead>>() { }.getType());
+        if(StringUtils.isNotEmpty(fcmOpensStr)) {
+            fcmOpenList = gson.fromJson(fcmOpensStr, new TypeToken<List<FcmOpen>>() { }.getType());
         }
         // operations begin
         if (operation.operationType == Operation.OperationType.SAVE_ONE) {
-            gcmReadList.add(operation.gcmRead);
+            fcmOpenList.add(operation.fcmOpen);
         }
         else if (operation.operationType == Operation.OperationType.REMOVE_PARTIALLY) {
-            gcmReadList.removeAll(operation.gcmReadList);
+            fcmOpenList.removeAll(operation.fcmOpenList);
         }
-        gcmReadsStr = gson.toJson(gcmReadList);
-        wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.GCM_READ_KEY.value, gcmReadsStr).apply();
+        fcmOpensStr = gson.toJson(fcmOpenList);
+        wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.FCM_OPEN_KEY.value, fcmOpensStr).apply();
     }
 }

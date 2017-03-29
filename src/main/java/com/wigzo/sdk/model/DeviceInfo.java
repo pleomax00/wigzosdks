@@ -3,7 +3,6 @@ package com.wigzo.sdk.model;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.support.annotation.Keep;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -27,7 +26,7 @@ import java.util.Map;
  *
  * @author Minaz Ali
  */
-@Keep
+
 public class DeviceInfo {
 
     //private static final String TAG = "DeviceId";

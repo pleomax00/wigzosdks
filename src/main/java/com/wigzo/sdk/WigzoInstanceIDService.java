@@ -19,13 +19,15 @@ package com.wigzo.sdk;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.ConnectionStream;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,10 +37,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import com.wigzo.sdk.helpers.Configuration;
-import com.wigzo.sdk.helpers.ConnectionStream;
-import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
@@ -61,9 +59,9 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
 
-        // Setting SENT_GCM_TOKEN_TO_SERVER to false since we want to refresh the token.
-        sharedPreferences.edit().putBoolean(Configuration.SENT_GCM_TOKEN_TO_SERVER.value, false).apply();
-        sharedPreferences.edit().putBoolean(Configuration.GCM_DEVICE_MAPPED.value, false).apply();
+        // Setting SENT_FCM_TOKEN_TO_SERVER to false since we want to refresh the token.
+        sharedPreferences.edit().putBoolean(Configuration.SENT_FCM_TOKEN_TO_SERVER.value, false).apply();
+        sharedPreferences.edit().putBoolean(Configuration.FCM_DEVICE_MAPPED.value, false).apply();
 
         // Get updated InstanceID token.
         refreshedToken = FirebaseInstanceId.getInstance().getToken();
@@ -72,7 +70,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
         sendRegistrationToServer(refreshedToken);
 
-        mapGcmToDeviceId(refreshedToken);
+        mapFcmToDeviceId(refreshedToken);
 
         try {
             subscribeTopics(WigzoSDK.getInstance().getOrgToken());
@@ -89,7 +87,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
 
         // Send to server only when the token is not yet sent
-        if (!sharedPreferences.getBoolean(Configuration.SENT_GCM_TOKEN_TO_SERVER.value, false)) {
+        if (!sharedPreferences.getBoolean(Configuration.SENT_FCM_TOKEN_TO_SERVER.value, false)) {
 
             //hashmap to store user data to send it to FCM server
             Map<String, Object> eventData = new HashMap<>();
@@ -102,24 +100,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
             final String eventDataStr = gson.toJson(eventData);
 
             //Endpoint Url TODO change url
-            final String url = Configuration.BASE_URL.value + Configuration.GCM_REGISTRATION_URL.value;
-            //final String url = "https://professorx.wigzopush.com/rest/v1/push/android/register-subscription";
-            //final String url = "https://superman.wigzopush.com/rest/v1/push/android/register-subscription";
-
-            /*//post data to end point Url
-            String response = ConnectionStream.postRequest(url, eventDataStr);
-
-            if (null != response) {
-
-                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {}.getType());
-
-                if ("success".equals(jsonResponse.get("status"))) {
-
-                    sharedPreferences.edit().putBoolean(Configuration.SENT_GCM_TOKEN_TO_SERVER.value, true).apply();
-
-                }
-            }*/
-
+            final String url = Configuration.BASE_URL.value + Configuration.FCM_REGISTRATION_URL.value;
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -161,7 +142,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
     }
 
-    private void mapGcmToDeviceId(String token) {
+    private void mapFcmToDeviceId(String token) {
         Gson gson = new Gson();
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
@@ -170,9 +151,9 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
         Boolean initDataSynced = sharedPreferences.getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, false);
 
-        Boolean isGcmDeviceMapped = sharedPreferences.getBoolean(Configuration.GCM_DEVICE_MAPPED.value, false);
+        Boolean isFcmDeviceMapped = sharedPreferences.getBoolean(Configuration.FCM_DEVICE_MAPPED.value, false);
 
-        if (initDataSynced && !isGcmDeviceMapped) {
+        if (initDataSynced && !isFcmDeviceMapped) {
 
             Map<String, Object> eventData = new HashMap<>();
 
@@ -184,7 +165,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
             final String eventDataStr = gson.toJson(eventData);
 
-            final String url = Configuration.BASE_URL.value + Configuration.GCM_DEVICE_MAPPING_URL.value;
+            final String url = Configuration.BASE_URL.value + Configuration.FCM_DEVICE_MAPPING_URL.value;
 
             String response = ConnectionStream.postRequest(url, eventDataStr);
 
@@ -194,31 +175,21 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
                 }.getType());
 
                 if ("success".equals(jsonResponse.get("status"))) {
-                    sharedPreferences.edit().putBoolean(Configuration.GCM_DEVICE_MAPPED.value, true);
+                    sharedPreferences.edit().putBoolean(Configuration.FCM_DEVICE_MAPPED.value, true);
                 }
             }
         }
     }
 
     /**
-     * Subscribe to any GCM topics of interest, as defined by the TOPICS constant.
+     * Subscribe to any FCM topics of interest, as defined by the TOPICS constant.
      *
-     * @param token GCM token
-     * @throws IOException if unable to reach the GCM PubSub service
+     * @param token FCM token
+     * @throws IOException if unable to reach the FCM PubSub service
      */
     // [START subscribe_topics]
     private void subscribeTopics(String token) throws IOException {
-
-        //Below commented GcmPubSub part is not used with FCM
-
-        /*GcmPubSub pubSub = GcmPubSub.getInstance(this);
-        pubSub.subscribe(token, "/topics/" + WigzoSDK.getInstance().getOrgToken(), null);*/
-
-        //FirebaseMessaging.getInstance().subscribeToTopic("mytopic");
-        //FirebaseMessaging.getInstance().subscribeToTopic("/topics/" + WigzoSDK.getInstance().getOrgToken());
         FirebaseMessaging.getInstance().subscribeToTopic("orgsubscribe-" + WigzoSDK.getInstance().getOrgToken());
-
-
     }
     // [END subscribe_topics]
 }

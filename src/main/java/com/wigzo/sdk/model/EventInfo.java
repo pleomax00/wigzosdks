@@ -1,7 +1,5 @@
 package com.wigzo.sdk.model;
 
-import android.support.annotation.Keep;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.WigzoSDK;
@@ -24,7 +22,7 @@ import java.util.concurrent.Executors;
  * {@link EventInfo#metadata}. For more info see - {@link Metadata}
  * @author Minaz Ali
  */
-@Keep
+
 public class EventInfo {
 
     private String eventName;

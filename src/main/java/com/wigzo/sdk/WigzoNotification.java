@@ -15,7 +15,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.wigzo.sdk.model.GcmRead;
+import com.wigzo.sdk.model.FcmRead;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,23 +46,6 @@ public class WigzoNotification {
 
 
         Intent proxyIntent = new Intent(applicationContext, ProxyActivity.class);
-
-       /* if (null != intentData) {
-            for (Map.Entry<String, Object> entry : intentData.entrySet())
-            {
-                if (entry.getValue() instanceof CharSequence) {
-                    proxyIntent.putExtra(entry.getKey(), (CharSequence) entry.getValue());
-                }
-                else if (entry.getValue() instanceof Number) {
-                    proxyIntent.putExtra(entry.getKey(), (Number) entry.getValue());
-                }
-                else if (entry.getValue() instanceof Boolean) {
-                    proxyIntent.putExtra(entry.getKey(), (Boolean) entry.getValue());
-                }
-            }
-        }*/
-
-
 
         // Because clicking the notification opens a new ("special") activity, there's
         // no need to create an artificial back stack.
@@ -97,10 +80,8 @@ public class WigzoNotification {
         notificationBuilder.setSmallIcon(icon);
 //            .setSound(defaultSoundUri)
         notificationBuilder.setAutoCancel(true);
-        notificationBuilder.setVibrate(new long[] { 0, 330, 300, 300 });
+        notificationBuilder.setVibrate(new long[]{0, 330, 300, 300});
         notificationBuilder.setContentIntent(resultPendingIntent);
-
-
 
 
         // Gets an instance of the NotificationManager service
@@ -134,13 +115,13 @@ public class WigzoNotification {
 
         // increase counter
         if (StringUtils.isNotEmpty(uuid)) {
-            final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
-            gcmReadWorker.schedule(new Runnable() {
+            final ScheduledExecutorService fcmReadWorker = Executors.newSingleThreadScheduledExecutor();
+            fcmReadWorker.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    GcmRead gcmRead = new GcmRead(uuid, campaignId, organizationId);
-                    GcmRead.Operation operation = GcmRead.Operation.saveOne(gcmRead);
-                    GcmRead.editOperation(applicationContext, operation);
+                    FcmRead fcmRead = new FcmRead(uuid, campaignId, organizationId);
+                    FcmRead.Operation operation = FcmRead.Operation.saveOne(fcmRead);
+                    FcmRead.editOperation(applicationContext, operation);
                 }
             }, 0, TimeUnit.SECONDS);
         }
@@ -148,8 +129,8 @@ public class WigzoNotification {
 
     public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId, Integer organizationId) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
-            .setContentTitle(title)
-            .setContentText(body);
+                .setContentTitle(title)
+                .setContentText(body);
         notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
     }
 
@@ -159,7 +140,7 @@ public class WigzoNotification {
                 .setSmallIcon(applicationContext.getApplicationInfo().icon)
                 .setContentText(body);
 
-        if(StringUtils.isNotEmpty(imageUrl)){
+        if (StringUtils.isNotEmpty(imageUrl)) {
             Bitmap remote_picture = null;
             NotificationCompat.BigPictureStyle notiStyle = new NotificationCompat.BigPictureStyle();
             try {
@@ -168,8 +149,8 @@ public class WigzoNotification {
                 e.printStackTrace();
             }
             notiStyle.bigPicture(remote_picture);
-//            notificationBuilder.setLargeIcon(remote_picture);
-             notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
+
+            notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
             notificationBuilder.setStyle(notiStyle);
         }
         notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);

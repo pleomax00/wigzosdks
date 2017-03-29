@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.wigzo.sdk.model.GcmOpen;
+import com.wigzo.sdk.model.FcmOpen;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,14 +36,14 @@ public class ProxyActivity extends AppCompatActivity {
         final int organizationId = extras.getInt("organizationId");
 
         if (StringUtils.isNotEmpty(uuid)) {
-            final ScheduledExecutorService gcmReadWorker = Executors.newSingleThreadScheduledExecutor();
+            final ScheduledExecutorService fcmReadWorker = Executors.newSingleThreadScheduledExecutor();
             final Context applicationContext = this;
-            gcmReadWorker.schedule(new Runnable() {
+            fcmReadWorker.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    GcmOpen gcmOpen = new GcmOpen(uuid, campaignId, organizationId);
-                    GcmOpen.Operation operation = GcmOpen.Operation.saveOne(gcmOpen);
-                    GcmOpen.editOperation(applicationContext, operation);
+                    FcmOpen fcmOpen = new FcmOpen(uuid, campaignId, organizationId);
+                    FcmOpen.Operation operation = FcmOpen.Operation.saveOne(fcmOpen);
+                    FcmOpen.editOperation(applicationContext, operation);
                 }
             }, 0, TimeUnit.SECONDS);
         }

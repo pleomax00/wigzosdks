@@ -1,6 +1,5 @@
 package com.wigzo.sdk.model;
 
-import android.support.annotation.Keep;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -26,7 +25,7 @@ import java.util.Map;
  *
  * @author Minaz Ali
  */
-@Keep
+
 public class UserProfile {
 
     private String fullName;
