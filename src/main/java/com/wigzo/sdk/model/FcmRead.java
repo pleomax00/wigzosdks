@@ -1,13 +1,13 @@
 package com.wigzo.sdk.model;
 
 import android.content.Context;
+import android.support.annotation.Keep;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Created by wigzo on 18/5/16.
  */
+@Keep
 public class FcmRead {
     public static class Operation {
         public enum OperationType {

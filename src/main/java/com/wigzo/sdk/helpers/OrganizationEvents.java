@@ -1,6 +1,8 @@
 package com.wigzo.sdk.helpers;
 
 
+import android.support.annotation.Keep;
+
 /**
  * Utility for standard events. It's advisable to use standard events so that Wigzo's recommendation engine can function properly.
  * Although you are free to use custom event names.
@@ -9,6 +11,7 @@ package com.wigzo.sdk.helpers;
  *     EventInfo eventInfo = new EventInfo( OrganizationEvents.Events.SEARCH.key,"iphone" );
  *
  */
+@Keep
 public class OrganizationEvents {
 
     /**

@@ -5,20 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.model.FcmOpen;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
+@Keep
 public class ProxyActivity extends AppCompatActivity {
 
     @Override
@@ -48,7 +48,7 @@ public class ProxyActivity extends AppCompatActivity {
             }, 0, TimeUnit.SECONDS);
         }
 
-        if (StringUtils.equals(linkType, "TARGET_ACTIVITY")) {
+        if (linkType.equals("TARGET_ACTIVITY")) {
             Map<String, Object> intentDataMap = gson.fromJson(intentData, new TypeToken<HashMap<String, Object>>() {
             }.getType());
 
@@ -67,7 +67,7 @@ public class ProxyActivity extends AppCompatActivity {
             }
             startActivity(targetIntent);
             finish();
-        } else if (StringUtils.equals(linkType, "URL")) {
+        } else if (linkType.equals("URL")) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(link));
             startActivity(intent);

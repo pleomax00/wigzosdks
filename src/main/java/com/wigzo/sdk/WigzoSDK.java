@@ -3,19 +3,19 @@ package com.wigzo.sdk;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.Keep;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.helpers.Configuration;
 import com.wigzo.sdk.helpers.ConnectionStream;
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
 import com.wigzo.sdk.model.DeviceInfo;
 import com.wigzo.sdk.model.EventInfo;
 import com.wigzo.sdk.model.FcmOpen;
 import com.wigzo.sdk.model.FcmRead;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * This class is the public API for the Wigzo Android SDK.
  *  @author Minaz Ali
  */
-
+@Keep
 public class WigzoSDK {
 
     private Context context;
@@ -613,7 +613,7 @@ public class WigzoSDK {
                 .getString(Configuration.APP_RUNNING_STATUS.value, "false");
 
         //Check if app is running. Return true if running
-        if (StringUtils.equalsIgnoreCase(appStatus, "true"))
+        if (appStatus.equalsIgnoreCase("true"))
             return true;
 
         return false;

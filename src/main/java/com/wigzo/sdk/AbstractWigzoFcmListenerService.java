@@ -20,16 +20,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.model.FcmOpen;
 import com.wigzo.sdk.model.FcmRead;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Keep
 public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingService {
 
     private String title = "";
@@ -188,7 +189,7 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         }
 
         //check if user wants to send In App Message and Push notification
-        if (StringUtils.equalsIgnoreCase("both", this.pushType)) {
+        if (this.pushType.equalsIgnoreCase("both")) {
 
             //send push notification if app is not running
             //if app is running create In App Message
@@ -213,13 +214,13 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
             }
         }
 
-        else if (StringUtils.equalsIgnoreCase("push", this.pushType) && !WigzoSDK.getInstance().isAppRunning())
+        else if (this.pushType.equalsIgnoreCase("push") && !WigzoSDK.getInstance().isAppRunning())
         {
             //call createNotification() method to create notification if app is not running
             createNotification();
         }
 
-        else if (StringUtils.equalsIgnoreCase("inapp", this.pushType) && WigzoSDK.getInstance().isAppRunning())
+        else if (this.pushType.equalsIgnoreCase("inapp") && WigzoSDK.getInstance().isAppRunning())
         {
             //generarte In APp Message
             generateInAppMessage();
@@ -238,9 +239,9 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
     }
 
     private void createNotification() {
-        if (StringUtils.equalsIgnoreCase(this.type, "simple")) {
+        if (this.type.equalsIgnoreCase("simple")) {
             WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
-        } else if (StringUtils.equalsIgnoreCase(this.type, "image")) {
+        } else if (this.type.equalsIgnoreCase("image")) {
             WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
         }
 

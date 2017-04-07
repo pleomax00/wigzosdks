@@ -1,5 +1,6 @@
 package com.wigzo.sdk.helpers;
 
+import android.support.annotation.Keep;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -15,7 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-
+@Keep
 public class ConnectionStream {
 
     private static final int CONNECT_TIMEOUT_IN_MILLISECONDS = 30000;

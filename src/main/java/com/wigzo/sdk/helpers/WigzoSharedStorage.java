@@ -2,13 +2,14 @@ package com.wigzo.sdk.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Keep;
 
 /**
  * This class provides a persistence layer for the sdk.
  *
  *  @author Minaz Ali
  */
-
+@Keep
 public class WigzoSharedStorage {
 
     public SharedPreferences getSharedStorage() {

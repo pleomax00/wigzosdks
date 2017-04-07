@@ -1,12 +1,13 @@
 package com.wigzo.sdk.model;
 
+import android.support.annotation.Keep;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.WigzoSDK;
 import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import java.util.concurrent.Executors;
  * {@link EventInfo#metadata}. For more info see - {@link Metadata}
  * @author Minaz Ali
  */
-
+@Keep
 public class EventInfo {
 
     private String eventName;

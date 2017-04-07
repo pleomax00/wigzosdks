@@ -18,7 +18,7 @@ import java.util.HashMap;
 /**
  * Created by wigzo on 17/2/17.
  */
-
+@Keep
 public class WigzoDialogTemplate extends Dialog implements View.OnClickListener {
 
     View v;

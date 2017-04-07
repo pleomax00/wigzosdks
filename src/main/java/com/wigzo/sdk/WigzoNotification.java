@@ -11,13 +11,13 @@ import android.graphics.BitmapFactory;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.annotation.Keep;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.model.FcmRead;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by ankit on 16/5/16.
  */
+@Keep
 public class WigzoNotification {
 
     private static int mNotificationId = 0;

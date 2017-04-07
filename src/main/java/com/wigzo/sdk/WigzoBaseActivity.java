@@ -1,9 +1,10 @@
 package com.wigzo.sdk;
 
+import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
 
-
-public class WigzoBaseActiviy extends AppCompatActivity {
+@Keep
+public class WigzoBaseActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
