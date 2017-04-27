@@ -54,8 +54,6 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
 
-        Log.e("WigzoInstanceIDService", ": onTokenRefresh() called");
-
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
 
@@ -65,8 +63,6 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
         // Get updated InstanceID token.
         refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.e(TAG, "Refreshed token WigzoInstanceIDService: " + refreshedToken);
-        // TODO: Implement this method to send any registration to your app's servers: This is done.
 
         sendRegistrationToServer(refreshedToken);
 
@@ -129,7 +125,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
                         @Override
                         public void run() {
                             //Toast.makeText(getApplicationContext(), "Sent", Toast.LENGTH_SHORT).show();
-                            Log.e("Status: ", "Sent");
+                            Log.d("Status: ", "Sent");
                         }
                     });
                 }

@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.support.annotation.Keep;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.model.FcmRead;
@@ -89,7 +88,7 @@ public class WigzoNotification {
         NotificationManager mNotifyMgr =
                 (NotificationManager) applicationContext.getSystemService(applicationContext.NOTIFICATION_SERVICE);
 
-        Log.e("NotificatioId", "" + mNotificationId);
+        /*Log.e("NotificatioId", "" + mNotificationId);*/
         // Builds the notification and issues it.
         mNotifyMgr.notify(mNotificationId, notificationBuilder.build());
 

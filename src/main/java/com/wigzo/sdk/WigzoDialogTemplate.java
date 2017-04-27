@@ -24,6 +24,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     View v;
     private TextView notification_title;
     private TextView notification_body;
+    private TextView dialog_title;
 
     private Button yes;
     private Button no;
@@ -63,19 +64,22 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
         setContentView(R.layout.wigzo_dialog_template);
 
-        setTitle("Wigzo Dialog");
+        /*setTitle(title);*/
 
         yes = (Button) findViewById(R.id.btn_yes);
         no = (Button) findViewById(R.id.btn_no);
 
         notification_title = (TextView) findViewById(R.id.notification_title);
         notification_body = (TextView) findViewById(R.id.notification_body);
+        dialog_title = (TextView) findViewById(R.id.dialog_title);
 
         notificationImage = (ImageView) findViewById(R.id.notificationImage);
 
         notificationImage.setImageBitmap(remote_picture);
 
-        notification_title.setText(title);
+        /*notification_title.setText(title);*/
+        dialog_title.setText(title);
+        notification_title.setVisibility(View.GONE);
         notification_body.setText(body);
 
         yes.setOnClickListener(this);
@@ -89,8 +93,9 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         if (i == R.id.btn_yes) {
             Toast.makeText(context, "Ok Clicked", Toast.LENGTH_SHORT).show();
 
-            Intent targetActivityIntent = new Intent(WigzoSDK.getInstance().getContext(), targetActivity);
-            WigzoSDK.getInstance().getContext().startActivity(targetActivityIntent);
+            /*Intent targetActivityIntent = new Intent(WigzoSDK.getInstance().getContext(), targetActivity);*/
+            Intent targetActivityIntent = new Intent(WigzoApplication.getAppContext(), targetActivity);
+            WigzoApplication.getAppContext().startActivity(targetActivityIntent);
             dismiss();
 
         } else if (i == R.id.btn_no) {
