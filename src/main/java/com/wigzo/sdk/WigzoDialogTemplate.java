@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -21,8 +20,7 @@ import java.util.HashMap;
 @Keep
 public class WigzoDialogTemplate extends Dialog implements View.OnClickListener {
 
-    View v;
-    private TextView notification_title;
+    /*private TextView notification_title;*/
     private TextView notification_body;
     private TextView dialog_title;
 
@@ -69,7 +67,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         yes = (Button) findViewById(R.id.btn_yes);
         no = (Button) findViewById(R.id.btn_no);
 
-        notification_title = (TextView) findViewById(R.id.notification_title);
+        /*notification_title = (TextView) findViewById(R.id.notification_title);*/
         notification_body = (TextView) findViewById(R.id.notification_body);
         dialog_title = (TextView) findViewById(R.id.dialog_title);
 
@@ -79,7 +77,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
         /*notification_title.setText(title);*/
         dialog_title.setText(title);
-        notification_title.setVisibility(View.GONE);
+        /*notification_title.setVisibility(View.GONE);*/
         notification_body.setText(body);
 
         yes.setOnClickListener(this);
@@ -91,8 +89,6 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btn_yes) {
-            Toast.makeText(context, "Ok Clicked", Toast.LENGTH_SHORT).show();
-
             /*Intent targetActivityIntent = new Intent(WigzoSDK.getInstance().getContext(), targetActivity);*/
             Intent targetActivityIntent = new Intent(WigzoApplication.getAppContext(), targetActivity);
             WigzoApplication.getAppContext().startActivity(targetActivityIntent);

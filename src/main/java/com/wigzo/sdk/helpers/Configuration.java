@@ -9,7 +9,7 @@ import android.support.annotation.Keep;
 public enum Configuration {
 
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
-    BASE_URL("baseUrl","https://darkknight.wigzopush.com"),
+    BASE_URL("baseUrl","https://app.wigzo.com"),
 
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
     APP_KEY("appKey","APP_KEY"),

@@ -63,6 +63,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
         // Get updated InstanceID token.
         refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        Log.e("token", refreshedToken);
 
         sendRegistrationToServer(refreshedToken);
 
