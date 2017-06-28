@@ -12,6 +12,7 @@ import android.view.WindowManager;
 
 import com.google.gson.Gson;
 import com.wigzo.sdk.helpers.Configuration;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -205,6 +206,7 @@ public class DeviceInfo {
         deviceInfo.put("ipAddress", getIpAddress());
         deviceInfo.put("appVersion", getAppVersion(context));
         deviceInfo.put("installingApp", getStore(context));
+        deviceInfo.put("location", getLocation(context));
         Gson gson = new Gson();
 
         String result = gson.toJson(deviceInfo);
@@ -242,6 +244,13 @@ public class DeviceInfo {
 
     return ipAddress;
 
+    }
+
+    private String getLocation(Context context)
+    {
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
+        String location = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_LOCATION_KEY.value, "");
+        return location;
     }
 
 }

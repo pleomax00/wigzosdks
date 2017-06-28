@@ -209,4 +209,58 @@ public class ConnectionStream {
 
     }
 
+    public static String getRequest(String urlStr)
+    {
+        Log.d("server url: ", urlStr);
+        final URL url;
+        HttpURLConnection connection = null;
+        try {
+            url = new URL(urlStr);
+            connection = (HttpURLConnection) url.openConnection();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        connection.setConnectTimeout(CONNECT_TIMEOUT_IN_MILLISECONDS);
+        connection.setReadTimeout(READ_TIMEOUT_IN_MILLISECONDS);
+        connection.setUseCaches(false);
+        connection.setDoInput(true);
+        connection.setDoOutput(false);
+        String response = null; //default json response
+
+
+        try {
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("charset", "utf-8");
+
+            final int responseCode = connection.getResponseCode();
+
+            boolean success = responseCode >= 200 && responseCode < 300;
+            if (success) {
+                BufferedReader r = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder responseBuilder = new StringBuilder();
+                String line;
+                while ((line = r.readLine()) != null) {
+                    responseBuilder.append(line).append('\n');
+                }
+                response = responseBuilder.toString();
+            }
+            if (!success )
+            {
+                Log.w(Configuration.WIGZO_SDK_TAG.value, "HTTP error response code was " + responseCode + " from getting device location");
+            }
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        finally {
+
+            if (null != connection && connection instanceof HttpURLConnection) {
+                (connection).disconnect();
+            }
+        }
+        return null;
+    }
 }

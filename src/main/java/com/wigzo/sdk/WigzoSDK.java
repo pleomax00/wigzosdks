@@ -143,6 +143,9 @@ public class WigzoSDK {
         //Get AppKey from Shared preferences (will not exist on first run)
         String storedAppKey = wigzoSharedStorage.getSharedStorage().getString(Configuration.APP_KEY.value, "");
 
+        //Save org token
+        wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.ORG_TOKEN_KEY.value, orgToken).apply();
+
         //if stored key does not exist then assign a new UUID AppKey
         if (StringUtils.isEmpty(storedAppKey)) {
 
@@ -156,6 +159,9 @@ public class WigzoSDK {
         else {
             this.appKey = storedAppKey;
         }
+
+        //get Device location and save in shared storage
+        getDeviceLocation();
 
         //Boolean to check if data has already been synced
         Boolean initDataSynced = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, false);
@@ -171,7 +177,6 @@ public class WigzoSDK {
             //Get User Data json string to send to Wigzo server
             final String userData = getDeviceIdentificationData();
 
-            //TODO Change Base URL from "http://minaz.wigzoes.com" to other company URL
             //Url to send user data (BASE_URL("http://minaz.wigzoes.com"), INITIAL_DATA_URL("/androidsdk/getinitialdata"))
             final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
 
@@ -633,5 +638,42 @@ public class WigzoSDK {
             return true;
 
         return false;
+    }
+
+    private void getDeviceLocation()
+    {
+        final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context == null ? getContext() : context);
+
+        String orgToken = wigzoSharedStorage.getSharedStorage().getString(Configuration.ORG_TOKEN_KEY.value, "");
+
+        final String url = Configuration.BASE_URL.value + Configuration.USER_LOCATION_URL.value + "?orgId=" + orgToken;
+
+        final Gson gson = new Gson();
+
+        //Initialise Executor Service to get device location from server
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        Future future = executorService.submit(new Callable<Void>() {
+            public Void call() {
+                //Get response from server
+                String response = ConnectionStream.getRequest(url);
+
+                //Check if response is not null
+                if (StringUtils.isNotEmpty(response)) {
+
+                    Map<String, Object> locationMap = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                    }.getType());
+
+                    String countryCode = locationMap.get("country").toString();
+                    locationMap.put("countryCode", countryCode);
+
+                    String location = gson.toJson(locationMap);
+
+                    //Save device location
+                    wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.DEVICE_LOCATION_KEY.value, location).apply();
+                }
+                return null;
+            }
+        });
     }
 }
