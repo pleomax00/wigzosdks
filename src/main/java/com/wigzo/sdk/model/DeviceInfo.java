@@ -246,7 +246,7 @@ public class DeviceInfo {
 
     }
 
-    private String getLocation(Context context)
+    public static String getLocation(Context context)
     {
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(context);
         String location = wigzoSharedStorage.getSharedStorage().getString(Configuration.DEVICE_LOCATION_KEY.value, "");
