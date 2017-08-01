@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.wigzo.sdk.helpers.WigzoTypeFace;
 
 import java.util.HashMap;
 
@@ -58,27 +61,31 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.wigzo_dialog_template);
 
-        /*setTitle(title);*/
-
         yes = (Button) findViewById(R.id.btn_yes);
         no = (Button) findViewById(R.id.btn_no);
-
-        /*notification_title = (TextView) findViewById(R.id.notification_title);*/
-        notification_body = (TextView) findViewById(R.id.notification_body);
         dialog_title = (TextView) findViewById(R.id.dialog_title);
+        notification_body = (TextView) findViewById(R.id.notification_body);
+
+        Typeface regularFace = WigzoTypeFace.getFontFromRes(context, R.raw.wigzo_brown_regular);
+        dialog_title.setTypeface(regularFace);
+        dialog_title.setText(title);
+
+        Typeface lightFace = WigzoTypeFace.getFontFromRes(context, R.raw.wigzo_brown_light);
+        notification_body.setTypeface(lightFace);
+        notification_body.setText(body);
+
+        yes.setTypeface(regularFace);
+        no.setTypeface(regularFace);
 
         notificationImage = (ImageView) findViewById(R.id.notificationImage);
 
-        notificationImage.setImageBitmap(remote_picture);
-
-        /*notification_title.setText(title);*/
-        dialog_title.setText(title);
-        /*notification_title.setVisibility(View.GONE);*/
-        notification_body.setText(body);
+        if (null != remote_picture) {
+            notificationImage.setVisibility(View.VISIBLE);
+            notificationImage.setImageBitmap(remote_picture);
+        }
 
         yes.setOnClickListener(this);
         no.setOnClickListener(this);
