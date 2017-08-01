@@ -62,7 +62,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.wigzo_dialog_template);
+        setContentView(R.layout.wigzo_dialog_template_1);
 
         yes = (Button) findViewById(R.id.btn_yes);
         no = (Button) findViewById(R.id.btn_no);
