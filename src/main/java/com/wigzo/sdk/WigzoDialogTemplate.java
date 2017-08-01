@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,7 +31,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     private Button yes;
     private Button no;
 
-    private ImageView notificationImage;
+    private ImageView notification_image;
 
     private Context context;
 
@@ -62,7 +63,9 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.wigzo_dialog_template_1);
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
+        setContentView(R.layout.wigzo_dialog_template_3);
 
         yes = (Button) findViewById(R.id.btn_yes);
         no = (Button) findViewById(R.id.btn_no);
@@ -80,11 +83,11 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         yes.setTypeface(regularFace);
         no.setTypeface(regularFace);
 
-        notificationImage = (ImageView) findViewById(R.id.notificationImage);
+        notification_image = (ImageView) findViewById(R.id.notification_image);
 
         if (null != remote_picture) {
-            notificationImage.setVisibility(View.VISIBLE);
-            notificationImage.setImageBitmap(remote_picture);
+            notification_image.setVisibility(View.VISIBLE);
+            notification_image.setImageBitmap(remote_picture);
         }
 
         yes.setOnClickListener(this);
