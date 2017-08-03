@@ -65,7 +65,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-        setContentView(R.layout.wigzo_dialog_template_3);
+        setContentView(R.layout.wigzo_dialog_template_1);
 
         yes = (Button) findViewById(R.id.btn_yes);
         no = (Button) findViewById(R.id.btn_no);
@@ -101,6 +101,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         if (i == R.id.btn_yes) {
             /*Intent targetActivityIntent = new Intent(WigzoSDK.getInstance().getContext(), targetActivity);*/
             Intent targetActivityIntent = new Intent(WigzoApplication.getAppContext(), targetActivity);
+            targetActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             WigzoApplication.getAppContext().startActivity(targetActivityIntent);
             dismiss();
 

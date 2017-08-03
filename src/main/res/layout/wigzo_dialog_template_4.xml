@@ -3,67 +3,66 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/wigzo_dialog_background" >
+    android:layout_gravity="center"
+    android:background="@drawable/wigzo_dialog_template_4_background">
+
     <Button
         android:id="@+id/btn_no"
-        android:background="@drawable/cross_white_60t_with_padding"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:layout_width="24dp"
-        android:layout_height="24dp" />
-    <ScrollView
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:background="@drawable/cross_white_60t_with_padding" />
+
+    <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fillViewport="true">
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="25dp"
+        android:background="@android:color/transparent"
+        android:fillViewport="true"
+        android:minHeight="300dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/wigzo_dialog_background"
+            android:background="@android:color/transparent"
             android:minWidth="200dp"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="#99c3ede7"
                 android:orientation="vertical">
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitXY"
-                        android:layout_centerInParent="true"
-                        android:id="@+id/notification_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:ignore="This image will be populated dynamically if in app message contains image" />
-
-                </RelativeLayout>
 
                 <TextView
                     android:id="@+id/dialog_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:gravity="center"
                     android:lineSpacingMultiplier="1.2"
                     android:paddingLeft="20dp"
                     android:paddingRight="20dp"
                     android:paddingTop="25dp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/notification_body"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:gravity="center"
                     android:lineSpacingMultiplier="1.2"
                     android:padding="20dp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="13sp" />
             </LinearLayout>
 
@@ -71,23 +70,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginBottom="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="#42c6b3"
                 android:orientation="vertical"
-                android:paddingBottom="5dp"
-                android:paddingTop="10dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="1"
-                    android:gravity="center_horizontal">
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight=".5"
-                        android:background="#808285" />
-
-                </LinearLayout>
+                android:paddingBottom="5dp">
 
                 <Button
                     android:id="@+id/btn_yes"
@@ -98,9 +86,11 @@
                     android:layout_weight="1"
                     android:text="Ok"
                     android:textAllCaps="true"
-                    android:textColor="#00932e" />
+                    android:textColor="@android:color/white" />
             </LinearLayout>
 
         </LinearLayout>
+
     </ScrollView>
+
 </RelativeLayout>
