@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.wigzo.sdk.WigzoLayoutAttributes.WigzoLayoutProperties;
 import com.wigzo.sdk.helpers.WigzoTypeFace;
 
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
     /*private TextView notification_title;*/
     private TextView notification_body;
-    private TextView dialog_title;
+    private TextView notification_title;
 
     private Button yes;
     private Button no;
@@ -35,9 +36,16 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
     private Context context;
 
+    private Bitmap remote_picture = null;
     private String body = "";
     private String title = "";
-    private Bitmap remote_picture = null;
+    private String layoutIdStr = "001";
+    private HashMap<String, String> payload = new HashMap<>();
+    private int layoutId = 0;
+    private boolean hasImageView = false;
+    private WigzoLayoutProperties wigzoLayoutProperties;
+    private Typeface wigzoPrimaryTypeFace = null;
+    private Typeface wigzoSecondayTypeFace = null;
 
     private Class<? extends AppCompatActivity> targetActivity = null;
 
@@ -47,6 +55,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         this.title = title;
         this.body = body;
         this.targetActivity = targetActivity;
+        this.payload = payload;
     }
 
     public WigzoDialogTemplate(Context context, String title, String body, HashMap<String, String> payload, Bitmap remote_picture, Class<? extends AppCompatActivity> targetActivity) {
@@ -57,6 +66,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         this.body = body;
         this.remote_picture = remote_picture;
         this.targetActivity = targetActivity;
+        this.payload = payload;
     }
 
     @Override
@@ -65,41 +75,53 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-        setContentView(R.layout.wigzo_dialog_template_1);
+        if (payload.containsKey("layoutId")) {
+            layoutIdStr = payload.get("layoutId");
+            layoutId = WigzoLayoutProperties.getWigzoLayoutId(layoutIdStr);
+        } else {
+            layoutId = R.layout.wigzo_dialog_template_1;
+        }
+
+        setContentView(layoutId);
+
+        wigzoLayoutProperties = WigzoLayoutProperties.getWigzoLayoutProperties(layoutId, context);
+
+        hasImageView = wigzoLayoutProperties.hasImage;
+
+        if (hasImageView) {
+            notification_image = (ImageView) findViewById(R.id.notification_image);
+        }
+
+        if (null != remote_picture && hasImageView) {
+                notification_image.setVisibility(View.VISIBLE);
+                notification_image.setImageBitmap(remote_picture);
+        }
 
         yes = (Button) findViewById(R.id.btn_yes);
         no = (Button) findViewById(R.id.btn_no);
-        dialog_title = (TextView) findViewById(R.id.dialog_title);
+
+        notification_title = (TextView) findViewById(R.id.notification_title);
         notification_body = (TextView) findViewById(R.id.notification_body);
 
-        Typeface regularFace = WigzoTypeFace.getFontFromRes(context, R.raw.wigzo_brown_regular);
-        dialog_title.setTypeface(regularFace);
-        dialog_title.setText(title);
+        wigzoPrimaryTypeFace = WigzoTypeFace.getFontFromRes(context, R.raw.wigzo_brown_regular);
+        notification_title.setTypeface(wigzoPrimaryTypeFace);
+        notification_title.setText(title);
 
-        Typeface lightFace = WigzoTypeFace.getFontFromRes(context, R.raw.wigzo_brown_light);
-        notification_body.setTypeface(lightFace);
+        wigzoSecondayTypeFace = WigzoTypeFace.getFontFromRes(context, R.raw.wigzo_brown_light);
+        notification_body.setTypeface(wigzoSecondayTypeFace);
         notification_body.setText(body);
 
-        yes.setTypeface(regularFace);
-        no.setTypeface(regularFace);
-
-        notification_image = (ImageView) findViewById(R.id.notification_image);
-
-        if (null != remote_picture) {
-            notification_image.setVisibility(View.VISIBLE);
-            notification_image.setImageBitmap(remote_picture);
-        }
+        yes.setTypeface(wigzoPrimaryTypeFace);
+        no.setTypeface(wigzoPrimaryTypeFace);
 
         yes.setOnClickListener(this);
         no.setOnClickListener(this);
-
     }
 
     @Override
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btn_yes) {
-            /*Intent targetActivityIntent = new Intent(WigzoSDK.getInstance().getContext(), targetActivity);*/
             Intent targetActivityIntent = new Intent(WigzoApplication.getAppContext(), targetActivity);
             targetActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             WigzoApplication.getAppContext().startActivity(targetActivityIntent);

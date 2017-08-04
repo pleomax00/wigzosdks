@@ -32,7 +32,7 @@
                 tools:ignore="This image will be populated dynamically if in app message contains image" />
 
             <TextView
-                android:id="@+id/dialog_title"
+                android:id="@+id/notification_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
