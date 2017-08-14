@@ -12,6 +12,7 @@ import com.wigzo.sdk.helpers.Configuration;
 import com.wigzo.sdk.helpers.ConnectionStream;
 import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.helpers.WigzoUrlWrapper;
 import com.wigzo.sdk.model.DeviceInfo;
 import com.wigzo.sdk.model.EventInfo;
 import com.wigzo.sdk.model.FcmOpen;
@@ -178,7 +179,9 @@ public class WigzoSDK {
             final String userData = getDeviceIdentificationData();
 
             //Url to send user data (BASE_URL("http://minaz.wigzoes.com"), INITIAL_DATA_URL("/androidsdk/getinitialdata"))
-            final String url = Configuration.BASE_URL.value + Configuration.INITIAL_DATA_URL.value;
+            final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                    + Configuration.INITIAL_DATA_URL.value, Configuration.SITE_ID.value
+                    , getOrgToken());
 
             //Initialise Executor Service to send user data to server
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -317,7 +320,9 @@ public class WigzoSDK {
 //                wigzoSharedStorage.getSharedStorage().edit().putString(Configuration.EVENTS_KEY.value, eventsStr).apply();
                 eventData.put("eventData", eventsStr);
                 final String eventDataStr = this.gson.toJson(eventData);
-                final String url = Configuration.BASE_URL.value + Configuration.EVENT_DATA_URL.value;
+                final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                        + Configuration.EVENT_DATA_URL.value, Configuration.SITE_ID.value
+                        , getOrgToken());
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 executorService.submit(new Runnable() {
                     @Override
@@ -348,7 +353,9 @@ public class WigzoSDK {
             HashMap<String, Object> payload = new HashMap<>();
             payload.put("data", fcmReadList);
 
-            final String url = Configuration.BASE_URL.value + Configuration.FCM_READ_URL.value;
+            final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                    + Configuration.FCM_READ_URL.value, Configuration.SITE_ID.value
+                    , getOrgToken());
             final String payloadStr = this.gson.toJson(payload);
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -375,7 +382,9 @@ public class WigzoSDK {
             HashMap<String, Object> payload = new HashMap<>();
             payload.put("data", fcmOpenList);
 
-            final String url = Configuration.BASE_URL.value + Configuration.FCM_OPEN_URL.value;
+            final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                    + Configuration.FCM_OPEN_URL.value, Configuration.SITE_ID.value
+                    , getOrgToken());
             final String payloadStr = this.gson.toJson(payload);
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -472,7 +481,9 @@ public class WigzoSDK {
                 sessionData.put("sessionData", durationStr);
                 Gson gson = new Gson();
                 final String sessionDataStr = gson.toJson(sessionData);
-                final String url = Configuration.BASE_URL.value + Configuration.SESSION_DATA_URL.value;
+                final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                        + Configuration.SESSION_DATA_URL.value, Configuration.SITE_ID.value
+                        , getOrgToken());
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 executorService.submit(new Runnable() {
                     @Override
@@ -494,7 +505,9 @@ public class WigzoSDK {
             if (syncData) {
                 final String hasProfilePicture = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_PROFILE_PICTURE_KEY.value, "");
                 final String userProfileDataStr = wigzoSharedStorage.getSharedStorage().getString(Configuration.USER_PROFILE_DATA_KEY.value, "");
-                final String url = Configuration.BASE_URL.value + Configuration.USER_PROFILE_URL.value;
+                final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                        + Configuration.USER_PROFILE_URL.value, Configuration.SITE_ID.value
+                        , getOrgToken());
                 if (StringUtils.isNotEmpty(userProfileDataStr)) {
                     if (StringUtils.isEmpty(hasProfilePicture)) {
                         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -547,7 +560,9 @@ public class WigzoSDK {
             final WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(getContext());
             Boolean syncData = wigzoSharedStorage.getSharedStorage().getBoolean(Configuration.EMAIL_SYNC_KEY.value, false);
             final String emailData = wigzoSharedStorage.getSharedStorage().getString(Configuration.EMAIL_KEY.value, "");
-            final String url = Configuration.BASE_URL.value + Configuration.EMAIL_DATA_URL.value;
+            final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                    + Configuration.EMAIL_DATA_URL.value, Configuration.SITE_ID.value
+                    , getOrgToken());
             if (syncData) {
                 if (StringUtils.isNotEmpty(emailData)) {
 
@@ -646,7 +661,9 @@ public class WigzoSDK {
 
         String orgToken = wigzoSharedStorage.getSharedStorage().getString(Configuration.ORG_TOKEN_KEY.value, "");
 
-        final String url = Configuration.BASE_URL.value + Configuration.USER_LOCATION_URL.value + "?orgId=" + orgToken;
+        final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                + Configuration.USER_LOCATION_URL.value + "?orgId=" + orgToken, Configuration.SITE_ID.value
+                , getOrgToken());
 
         final Gson gson = new Gson();
 

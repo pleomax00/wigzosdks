@@ -36,6 +36,7 @@ public enum Configuration {
     PREV_TIME_SPENT_KEY("prevTimeSpent","PREV_TIME_SPENT_KEY"),
     SENT_FCM_TOKEN_TO_SERVER("sentTokenToServer", "SENT_FCM_TOKEN_TO_SERVER"),
     SESSION_DATA_URL("sessionDataUrl","/androidsdk/getsessiondata"),
+    SITE_ID("siteid", "_siteid"),
     STORAGE_KEY("storageKey","WIGZO_SHARED_STORAGE"),
     TIME_DELAY("timeDelay","45"),
     TIME_SPENT_KEY("timeSpentKey","TIME_SPENT_KEY"),

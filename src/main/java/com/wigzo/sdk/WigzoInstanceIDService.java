@@ -28,6 +28,7 @@ import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.helpers.Configuration;
 import com.wigzo.sdk.helpers.ConnectionStream;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
+import com.wigzo.sdk.helpers.WigzoUrlWrapper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -96,8 +97,12 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
             //Convert eventData to json string
             final String eventDataStr = gson.toJson(eventData);
 
-            //Endpoint Url TODO change url
-            final String url = Configuration.BASE_URL.value + Configuration.FCM_REGISTRATION_URL.value;
+            //Endpoint Url
+            final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                    + Configuration.FCM_REGISTRATION_URL.value, Configuration.SITE_ID.value
+                    , WigzoSDK.getInstance().getOrgToken());
+
+
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -162,7 +167,9 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
             final String eventDataStr = gson.toJson(eventData);
 
-            final String url = Configuration.BASE_URL.value + Configuration.FCM_DEVICE_MAPPING_URL.value;
+            final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
+                    + Configuration.FCM_DEVICE_MAPPING_URL.value, Configuration.SITE_ID.value
+                    , WigzoSDK.getInstance().getOrgToken());
 
             String response = ConnectionStream.postRequest(url, eventDataStr);
 
