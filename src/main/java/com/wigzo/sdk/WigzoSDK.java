@@ -629,7 +629,7 @@ public class WigzoSDK {
 
     /**
      * Checks the state of the app. this method is called
-     * from {@link AbstractWigzoFcmListenerService} to generate notifications.
+     * from {@link WigzoFcmListenerService} to generate notifications.
      * If the app state is running then No notification will be generated, instead, notification
      * data can be used to display In App Messages.
      */
@@ -661,9 +661,9 @@ public class WigzoSDK {
 
         String orgToken = wigzoSharedStorage.getSharedStorage().getString(Configuration.ORG_TOKEN_KEY.value, "");
 
-        final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
-                + Configuration.USER_LOCATION_URL.value + "?orgId=" + orgToken, Configuration.SITE_ID.value
-                , getOrgToken());
+        final String url = WigzoUrlWrapper.addQueryParam(
+                WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value + Configuration.USER_LOCATION_URL.value,  "orgId", orgToken)
+                , Configuration.SITE_ID.value, orgToken);
 
         final Gson gson = new Gson();
 

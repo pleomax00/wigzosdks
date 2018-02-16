@@ -36,6 +36,57 @@
           "status": 2
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768564314928:android:90f6c28e1479fd82",
+        "android_client_info": {
+          "package_name": "wigzo.com.maventestapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "768564314928-mkah5as2u2em6g3fhv4dtjnhip29teck.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "wigzo.com.maventestapp",
+            "certificate_hash": "122ce5d577953bce2521d9c7f29eef7268801bba"
+          }
+        },
+        {
+          "client_id": "768564314928-h1rlg2peu4pvfgkvr7dfev5rt2dvdtth.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdX5An8U3awNAsv4iIHLdQ7dviHMRrpyE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "768564314928-84sklohocd4er34lvn8lrcq06h81g7ua.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.testExalt.com"
+              }
+            },
+            {
+              "client_id": "768564314928-h1rlg2peu4pvfgkvr7dfev5rt2dvdtth.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
     }
   ],
   "configuration_version": "1"

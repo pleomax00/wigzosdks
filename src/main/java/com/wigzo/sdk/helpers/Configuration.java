@@ -10,7 +10,6 @@ public enum Configuration {
 
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
     BASE_URL("baseUrl","https://app.wigzo.com"),
-
     // ----------------------------------------- MIND IT !!!!!!!!!! -----------------------------------------//
     APP_KEY("appKey","APP_KEY"),
     DEFAULT_APP_VERSION("defaultAppVersion","1.0"),
@@ -44,7 +43,7 @@ public enum Configuration {
     USER_PROFILE_PICTURE_KEY("userProfilePictureKey","USER_PROFILE_PICTURE_KEY"),
     USER_PROFILE_SYNC_KEY("userProfileSyncKey","USER_PROFILE_SYNC_KEY"),
     USER_PROFILE_URL("userProfileUrl","/androidsdk/getuserprofiledata"),
-    WIGZO_FCM_LISTENER_SERVICE_TAG("wigzoFCMListenerServiceTag","AbstractWigzoFcmListenerService"),
+    WIGZO_FCM_LISTENER_SERVICE_TAG("wigzoFCMListenerServiceTag","WigzoFcmListenerService"),
     WIGZO_INIT_DATA_SYNC_FLAG_KEY("wigzoInitiDataSyncFlag","WIGZO_INIT_DATA_SYNC_FLAG_KEY"),
     WIGZO_REG_INTENT_SERVICE_TAG("wigzoRegIntentServiceTag","RegIntentService"),
     WIGZO_SDK_TAG("wigzoSdkTag","Wigzo"),

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wigzo.sdk.WigzoLayoutAttributes.WigzoLayoutProperties;
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.helpers.WigzoTypeFace;
 
 import java.util.HashMap;
@@ -49,7 +50,8 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
     private Class<? extends AppCompatActivity> targetActivity = null;
 
-    public WigzoDialogTemplate(Context context, String title, String body, HashMap<String, String> payload, Class<? extends AppCompatActivity> targetActivity) {
+    public WigzoDialogTemplate(Context context, String title, String body, HashMap<String,
+            String> payload, Class<? extends AppCompatActivity> targetActivity) {
         super(context);
         this.context = context;
         this.title = title;
@@ -58,7 +60,9 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         this.payload = payload;
     }
 
-    public WigzoDialogTemplate(Context context, String title, String body, HashMap<String, String> payload, Bitmap remote_picture, Class<? extends AppCompatActivity> targetActivity) {
+    public WigzoDialogTemplate(Context context, String title, String body, HashMap<String,
+            String> payload, Bitmap remote_picture, Class<? extends AppCompatActivity> targetActivity,
+                               String layoutIdStr) {
         super(context);
 
         this.context = context;
@@ -67,6 +71,7 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
         this.remote_picture = remote_picture;
         this.targetActivity = targetActivity;
         this.payload = payload;
+        this.layoutIdStr = layoutIdStr;
     }
 
     @Override
@@ -75,8 +80,15 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
 
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-        if (payload.containsKey("layoutId")) {
+        /*if (payload.containsKey("layoutId")) {
             layoutIdStr = payload.get("layoutId");
+            layoutId = WigzoLayoutProperties.getWigzoLayoutId(layoutIdStr);
+        } else {
+            layoutId = R.layout.wigzo_dialog_template_1;
+        }*/
+
+        if (StringUtils.isNotEmpty(layoutIdStr)) {
+            /*layoutIdStr = payload.get("layoutId");*/
             layoutId = WigzoLayoutProperties.getWigzoLayoutId(layoutIdStr);
         } else {
             layoutId = R.layout.wigzo_dialog_template_1;

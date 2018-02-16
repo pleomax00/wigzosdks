@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -41,7 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Keep
-public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingService {
+public class WigzoFcmListenerService extends FirebaseMessagingService {
 
     private String title = "";
     private String body = "";
@@ -57,6 +58,7 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
     private Integer secondSound = 0;
     private String imageUrl = "";
     private Integer organizationId = 0;
+    private String layoutId = "001";
     private static Class<? extends Activity> positiveButtonClickActivity = null;
 
     /**
@@ -73,7 +75,9 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      *     }
      * </pre></code>
      */
-    protected abstract Class<? extends Activity> getTargetActivity();
+    protected Class<? extends Activity> getTargetActivity() {
+        return null;
+    }
 
     /**
      * Listens to the notifications arrived when app is already open
@@ -92,11 +96,13 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      *     });
      * </pre></code>
      */
-    protected abstract void notificationListener(Context context);
+    protected void notificationListener(Context context) {
+
+    }
 
     /**
      * return the activity which should open on click of the positive button when an In App Message
-     * is received when {@link AbstractWigzoFcmListenerService#showWigzoDialog()} is true. Logic to
+     * is received when {@link WigzoFcmListenerService#showWigzoDialog()} is true. Logic to
      * return the activity can be based upon Notification title, body or payload-key-value pairs.
      * <code><pre>
      *     Example:
@@ -106,13 +112,17 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
      *     }
      * </pre></code>
      * */
-    protected abstract Class<? extends AppCompatActivity> getPositiveButtonClickActivity();
+    protected Class<? extends AppCompatActivity> getPositiveButtonClickActivity() {
+        return null;
+    }
 
     /**
      * Return <B>"true"</B> if you want to display In App Messages using Wigzo SDK.
      * To Display your custom dialog return <B>"false"</B>
      */
-    protected abstract boolean showWigzoDialog();
+    protected boolean showWigzoDialog() {
+        return true;
+    }
 
     /**
      * returns the Key-Value pairs received via notification
@@ -152,20 +162,26 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
 
         Map data = message.getData();
 
-        imageUrl = (String) data.get("image_url");
-        uuid = (String) data.get("uuid");
-        body = (String) data.get("body");
-        title = (String) data.get("title");
+        imageUrl = (String) (data.keySet().contains("image_url") ? data.get("image_url") : "");
+        uuid = (String) (data.keySet().contains("uuid") ? data.get("uuid") : "");
+        body = (String) (data.keySet().contains("body") ? data.get("body") : "");
+        title = (String) (data.keySet().contains("title") ? data.get("title") : "");
 
         linkType = "TARGET_ACTIVITY";
         link = "http://www.google.com";
 
-        String notificationIdStr = (String) data.get("notification_id");
-        String intentData = (String) data.get("intent_data");
-        String secondSoundStr = (String) data.get("second_sound");
-        String type = (String) data.get("type");
-        String campaignIdStr = (String) data.get("id");
-        String organizationIdStr = (String) data.get("organizationId");
+        String notificationIdStr = (String) (data.keySet().contains("notification_id") ? data.get("notification_id") : "");
+        String intentData = (String) (data.keySet().contains("intent_data") ? data.get("intent_data") : "");
+        String secondSoundStr = (String) (data.keySet().contains("second_sound") ? data.get("second_sound") : "");
+        String type = (String) (data.keySet().contains("type") ? data.get("type") : "");
+        String campaignIdStr = (String) (data.keySet().contains("id") ? data.get("id") : "");
+        String organizationIdStr = (String) (data.keySet().contains("organizationId") ? data.get("organizationId") : "");
+        String layoutIdStr = (String) (data.keySet().contains("layoutId") ? data.get("layoutId") : "001");
+
+        if (StringUtils.isEmpty(notificationIdStr, type, campaignIdStr, organizationIdStr)) {
+            Log.e("INVALID JSON", "Received invalid json. Please try sending android notification from WIGZO dashboard again");
+            return;
+        }
 
         Map message_type = gson.fromJson(type, new TypeToken<HashMap<String, Object>>() {
         }.getType());
@@ -179,6 +195,8 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         this.organizationId = StringUtils.isEmpty(organizationIdStr) ? null : Integer.parseInt(organizationIdStr);
 
         this.payload = new Gson().fromJson(intentData, new TypeToken<HashMap<String, String>>() {}.getType());
+
+        this.layoutId = StringUtils.isEmpty(layoutIdStr) ? null : layoutIdStr;
 
         if(StringUtils.isNotEmpty(imageUrl)) {
             try {
@@ -242,7 +260,9 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
         if (this.type.equalsIgnoreCase("simple")) {
             WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
         } else if (this.type.equalsIgnoreCase("image")) {
-            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title, body, imageUrl, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
+            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title,
+                    body, imageUrl, getWigzoNotificationPayload().toString(), uuid, notificationId,
+                    linkType, link, secondSound, campaignId, organizationId);
         }
 
     }
@@ -254,16 +274,22 @@ public abstract class AbstractWigzoFcmListenerService extends FirebaseMessagingS
 
                 if(StringUtils.isNotEmpty(imageUrl)) {
                     WigzoDialogTemplate wigzoDialogTemplate
-                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
-                            , getWigzoNotificationTitle(), getWigzoNotificationBody()
-                            , getWigzoNotificationPayload(), remote_picture, getPositiveButtonClickActivity());
+                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
+                            getWigzoNotificationTitle(),
+                            getWigzoNotificationBody(),
+                            getWigzoNotificationPayload(),
+                            remote_picture,
+                            getPositiveButtonClickActivity(),
+                            layoutId);
                     wigzoDialogTemplate.show();
                 }
                 else {
                     WigzoDialogTemplate wigzoDialogTemplate
-                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext()
-                            , getWigzoNotificationTitle(), getWigzoNotificationBody()
-                            , getWigzoNotificationPayload(), getPositiveButtonClickActivity());
+                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
+                            getWigzoNotificationTitle(),
+                            getWigzoNotificationBody(),
+                            getWigzoNotificationPayload(),
+                            getPositiveButtonClickActivity());
                     wigzoDialogTemplate.show();
                 }
             }
