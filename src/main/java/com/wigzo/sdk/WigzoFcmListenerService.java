@@ -299,33 +299,6 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
                 }
             }
         });
-
-        /*((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if(StringUtils.isNotEmpty(imageUrl)) {
-                    WigzoDialogTemplate wigzoDialogTemplate
-                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
-                            getWigzoNotificationTitle(),
-                            getWigzoNotificationBody(),
-                            getWigzoNotificationPayload(),
-                            remote_picture,
-                            getPositiveButtonClickActivity(),
-                            layoutId);
-                    wigzoDialogTemplate.show();
-                }
-                else {
-                    WigzoDialogTemplate wigzoDialogTemplate
-                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
-                            getWigzoNotificationTitle(),
-                            getWigzoNotificationBody(),
-                            getWigzoNotificationPayload(),
-                            getPositiveButtonClickActivity());
-                    wigzoDialogTemplate.show();
-                }
-            }
-        });*/
     }
 
     private void increaseNotificationReceivedOpenedCounter()

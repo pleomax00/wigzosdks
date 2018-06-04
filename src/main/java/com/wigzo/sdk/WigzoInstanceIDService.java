@@ -17,7 +17,6 @@
 package com.wigzo.sdk;
 
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -204,15 +203,8 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
             try {
                 //if post request was successful save the Synced data flag as true in shared preferences
-                if (future.get()) {
-                    ((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Toast.makeText(getApplicationContext(), "Sent", Toast.LENGTH_SHORT).show();
-                            Log.d("Status: ", "Sent");
-                        }
-                    });
-                }
+                if (future.get()) Log.d("Mapping" , "Mapped FCM to device");
+                else Log.d("Mapping" , "Could not map FCM to device");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
