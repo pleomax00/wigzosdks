@@ -20,6 +20,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -257,18 +259,48 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
     }
 
     private void createNotification() {
+
+        Gson gson = new Gson();
+        String payloadJsonStr = gson.toJson(getWigzoNotificationPayload());
+
         if (this.type.equalsIgnoreCase("simple")) {
-            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, getWigzoNotificationPayload().toString(), uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
+            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, payloadJsonStr, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
         } else if (this.type.equalsIgnoreCase("image")) {
             WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title,
-                    body, imageUrl, getWigzoNotificationPayload().toString(), uuid, notificationId,
+                    body, imageUrl, payloadJsonStr, uuid, notificationId,
                     linkType, link, secondSound, campaignId, organizationId);
         }
 
     }
 
     private void generateInAppMessage() {
-        ((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if(StringUtils.isNotEmpty(imageUrl)) {
+                    WigzoDialogTemplate wigzoDialogTemplate
+                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
+                            getWigzoNotificationTitle(),
+                            getWigzoNotificationBody(),
+                            getWigzoNotificationPayload(),
+                            remote_picture,
+                            getPositiveButtonClickActivity(),
+                            layoutId);
+                    wigzoDialogTemplate.show();
+                }
+                else {
+                    WigzoDialogTemplate wigzoDialogTemplate
+                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
+                            getWigzoNotificationTitle(),
+                            getWigzoNotificationBody(),
+                            getWigzoNotificationPayload(),
+                            getPositiveButtonClickActivity());
+                    wigzoDialogTemplate.show();
+                }
+            }
+        });
+
+        /*((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
@@ -293,7 +325,7 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
                     wigzoDialogTemplate.show();
                 }
             }
-        });
+        });*/
     }
 
     private void increaseNotificationReceivedOpenedCounter()

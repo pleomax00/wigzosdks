@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.Keep;
 import android.util.Log;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.helpers.Configuration;
@@ -33,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class is the public API for the Wigzo Android SDK.
  *
- * @author Minaz Ali
+ * @author Rihan Husain
  */
 @Keep
 public class WigzoSDK {
@@ -80,7 +81,6 @@ public class WigzoSDK {
     protected synchronized void setContext(Context context) {
         this.context = context;
     }
-
 
     /**
      * Returns the WigzoSdk singleton.
@@ -192,7 +192,7 @@ public class WigzoSDK {
                     String response = ConnectionStream.postRequest(url, userData);
 
                     //Check if post request returned success if the response is not null
-                    if (null != response) {
+                    if (null != response && StringUtils.isJsonString(response)) {
                         Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
                         }.getType());
 
@@ -208,7 +208,9 @@ public class WigzoSDK {
                 //if post request was successful save the Synced data flag as true in shared preferences
                 if (future.get()) {
                     wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, true).apply();
-
+                    if (StringUtils.isNotEmpty(FirebaseInstanceId.getInstance().getToken())) {
+                        WigzoInstanceIDService.mapFcmToDeviceId(FirebaseInstanceId.getInstance().getToken());
+                    }
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -300,6 +302,11 @@ public class WigzoSDK {
      * Method to send events to wigzo server
      */
     private synchronized void checkAndPushEvent() {
+
+        if (!WigzoInstanceIDService.isSentToServer && StringUtils.isNotEmpty(FirebaseInstanceId.getInstance().getToken())) {
+            WigzoInstanceIDService.refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            WigzoInstanceIDService.sendRegistrationToServer(WigzoInstanceIDService.refreshedToken);
+        }
 
         boolean checkStatus = checkWigzoData();
         if (checkStatus) {
@@ -614,7 +621,7 @@ public class WigzoSDK {
      *                         context is not required to be passed everytime, and so method overloading is done.
      */
 
-    protected void appStatus(String appRunningStatus) {
+    protected void appStatus(boolean appRunningStatus) {
 
         //Initialising shared preferences
         wigzoSharedStorageForAppliLifeCycle = getContext()
@@ -622,9 +629,9 @@ public class WigzoSDK {
 
         //updated app running status in shared preferences
         wigzoSharedStorageForAppliLifeCycle.edit()
-                .putString(Configuration.APP_RUNNING_STATUS.value, appRunningStatus).apply();
+                .putBoolean(Configuration.APP_RUNNING_STATUS.value, appRunningStatus).apply();
 
-        Log.d("State", wigzoSharedStorageForAppliLifeCycle.getString(Configuration.APP_RUNNING_STATUS.value, "false"));
+        Log.d("State", "" + wigzoSharedStorageForAppliLifeCycle.getBoolean(Configuration.APP_RUNNING_STATUS.value, false));
     }
 
     /**
@@ -645,14 +652,11 @@ public class WigzoSDK {
         }
 
         //Fetch App Running Status from shared preferences and return corresponding bool.
-        String appStatus = wigzoSharedStorageForAppliLifeCycle
-                .getString(Configuration.APP_RUNNING_STATUS.value, "false");
+        boolean appStatus = wigzoSharedStorageForAppliLifeCycle
+                .getBoolean(Configuration.APP_RUNNING_STATUS.value, false);
 
         //Check if app is running. Return true if running
-        if (appStatus.equalsIgnoreCase("true"))
-            return true;
-
-        return false;
+        return appStatus;
     }
 
     private void getDeviceLocation()

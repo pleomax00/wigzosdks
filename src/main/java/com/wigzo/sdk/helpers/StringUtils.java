@@ -29,6 +29,13 @@ public class StringUtils {
         }
     }
 
+    public static boolean isJsonString(String eventValue) {
+        eventValue = eventValue.trim();
+        if (StringUtils.isNotEmpty(eventValue) && eventValue.startsWith("{") && eventValue.endsWith("}"))
+            return true;
+        return false;
+    }
+
     public static boolean isNotEmpty(String string) {
         return !isEmpty(string);
     }

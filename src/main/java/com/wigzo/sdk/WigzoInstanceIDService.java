@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.helpers.Configuration;
 import com.wigzo.sdk.helpers.ConnectionStream;
+import com.wigzo.sdk.helpers.StringUtils;
 import com.wigzo.sdk.helpers.WigzoSharedStorage;
 import com.wigzo.sdk.helpers.WigzoUrlWrapper;
 
@@ -43,6 +44,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
     private static final String TAG = "MyInstanceIDLS";
     public static String refreshedToken;
+    public static boolean isSentToServer = false;
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -55,20 +57,26 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
 
+        // Get updated InstanceID token.
+        refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        Log.d("token", refreshedToken);
+        if (null == WigzoSDK.getInstance().getContext()) return;
+
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if (null == wigzoSharedStorage) return;
+
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+        if (null == sharedPreferences) return;
 
         // Setting SENT_FCM_TOKEN_TO_SERVER to false since we want to refresh the token.
         sharedPreferences.edit().putBoolean(Configuration.SENT_FCM_TOKEN_TO_SERVER.value, false).apply();
         sharedPreferences.edit().putBoolean(Configuration.FCM_DEVICE_MAPPED.value, false).apply();
 
-        // Get updated InstanceID token.
-        refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.e("token", refreshedToken);
-
         sendRegistrationToServer(refreshedToken);
-
-        mapFcmToDeviceId(refreshedToken);
+        if (StringUtils.isNotEmpty(wigzoSharedStorage.getSharedStorage().getString(Configuration.ORG_TOKEN_KEY.value, "")) ||
+                StringUtils.isNotEmpty(WigzoSDK.getInstance().getOrgToken())) {
+            mapFcmToDeviceId(refreshedToken);
+        }
 
         try {
             subscribeTopics(WigzoSDK.getInstance().getOrgToken());
@@ -79,10 +87,15 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
     }
     // [END refresh_token]
 
-    private void sendRegistrationToServer(String token) {
+    public static void sendRegistrationToServer(String token) {
         final Gson gson = new Gson();
+        if (null == WigzoSDK.getInstance().getContext()) return;
+
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if (null == wigzoSharedStorage) return;
+
         SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+        if (null == sharedPreferences) return;
 
         // Send to server only when the token is not yet sent
         if (!sharedPreferences.getBoolean(Configuration.SENT_FCM_TOKEN_TO_SERVER.value, false)) {
@@ -102,54 +115,54 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
                     + Configuration.FCM_REGISTRATION_URL.value, Configuration.SITE_ID.value
                     , WigzoSDK.getInstance().getOrgToken());
 
+            if (StringUtils.isNotEmpty(WigzoSDK.getInstance().getOrgToken())) {
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+                    public Boolean call() {
+                        //Post data to server
+                        String response = ConnectionStream.postRequest(url, eventDataStr);
 
-
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-            Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
-                public Boolean call() {
-                    //Post data to server
-                    String response = ConnectionStream.postRequest(url, eventDataStr);
-
-                    //Check if post request returned success if the response is not null
-                    if (null != response) {
-                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
-                        }.getType());
-                        if ("success".equals(jsonResponse.get("status"))) {
-                            return true;
+                        //Check if post request returned success if the response is not null
+                        if (null != response && StringUtils.isJsonString(response)) {
+                            try {
+                                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                                }.getType());
+                                if ("success".equals(jsonResponse.get("status"))) {
+                                    isSentToServer = true;
+                                    return true;
+                                }
+                            } catch (Exception e) {
+                                return false;
+                            }
                         }
+                        return false;
                     }
-                    return false;
-                }
-            });
+                });
 
-            try {
+                try {
+                    //if post request was successful save the Synced data flag as true in shared preferences
+                    if (future.get()) Log.i("Status ", "Token successfully send to server");
+                    else Log.e("Status ", "Failed to send token to server. Please verify things are right else contact Wigzo for troubleshooting.");
 
-                //if post request was successful save the Synced data flag as true in shared preferences
-                if (future.get()) {
-                    ((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Toast.makeText(getApplicationContext(), "Sent", Toast.LENGTH_SHORT).show();
-                            Log.d("Status: ", "Sent");
-                        }
-                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
             }
         }
 
     }
 
-    private void mapFcmToDeviceId(String token) {
-        Gson gson = new Gson();
+    public static void mapFcmToDeviceId(String token) {
+        final Gson gson = new Gson();
+        if (null == WigzoSDK.getInstance().getContext()) return;
 
         WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if (null == wigzoSharedStorage) return;
 
-        SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+        final SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+        if (null == sharedPreferences) return;
 
         Boolean initDataSynced = sharedPreferences.getBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, false);
 
@@ -171,16 +184,39 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
                     + Configuration.FCM_DEVICE_MAPPING_URL.value, Configuration.SITE_ID.value
                     , WigzoSDK.getInstance().getOrgToken());
 
-            String response = ConnectionStream.postRequest(url, eventDataStr);
-
-            if (null != response) {
-
-                Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
-                }.getType());
-
-                if ("success".equals(jsonResponse.get("status"))) {
-                    sharedPreferences.edit().putBoolean(Configuration.FCM_DEVICE_MAPPED.value, true);
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Future<Boolean> future = executorService.submit(new Callable<Boolean>() {
+                public Boolean call() {
+                    //Post data to server
+                    String response = ConnectionStream.postRequest(url, eventDataStr);
+                    if (null != response) {
+                        Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
+                        }.getType());
+                        if ("success".equals(jsonResponse.get("status"))) {
+                            sharedPreferences.edit().putBoolean(Configuration.FCM_DEVICE_MAPPED.value, true);
+                            return true;
+                        }
+                        return false;
+                    }
+                    return false;
                 }
+            });
+
+            try {
+                //if post request was successful save the Synced data flag as true in shared preferences
+                if (future.get()) {
+                    ((AppCompatActivity) WigzoSDK.getInstance().getContext()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Toast.makeText(getApplicationContext(), "Sent", Toast.LENGTH_SHORT).show();
+                            Log.d("Status: ", "Sent");
+                        }
+                    });
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
         }
     }

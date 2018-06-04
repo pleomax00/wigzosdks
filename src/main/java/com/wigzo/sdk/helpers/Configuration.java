@@ -37,7 +37,7 @@ public enum Configuration {
     SESSION_DATA_URL("sessionDataUrl","/androidsdk/getsessiondata"),
     SITE_ID("siteid", "_siteid"),
     STORAGE_KEY("storageKey","WIGZO_SHARED_STORAGE"),
-    TIME_DELAY("timeDelay","45"),
+    TIME_DELAY("timeDelay","15"),
     TIME_SPENT_KEY("timeSpentKey","TIME_SPENT_KEY"),
     USER_PROFILE_DATA_KEY("userProfileDataKey","USER_PROFILE_DATA_KEY"),
     USER_PROFILE_PICTURE_KEY("userProfilePictureKey","USER_PROFILE_PICTURE_KEY"),

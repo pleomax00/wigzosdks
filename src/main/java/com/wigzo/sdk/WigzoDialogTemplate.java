@@ -134,9 +134,9 @@ public class WigzoDialogTemplate extends Dialog implements View.OnClickListener 
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btn_yes) {
-            Intent targetActivityIntent = new Intent(WigzoApplication.getAppContext(), targetActivity);
+            Intent targetActivityIntent = new Intent(WigzoSDK.getInstance().getContext(), targetActivity);
             targetActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            WigzoApplication.getAppContext().startActivity(targetActivityIntent);
+            WigzoSDK.getInstance().getContext().startActivity(targetActivityIntent);
             dismiss();
 
         } else if (i == R.id.btn_no) {
