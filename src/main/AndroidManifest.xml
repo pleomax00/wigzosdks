@@ -16,13 +16,13 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
-        <service
+        <!--<service
             android:name=".WigzoInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
-        </service>
-
+        </service>-->
+        <!--INSTANCE ID SERVICE IS NO MORE USED-->
         <!-- [END instanceId_listener] -->
 
         <activity android:name=".ProxyActivity"></activity>

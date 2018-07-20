@@ -17,7 +17,6 @@
 package com.wigzo.sdk;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -61,6 +60,7 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
     private String imageUrl = "";
     private Integer organizationId = 0;
     private String layoutId = "001";
+    private boolean isWigzoNotification = false;
     private static Class<? extends Activity> positiveButtonClickActivity = null;
 
     /**
@@ -98,7 +98,7 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
      *     });
      * </pre></code>
      */
-    protected void notificationListener(Context context) {
+    protected void notificationListener(RemoteMessage message) {
 
     }
 
@@ -123,7 +123,15 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
      * To Display your custom dialog return <B>"false"</B>
      */
     protected boolean showWigzoDialog() {
-        return true;
+        return isWigzoNotification;
+    }
+
+    /**
+     * Return <B>"true"</B> if you want to display In App Messages using Wigzo SDK.
+     * To Display your custom dialog return <B>"false"</B>
+     */
+    protected boolean showWigzoNotifications() {
+        return isWigzoNotification;
     }
 
     /**
@@ -159,6 +167,9 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage message) {
 
+        notificationListener(message);
+        if (!showWigzoNotifications()) return;
+
         Gson gson = new Gson();
         String from = message.getFrom();
 
@@ -179,8 +190,9 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
         String campaignIdStr = (String) (data.keySet().contains("id") ? data.get("id") : "");
         String organizationIdStr = (String) (data.keySet().contains("organizationId") ? data.get("organizationId") : "");
         String layoutIdStr = (String) (data.keySet().contains("layoutId") ? data.get("layoutId") : "001");
+        isWigzoNotification = (Boolean) (data.keySet().contains("isWigzoNotification") ? data.get("isWigzoNotification") : false);
 
-        if (StringUtils.isEmpty(notificationIdStr, type, campaignIdStr, organizationIdStr)) {
+        if (StringUtils.isEmpty(uuid, body, title, notificationIdStr, intentData, type, campaignIdStr, organizationIdStr)) {
             Log.e("INVALID JSON", "Received invalid json. Please try sending android notification from WIGZO dashboard again");
             return;
         }
@@ -223,7 +235,7 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
                 //check if users want to show our builtin dialog of want to show their own custom dialog
                 //if they want to show their own custom dialog then trigger notificationlistener() method
                 if (!showWigzoDialog())
-                    notificationListener(WigzoSDK.getInstance().getContext());
+                    notificationListener(message);
                 //if users want to show our dialog then trigger generateInAppMessage() method
                 else {
                     generateInAppMessage();

@@ -25,6 +25,7 @@ artifacts {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
+/*
 bintray  {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
@@ -34,6 +35,22 @@ bintray  {
         repo = 'maven-repository'
         name = 'latest-sdk' //YOUR PACKAGE NAME
         desc = 'Wigzo Android SDK' // YOUR LIBRARY DESCRIPTION
+        websiteUrl = 'https://github.com/pleomax00/wigzosdks' // YOUR SITE
+        vcsUrl = 'https://github.com/pleomax00/wigzosdks.git' // YOUR GIT REPO
+        licenses = ["Apache-2.0"] // A LIST OF YOUR LICENCES
+        publish = true
+        publicDownloadNumbers = true
+    }
+}*/
+bintray  {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = 'maven-repository'
+        name = 'Dev' //YOUR PACKAGE NAME
+        desc = 'for development' // YOUR LIBRARY DESCRIPTION
         websiteUrl = 'https://github.com/pleomax00/wigzosdks' // YOUR SITE
         vcsUrl = 'https://github.com/pleomax00/wigzosdks.git' // YOUR GIT REPO
         licenses = ["Apache-2.0"] // A LIST OF YOUR LICENCES
