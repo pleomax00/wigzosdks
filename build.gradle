@@ -14,11 +14,9 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
-        /*classpath 'com.android.tools.build:gradle:3.0.0'*/
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.google.gms:google-services:3.1.2'
-        /*classpath 'com.google.gms:google-services:3.0.0'*/
     }
 }
 
@@ -49,7 +47,6 @@ dependencies {
 
 android {
     compileSdkVersion 26
-    /*buildToolsVersion "23.0.1"*/
 
     defaultConfig {
         minSdkVersion 14
@@ -73,8 +70,5 @@ android {
 }
 
 apply plugin: 'com.google.gms.google-services'
-/*apply plugin: 'com.google.gms.google-services'*/
 apply from: 'install.gradle'
 apply from: 'bintray.gradle'
-/*
-apply plugin: 'com.google.gms.google-services'*/
