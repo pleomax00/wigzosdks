@@ -1,34 +1,14 @@
-/**
- * Copyright 2015 Google Inc. All Rights Reserved.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.wigzo.sdk;
+package com.wigzo.sdk.helpers;
 
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.wigzo.sdk.helpers.Configuration;
-import com.wigzo.sdk.helpers.ConnectionStream;
-import com.wigzo.sdk.helpers.StringUtils;
-import com.wigzo.sdk.helpers.WigzoSharedStorage;
-import com.wigzo.sdk.helpers.WigzoUrlWrapper;
+import com.wigzo.sdk.WigzoFcmListenerService;
+import com.wigzo.sdk.WigzoSDK;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -39,54 +19,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-@Deprecated
-public class WigzoInstanceIDService extends FirebaseInstanceIdService {
+import static com.wigzo.sdk.WigzoFcmListenerService.refreshedToken;
 
-    private static final String TAG = "MyInstanceIDLS";
-    public static String refreshedToken;
-    public static boolean isSentToServer = false;
+public class WigzoFCMTokenSupporter {
 
-    /**
-     * Called if InstanceID token is updated. This may occur if the security of
-     * the previous token had been compromised. Note that this is also called
-     * when the InstanceID token is initially generated, so this is where
-     * you retrieve the token.
-     */
-    // [START refresh_token]
-
-    @Override
-    public void onTokenRefresh() {
-
-        // Get updated InstanceID token.
-        refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d("token", refreshedToken);
-        if (null == WigzoSDK.getInstance().getContext()) return;
-
-        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
-        if (null == wigzoSharedStorage) return;
-
-        SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
-        if (null == sharedPreferences) return;
-
-        // Setting SENT_FCM_TOKEN_TO_SERVER to false since we want to refresh the token.
-        sharedPreferences.edit().putBoolean(Configuration.SENT_FCM_TOKEN_TO_SERVER.value, false).apply();
-        sharedPreferences.edit().putBoolean(Configuration.FCM_DEVICE_MAPPED.value, false).apply();
-
-        sendRegistrationToServer(refreshedToken);
-        if (StringUtils.isNotEmpty(wigzoSharedStorage.getSharedStorage().getString(Configuration.ORG_TOKEN_KEY.value, "")) ||
-                StringUtils.isNotEmpty(WigzoSDK.getInstance().getOrgToken())) {
-            mapFcmToDeviceId(refreshedToken);
-        }
-
-        try {
-            subscribeTopics(WigzoSDK.getInstance().getOrgToken());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-    // [END refresh_token]
-
+    /*send token to WIGZO server*/
     public static void sendRegistrationToServer(String token) {
         final Gson gson = new Gson();
         if (null == WigzoSDK.getInstance().getContext()) return;
@@ -112,7 +49,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
 
             //Endpoint Url
             final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
-                    + Configuration.FCM_REGISTRATION_URL.value, Configuration.SITE_ID.value
+                            + Configuration.FCM_REGISTRATION_URL.value, Configuration.SITE_ID.value
                     , WigzoSDK.getInstance().getOrgToken());
 
             if (StringUtils.isNotEmpty(WigzoSDK.getInstance().getOrgToken())) {
@@ -128,7 +65,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
                                 Map<String, Object> jsonResponse = gson.fromJson(response, new TypeToken<HashMap<String, Object>>() {
                                 }.getType());
                                 if ("success".equals(jsonResponse.get("status"))) {
-                                    isSentToServer = true;
+                                    WigzoFcmListenerService.isSentToServer = true;
                                     return true;
                                 }
                             } catch (Exception e) {
@@ -151,9 +88,9 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
                 }
             }
         }
-
     }
 
+    /*MAP DEVICE ID WITH THE TOKEN AT WIGZO SERVER */
     public static void mapFcmToDeviceId(String token) {
         final Gson gson = new Gson();
         if (null == WigzoSDK.getInstance().getContext()) return;
@@ -181,7 +118,7 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
             final String eventDataStr = gson.toJson(eventData);
 
             final String url = WigzoUrlWrapper.addQueryParam(Configuration.BASE_URL.value
-                    + Configuration.FCM_DEVICE_MAPPING_URL.value, Configuration.SITE_ID.value
+                            + Configuration.FCM_DEVICE_MAPPING_URL.value, Configuration.SITE_ID.value
                     , WigzoSDK.getInstance().getOrgToken());
 
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -221,8 +158,20 @@ public class WigzoInstanceIDService extends FirebaseInstanceIdService {
      * @throws IOException if unable to reach the FCM PubSub service
      */
     // [START subscribe_topics]
-    private void subscribeTopics(String token) throws IOException {
+    public static void subscribeTopics(String token) throws IOException {
         FirebaseMessaging.getInstance().subscribeToTopic("orgsubscribe-" + WigzoSDK.getInstance().getOrgToken());
     }
     // [END subscribe_topics]
+
+    public static String getGeneratedToken() {
+        /*String senderId = WigzoEnvironment.getFCMSenderId();*/
+        if (StringUtils.isEmpty(refreshedToken)) {
+            try {
+                refreshedToken = FirebaseInstanceId.getInstance().getToken(WigzoEnvironment.getFCMSenderId(), Configuration.FCM_SCOPE.value);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return refreshedToken;
+    }
 }

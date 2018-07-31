@@ -1,6 +1,9 @@
 package com.wigzo.sdk.helpers;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.support.annotation.Keep;
+import android.support.v4.app.NotificationCompat;
 
 /**
  * Created by wigzo
@@ -47,7 +50,15 @@ public enum Configuration {
     WIGZO_INIT_DATA_SYNC_FLAG_KEY("wigzoInitiDataSyncFlag","WIGZO_INIT_DATA_SYNC_FLAG_KEY"),
     WIGZO_REG_INTENT_SERVICE_TAG("wigzoRegIntentServiceTag","RegIntentService"),
     WIGZO_SDK_TAG("wigzoSdkTag","Wigzo"),
-    APP_RUNNING_STATUS("appRunningSatus", "AppRunningStatus");
+    APP_RUNNING_STATUS("appRunningSatus", "AppRunningStatus"),
+    W_FCM_SENDER_ID("W_FCM_SENDER_ID", "768564314928"),//to be read from manifest
+    W_FCM_CHANNEL_ID("W_FCM_CHANNEL_ID", NotificationChannel.DEFAULT_CHANNEL_ID),//to be read from manifest
+    W_FCM_CHANNEL_NAME("W_FCM_CHANNEL_NAME", "DEFUALT"),//to be read from manifest
+    W_FCM_CHANNEL_DESCRIPTION("W_FCM_CHANNEL_DESCRIPTION", ""),//to be read from manifest
+    W_FCM_CHANNEL_IMPORTANCE("W_FCM_CHANNEL_IMPORTANCE", "" + NotificationManager.IMPORTANCE_DEFAULT),//to be read from manifest
+    W_NOTIFICATION_PRIORITY("W_NOTIFICATION_PRIORITY", "" + NotificationCompat.PRIORITY_DEFAULT),//to be read from manifest
+    W_IS_NOTIFICATION_AUTO_CANCEL("W_NOTIFICATION_AUTO_CANCEL_BEHAVIOUR", "true"),//to be read from manifest
+    FCM_SCOPE("fcmScope", "FCM");
 
     public String key;
     public String value;

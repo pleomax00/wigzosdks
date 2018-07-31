@@ -17,10 +17,9 @@
 package com.wigzo.sdk;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -29,36 +28,42 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.wigzo.sdk.helpers.Configuration;
 import com.wigzo.sdk.helpers.StringUtils;
-import com.wigzo.sdk.model.FcmOpen;
-import com.wigzo.sdk.model.FcmRead;
+import com.wigzo.sdk.helpers.WigzoEnvironment;
+import com.wigzo.sdk.helpers.WigzoFCMNotificationSupporter;
+import com.wigzo.sdk.helpers.WigzoSharedStorage;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
+import static com.wigzo.sdk.helpers.WigzoFCMTokenSupporter.mapFcmToDeviceId;
+import static com.wigzo.sdk.helpers.WigzoFCMTokenSupporter.sendRegistrationToServer;
+import static com.wigzo.sdk.helpers.WigzoFCMTokenSupporter.subscribeTopics;
 
 @Keep
 public class WigzoFcmListenerService extends FirebaseMessagingService {
 
+    /*NOTIFICATION SPECIFIC BLOCK BEGINS*/
     private String title = "";
     private String body = "";
     private String uuid = "";
     private String type = "";
     private String pushType = "";
-    private Integer campaignId = 0;
+    private long campaignId = 0;
     private HashMap<String, String> payload = new HashMap<>();
     private Bitmap remote_picture = null;
-    private Integer notificationId = 0;
+    private int notificationId = 0;
     private String linkType = "";
     private String link = "";
-    private Integer secondSound = 0;
+    private int secondSound = 0;
     private String imageUrl = "";
-    private Integer organizationId = 0;
+    private long organizationId = 0;
     private String layoutId = "001";
     private boolean isWigzoNotification = false;
     private static Class<? extends Activity> positiveButtonClickActivity = null;
@@ -77,7 +82,7 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
      *     }
      * </pre></code>
      */
-    protected Class<? extends Activity> getTargetActivity() {
+    protected Class<? extends AppCompatActivity> getTargetActivity() {
         return null;
     }
 
@@ -98,7 +103,7 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
      *     });
      * </pre></code>
      */
-    protected void notificationListener(RemoteMessage message) {
+    protected void notificationListener(Map data) {
 
     }
 
@@ -167,19 +172,21 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage message) {
 
-        notificationListener(message);
-        if (!showWigzoNotifications()) return;
+        notificationListener(message.getData());
+
+        JSONObject jsonObject = new JSONObject();
 
         Gson gson = new Gson();
         String from = message.getFrom();
 
         Map data = message.getData();
+        isWigzoNotification = (data.keySet().contains("isWigzoNotification") ? Boolean.parseBoolean(data.get("isWigzoNotification").toString()) : false);
+        if (!isWigzoNotification || !showWigzoNotifications()) return;
 
         imageUrl = (String) (data.keySet().contains("image_url") ? data.get("image_url") : "");
         uuid = (String) (data.keySet().contains("uuid") ? data.get("uuid") : "");
         body = (String) (data.keySet().contains("body") ? data.get("body") : "");
         title = (String) (data.keySet().contains("title") ? data.get("title") : "");
-
         linkType = "TARGET_ACTIVITY";
         link = "http://www.google.com";
 
@@ -190,7 +197,6 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
         String campaignIdStr = (String) (data.keySet().contains("id") ? data.get("id") : "");
         String organizationIdStr = (String) (data.keySet().contains("organizationId") ? data.get("organizationId") : "");
         String layoutIdStr = (String) (data.keySet().contains("layoutId") ? data.get("layoutId") : "001");
-        isWigzoNotification = (Boolean) (data.keySet().contains("isWigzoNotification") ? data.get("isWigzoNotification") : false);
 
         if (StringUtils.isEmpty(uuid, body, title, notificationIdStr, intentData, type, campaignIdStr, organizationIdStr)) {
             Log.e("INVALID JSON", "Received invalid json. Please try sending android notification from WIGZO dashboard again");
@@ -227,36 +233,42 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
             //if app is running create In App Message
             if (!WigzoSDK.getInstance().isAppRunning()) {
                 //call createNotification() method to create notification if app is not running
-                createNotification();
+                WigzoFCMNotificationSupporter.createNotification(getWigzoNotificationPayload(), this.type,
+                        getApplicationContext(), getTargetActivity(), title, body, uuid, notificationId,
+                        linkType, link, secondSound, campaignId, organizationId, imageUrl);
             }
 
             //if app is running generate In App Message
             else {
                 //check if users want to show our builtin dialog of want to show their own custom dialog
                 //if they want to show their own custom dialog then trigger notificationlistener() method
-                if (!showWigzoDialog())
-                    notificationListener(message);
                 //if users want to show our dialog then trigger generateInAppMessage() method
-                else {
-                    generateInAppMessage();
+                if (showWigzoDialog()) {
+                    WigzoFCMNotificationSupporter.generateInAppMessage(imageUrl, getWigzoNotificationTitle(),
+                            getWigzoNotificationBody(), getWigzoNotificationPayload(), getWigzoNitificationBitmap(),
+                            getPositiveButtonClickActivity(), layoutId);
                 }
 
                 // increase counter for notification recieved and opened for In App Message
-                increaseNotificationReceivedOpenedCounter();
+                WigzoFCMNotificationSupporter.increaseNotificationReceivedOpenedCounter(uuid, campaignId, organizationId);
             }
         }
 
         else if (this.pushType.equalsIgnoreCase("push") && !WigzoSDK.getInstance().isAppRunning())
         {
             //call createNotification() method to create notification if app is not running
-            createNotification();
+            WigzoFCMNotificationSupporter.createNotification(getWigzoNotificationPayload(), this.type,
+                    getApplicationContext(), getTargetActivity(), title, body, uuid, notificationId,
+                    linkType, link, secondSound, campaignId, organizationId, imageUrl);
         }
 
         else if (this.pushType.equalsIgnoreCase("inapp") && WigzoSDK.getInstance().isAppRunning())
         {
             //generarte In APp Message
-            generateInAppMessage();
-            increaseNotificationReceivedOpenedCounter();
+            WigzoFCMNotificationSupporter.generateInAppMessage(imageUrl, getWigzoNotificationTitle(),
+                    getWigzoNotificationBody(), getWigzoNotificationPayload(), getWigzoNitificationBitmap(),
+                    getPositiveButtonClickActivity(), layoutId);
+            WigzoFCMNotificationSupporter.increaseNotificationReceivedOpenedCounter(uuid, campaignId, organizationId);
         }
 
         else {
@@ -270,66 +282,52 @@ public class WigzoFcmListenerService extends FirebaseMessagingService {
         }
     }
 
-    private void createNotification() {
+    /*NOTIFICATION SPECIFIC BLOCK ENDS*/
 
-        Gson gson = new Gson();
-        String payloadJsonStr = gson.toJson(getWigzoNotificationPayload());
+    /*FCM ID SPECIFIC BLOCK BEGINS*/
+    /*private static final String TAG = "MyInstanceIDLS";*/
+    public static String refreshedToken;
+    public static boolean isSentToServer = false;
+    public static String fcmSenderId = "";
 
-        if (this.type.equalsIgnoreCase("simple")) {
-            WigzoNotification.simpleNotification(getApplicationContext(), getTargetActivity(), title, body, payloadJsonStr, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
-        } else if (this.type.equalsIgnoreCase("image")) {
-            WigzoNotification.imageNotification(getApplicationContext(), getTargetActivity(), title,
-                    body, imageUrl, payloadJsonStr, uuid, notificationId,
-                    linkType, link, secondSound, campaignId, organizationId);
+    /**
+     * Called if InstanceID token is updated. This may occur if the security of
+     * the previous token had been compromised. Note that this is also called
+     * when the InstanceID token is initially generated, so this is where
+     * you retrieve the token.
+     */
+    // [START refresh_token]
+
+    @Override
+    public void onNewToken(String token) {
+
+        // Get updated InstanceID token.
+        fcmSenderId = WigzoEnvironment.getFCMSenderId();
+        refreshedToken = token;
+        Log.d("token", refreshedToken);
+        if (null == WigzoSDK.getInstance().getContext()) return;
+
+        WigzoSharedStorage wigzoSharedStorage = new WigzoSharedStorage(WigzoSDK.getInstance().getContext());
+        if (null == wigzoSharedStorage) return;
+
+        SharedPreferences sharedPreferences = wigzoSharedStorage.getSharedStorage();
+        if (null == sharedPreferences) return;
+
+        // Setting SENT_FCM_TOKEN_TO_SERVER to false since we want to refresh the token.
+        sharedPreferences.edit().putBoolean(Configuration.SENT_FCM_TOKEN_TO_SERVER.value, false).apply();
+        sharedPreferences.edit().putBoolean(Configuration.FCM_DEVICE_MAPPED.value, false).apply();
+
+        sendRegistrationToServer(refreshedToken);
+        if (StringUtils.isNotEmpty(wigzoSharedStorage.getSharedStorage().getString(Configuration.ORG_TOKEN_KEY.value, "")) ||
+                StringUtils.isNotEmpty(WigzoSDK.getInstance().getOrgToken())) {
+            mapFcmToDeviceId(refreshedToken);
         }
 
-    }
-
-    private void generateInAppMessage() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                if(StringUtils.isNotEmpty(imageUrl)) {
-                    WigzoDialogTemplate wigzoDialogTemplate
-                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
-                            getWigzoNotificationTitle(),
-                            getWigzoNotificationBody(),
-                            getWigzoNotificationPayload(),
-                            remote_picture,
-                            getPositiveButtonClickActivity(),
-                            layoutId);
-                    wigzoDialogTemplate.show();
-                }
-                else {
-                    WigzoDialogTemplate wigzoDialogTemplate
-                            = new WigzoDialogTemplate(WigzoSDK.getInstance().getContext(),
-                            getWigzoNotificationTitle(),
-                            getWigzoNotificationBody(),
-                            getWigzoNotificationPayload(),
-                            getPositiveButtonClickActivity());
-                    wigzoDialogTemplate.show();
-                }
-            }
-        });
-    }
-
-    private void increaseNotificationReceivedOpenedCounter()
-    {
-        if (StringUtils.isNotEmpty(uuid)) {
-            final ScheduledExecutorService fcmReadWorker = Executors.newSingleThreadScheduledExecutor();
-            fcmReadWorker.schedule(new Runnable() {
-                @Override
-                public void run() {
-                    FcmRead fcmRead = new FcmRead(uuid, campaignId, organizationId);
-                    FcmRead.Operation operationRead = FcmRead.Operation.saveOne(fcmRead);
-                    FcmRead.editOperation(WigzoSDK.getInstance().getContext(), operationRead);
-
-                    FcmOpen fcmOpen = new FcmOpen(uuid, campaignId, organizationId);
-                    FcmOpen.Operation operationOpen = FcmOpen.Operation.saveOne(fcmOpen);
-                    FcmOpen.editOperation(WigzoSDK.getInstance().getContext(), operationOpen);
-                }
-            }, 0, TimeUnit.SECONDS);
+        try {
+            subscribeTopics(WigzoSDK.getInstance().getOrgToken());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-    // [END receive_message]
+    // [END refresh_token]
 }

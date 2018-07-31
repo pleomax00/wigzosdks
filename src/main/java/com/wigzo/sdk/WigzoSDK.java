@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.support.annotation.Keep;
 import android.util.Log;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.wigzo.sdk.helpers.Configuration;
@@ -30,6 +29,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static com.wigzo.sdk.helpers.WigzoFCMTokenSupporter.getGeneratedToken;
+import static com.wigzo.sdk.helpers.WigzoFCMTokenSupporter.mapFcmToDeviceId;
+import static com.wigzo.sdk.helpers.WigzoFCMTokenSupporter.sendRegistrationToServer;
 
 /**
  * This class is the public API for the Wigzo Android SDK.
@@ -109,7 +112,7 @@ public class WigzoSDK {
     }
 
     private void fcmRegister() {
-        Intent intent = new Intent(getContext(), WigzoInstanceIDService.class);
+        Intent intent = new Intent(getContext(), WigzoFcmListenerService.class);
         getContext().startService(intent);
     }
 
@@ -208,8 +211,8 @@ public class WigzoSDK {
                 //if post request was successful save the Synced data flag as true in shared preferences
                 if (future.get()) {
                     wigzoSharedStorage.getSharedStorage().edit().putBoolean(Configuration.WIGZO_INIT_DATA_SYNC_FLAG_KEY.value, true).apply();
-                    if (StringUtils.isNotEmpty(FirebaseInstanceId.getInstance().getToken())) {
-                        WigzoInstanceIDService.mapFcmToDeviceId(FirebaseInstanceId.getInstance().getToken());
+                    if (StringUtils.isNotEmpty(getGeneratedToken())) {
+                        mapFcmToDeviceId(getGeneratedToken());
                     }
                 }
             } catch (InterruptedException e) {
@@ -303,9 +306,9 @@ public class WigzoSDK {
      */
     private synchronized void checkAndPushEvent() {
 
-        if (!WigzoInstanceIDService.isSentToServer && StringUtils.isNotEmpty(FirebaseInstanceId.getInstance().getToken())) {
-            WigzoInstanceIDService.refreshedToken = FirebaseInstanceId.getInstance().getToken();
-            WigzoInstanceIDService.sendRegistrationToServer(WigzoInstanceIDService.refreshedToken);
+        if (!WigzoFcmListenerService.isSentToServer && StringUtils.isNotEmpty(getGeneratedToken())) {
+            WigzoFcmListenerService.refreshedToken = getGeneratedToken();
+            sendRegistrationToServer(WigzoFcmListenerService.refreshedToken);
         }
 
         boolean checkStatus = checkWigzoData();
@@ -641,7 +644,7 @@ public class WigzoSDK {
      * data can be used to display In App Messages.
      */
 
-    boolean isAppRunning() {
+    public boolean isAppRunning() {
         try {
             if (null == wigzoSharedStorageForAppliLifeCycle) {
                 wigzoSharedStorageForAppliLifeCycle = getContext()

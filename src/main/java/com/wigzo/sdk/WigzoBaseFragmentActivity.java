@@ -6,12 +6,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 
 import java.lang.ref.WeakReference;
 
 @Keep
-public class WigzoBaseActivity extends AppCompatActivity implements Application.ActivityLifecycleCallbacks {
+public class WigzoBaseFragmentActivity extends FragmentActivity implements Application.ActivityLifecycleCallbacks {
 
     private WeakReference<Context> foregroundActivity;
 
