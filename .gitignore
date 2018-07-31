@@ -21,6 +21,13 @@ build/
 # Local configuration file (sdk path, etc)
 local.properties
 
+# Bintray configuration file (sdk path, etc)
+bintray.gradle.prod
+bintray.gradle
+
+#gitignore~ file
+.gitignore~
+
 # Log Files
 *.log
 

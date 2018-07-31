@@ -49,7 +49,7 @@ public class FcmRead {
     private int campaignId;
     private int organizationId;
 
-    public FcmRead(){};
+    public FcmRead(String uuid, long campaignId, long organizationId){};
 
     public FcmRead(String uuid, int campaignId, int organizationId) {
         this.uuid = uuid;

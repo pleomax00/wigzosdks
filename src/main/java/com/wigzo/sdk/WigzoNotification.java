@@ -1,6 +1,5 @@
 package com.wigzo.sdk;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,8 +13,10 @@ import android.net.Uri;
 import android.support.annotation.Keep;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 
 import com.wigzo.sdk.helpers.StringUtils;
+import com.wigzo.sdk.helpers.WigzoEnvironment;
 import com.wigzo.sdk.model.FcmRead;
 
 import java.io.IOException;
@@ -33,13 +34,16 @@ import java.util.concurrent.TimeUnit;
 public class WigzoNotification {
 
     private static int mNotificationId = 0;
-    private static int campaignId = 0;
-    private static int organizationId = 0;
+    private static long campaignId = 0;
+    private static long organizationId = 0;
 
-    public static void notification(final Context applicationContext, Class<? extends Activity> targetActivity, NotificationCompat.Builder notificationBuilder, String intentData, final String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer id, Integer orgId) {
+    public static void notification(final Context applicationContext, Class<? extends AppCompatActivity> targetActivity,
+                                    NotificationCompat.Builder notificationBuilder, String intentData,
+                                    final String uuid, int notificationId, String linkType, String link,
+                                    int secondSound, long id, long orgId) {
         // if notification_id is provided use it.
-        mNotificationId = null != notificationId ? notificationId : new Random().nextInt();
-        campaignId = null != id ? id : 0;
+        mNotificationId = notificationId > 0 ? notificationId : new Random().nextInt();
+        campaignId = id > 0 ? id : 0;
         organizationId = orgId;
 
         int icon = applicationContext.getApplicationInfo().icon;
@@ -78,8 +82,8 @@ public class WigzoNotification {
 
 
         notificationBuilder.setSmallIcon(icon);
+        notificationBuilder.setAutoCancel(WigzoEnvironment.getNotificationAutoCancelBehaviour());
 //            .setSound(defaultSoundUri)
-        notificationBuilder.setAutoCancel(true);
         notificationBuilder.setVibrate(new long[]{0, 330, 300, 300});
         notificationBuilder.setContentIntent(resultPendingIntent);
 
@@ -106,7 +110,7 @@ public class WigzoNotification {
 
         soundWorker.schedule(playSound, 0, TimeUnit.SECONDS);
         // Play second sound
-        if (null != secondSound && secondSound > 0) {
+        if (secondSound > 0) {
             if (secondSound > 10) {
                 secondSound = 10;
             }
@@ -127,18 +131,38 @@ public class WigzoNotification {
         }
     }
 
-    public static void simpleNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId, Integer organizationId) {
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
+    public static void simpleNotification(Context applicationContext, Class<? extends AppCompatActivity> targetActivity,
+                                          String title, String body, String intentData, String uuid,
+                                          int notificationId, String linkType, String link,
+                                          int secondSound, long campaignId, long organizationId) {
+        /*NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setContentTitle(title)
-                .setContentText(body);
-        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
+                .setContentText(body);*/
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext, WigzoEnvironment.getChannelId())
+                .setContentTitle(title)
+                .setContentText(body)
+                .setPriority(WigzoEnvironment.getNotificationPriority());
+                // Set the intent that will fire when the user taps the notification
+
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId,
+                linkType, link, secondSound, campaignId, organizationId);
     }
 
-    public static void imageNotification(Context applicationContext, Class<? extends Activity> targetActivity, String title, String body, String imageUrl, String intentData, String uuid, Integer notificationId, String linkType, String link, Integer secondSound, Integer campaignId, Integer organizationId) {
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
+    public static void imageNotification(Context applicationContext, Class<? extends AppCompatActivity> targetActivity,
+                                         String title, String body, String imageUrl, String intentData,
+                                         String uuid, int notificationId, String linkType, String link,
+                                         int secondSound, long campaignId, long organizationId) {
+        /*NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext)
                 .setContentTitle(title)
                 .setSmallIcon(applicationContext.getApplicationInfo().icon)
-                .setContentText(body);
+                .setContentText(body);*/
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(applicationContext, WigzoEnvironment.getChannelId())
+                .setContentTitle(title)
+                .setContentText(body)
+                .setPriority(WigzoEnvironment.getNotificationPriority());
+                // Set the intent that will fire when the user taps the notification
 
         if (StringUtils.isNotEmpty(imageUrl)) {
             Bitmap remote_picture = null;
@@ -153,6 +177,7 @@ public class WigzoNotification {
             notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body));
             notificationBuilder.setStyle(notiStyle);
         }
-        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId, linkType, link, secondSound, campaignId, organizationId);
+        notification(applicationContext, targetActivity, notificationBuilder, intentData, uuid, notificationId,
+                linkType, link, secondSound, campaignId, organizationId);
     }
 }

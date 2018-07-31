@@ -19,14 +19,17 @@ public class WigzoBaseActivity extends AppCompatActivity implements Application.
     protected void onResume() {
         super.onResume();
         WigzoSDK.getInstance().setContext(this);
-        /*WigzoSDK.getInstance().appStatus("true");*/
+        /*registerAppStatus(this);*/
+        WigzoSDK.getInstance().appStatus(true);
     }
 
-    /*@Override
+    @Override
     protected void onPause() {
         super.onPause();
-        WigzoSDK.getInstance().appStatus("false");
-    }*/
+        /*WigzoSDK.getInstance().appStatus(false);*/
+        foregroundActivity = null;
+        WigzoSDK.getInstance().appStatus(false);
+    }
 
     @Override
     protected void onStart() {

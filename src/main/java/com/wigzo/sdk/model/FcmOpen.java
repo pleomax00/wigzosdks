@@ -45,11 +45,11 @@ public class FcmOpen {
     }
 
     private String uuid;
-    private int campaignId;
-    private int organizationId;
+    private long campaignId;
+    private long organizationId;
     private String timestamp;
 
-    public FcmOpen(String uuid, int campaignId, int organizationId) {
+    public FcmOpen(String uuid, long campaignId, long organizationId) {
         this.uuid = uuid;
         this.campaignId = campaignId;
         this.organizationId = organizationId;
@@ -72,11 +72,11 @@ public class FcmOpen {
         this.timestamp = timestamp;
     }
 
-    public int getnotificationId() { return campaignId; }
+    public long getnotificationId() { return campaignId; }
 
     public void setNotificationId(int id) { this.campaignId = id; }
 
-    public int getOrganizationId() { return organizationId; }
+    public long getOrganizationId() { return organizationId; }
 
     public void setOrganizationId(int organizationId) { this.organizationId = organizationId; }
 
