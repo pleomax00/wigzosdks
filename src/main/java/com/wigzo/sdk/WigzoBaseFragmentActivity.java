@@ -6,7 +6,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.view.ActionMode;
 
 import java.lang.ref.WeakReference;
 
@@ -81,6 +83,18 @@ public class WigzoBaseFragmentActivity extends FragmentActivity implements Appli
     @Override
     public void onActivityDestroyed(Activity activity) {
 
+    }
+
+    @Nullable
+    @Override
+    public ActionMode onWindowStartingActionMode(ActionMode.Callback callback, int type) {
+        return super.onWindowStartingActionMode(callback, type);
+    }
+
+    @Nullable
+    @Override
+    public ActionMode onWindowStartingActionMode(ActionMode.Callback callback) {
+        return super.onWindowStartingActionMode(callback);
     }
 
     public boolean isOnForeground(@NonNull Context activity_cntxt) {

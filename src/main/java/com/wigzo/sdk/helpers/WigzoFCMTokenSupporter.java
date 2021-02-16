@@ -78,7 +78,7 @@ public class WigzoFCMTokenSupporter {
 
                 try {
                     //if post request was successful save the Synced data flag as true in shared preferences
-                    if (future.get()) Log.i("Status ", "Token successfully send to server");
+                    if (future.get()) Log.i("Status ", "Token successfully sent to server");
                     else Log.e("Status ", "Failed to send token to server. Please verify things are right else contact Wigzo for troubleshooting.");
 
                 } catch (InterruptedException e) {
@@ -164,12 +164,26 @@ public class WigzoFCMTokenSupporter {
     // [END subscribe_topics]
 
     public static String getGeneratedToken() {
-        /*String senderId = WigzoEnvironment.getFCMSenderId();*/
         if (StringUtils.isEmpty(refreshedToken)) {
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Future<String> future = executorService.submit(new Callable<String>() {
+                public String call() {
+                    refreshedToken = FirebaseInstanceId.getInstance().getInstanceId().getResult().getToken();
+                    Log.d("REFRESHEDTOKEN", refreshedToken);
+                    return refreshedToken;
+                }
+            });
+
             try {
-                refreshedToken = FirebaseInstanceId.getInstance().getToken(WigzoEnvironment.getFCMSenderId(), Configuration.FCM_SCOPE.value);
-            } catch (IOException e) {
+                if (StringUtils.isNotEmpty(future.get())) {
+                    refreshedToken = future.get();
+                }
+            } catch (InterruptedException e) {
                 e.printStackTrace();
+                refreshedToken = "";
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                refreshedToken = "";
             }
         }
         return refreshedToken;
